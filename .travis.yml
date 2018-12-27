@@ -15,6 +15,7 @@ addons:
     - gdal-bin
     - libgdal-dev
 install:
+- pip install cython
 - pip wheel -r requirements.txt
 - pip install .
 script: pytest
