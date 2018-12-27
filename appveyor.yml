@@ -1,0 +1,38 @@
+build: false
+
+platform: x64
+
+environment:
+  ANACONDA_TOKEN:
+    secure: cKeC+a3Su46s2RrxdYhXLQ7G9APT03vq+hLxK0joIKZtWcjAx9GdFVoqWEtOg5dx
+  matrix:
+    - PYTHON_VERSION: 3.6
+      PYTHON_ARCH: 64
+      MINICONDA: C:\Miniconda36-x64
+
+init:
+  - "ECHO %PYTHON_VERSION% %MINICONDA%"
+
+install:
+  - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda install conda-build anaconda-client
+  - conda info -a
+  - conda config --add channels conda-forge
+  - "conda create -q -n test-environment python=%PYTHON_VERSION% rasterio click pytest"
+  - activate test-environment
+  - conda build .
+  - conda install rio-terrain --use-local
+
+artifacts:
+  - path: 'conda-packages\*.tar.bz2'
+
+test_script:
+  - pytest
+  - cmd: mkdir conda-packages
+  - cmd: 'copy /Y C:\Miniconda36-x64\conda-bld\win-64\*.tar.bz2 conda-packages || cmd /c "exit /b 0"'
+  - cmd: 'copy /Y C:\Miniconda36-x64\conda-bld\noarch\*.tar.bz2 conda-packages || cmd /c "exit /b 0"'
+
+deploy_script:
+  - powershell ci/appveyor/deploy_to_anaconda.ps1

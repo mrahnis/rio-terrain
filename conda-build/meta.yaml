@@ -1,0 +1,58 @@
+package:
+  name: rio-terrain
+  version: 0.0.0
+
+source:
+  git_url: ../
+  git_rev: head
+
+build:
+  noarch: python
+  number: 1
+  script: python setup.py install --single-version-externally-managed --record=record.txt
+  entry_points:
+    - aspect = terrain.cli.aspect:aspect
+    - close = terrain.cli.close:close
+    - curvature = terrain.cli.curvature:curvature
+    - difference = terrain.cli.difference:difference
+    - extract = terrain.cli.extract:extract
+    - mad = terrain.cli.mad:mad
+    - quantiles = terrain.cli.quantiles:quantiles
+    - slice = terrain.cli.slice:slice
+    - slope = terrain.cli.slope:slope
+    - std = terrain.cli.std:std
+    - threshold = terrain.cli.threshold:threshold
+    - uncertainty = terrain.cli.uncertainty:uncertainty
+
+requirements:
+  build:
+    - python
+    - setuptools
+  run:
+    - python
+    - numpy
+    - scipy
+    - matplotlib
+    - rasterio
+    - click
+    - crick 
+test:
+  imports:
+    - terrain
+  commands:
+    - rio aspect --help
+    - rio curvature --help
+    - rio difference --help
+    - rio extract --help
+    - rio mad --help
+    - rio quantiles --help
+    - rio slice --help
+    - rio slope --help
+    - rio std --help
+    - rio threshold --help
+    - rio uncertainty --help
+
+about:
+  home: https://github.com/mrahnis/rio-terrain
+  license: BSD
+  license_file: LICENSE.txt
