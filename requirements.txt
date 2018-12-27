@@ -3,4 +3,4 @@ scipy>=1.0
 matplotlib>=2.2
 rasterio>=1.0
 click>=6.7
-crick>=0.3.0
+crick>=0.0.3
