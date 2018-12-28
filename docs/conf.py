@@ -32,7 +32,15 @@ class Mock(object):
         else:
             return Mock()
 
-MOCK_MODULES = ['numpy', 'rasterio', 'matplotlib', 'scipy', 'crick']
+MOCK_MODULES = ['numpy',
+                'rasterio',
+                'rasterio.windows',
+                'rasterio.transform',
+                'matplotlib',
+                'matplotlib.pyplot',
+                'scipy',
+                'scipy.stats.mstats',
+                'crick']
 
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = Mock()
