@@ -4,7 +4,7 @@ platform: x64
 
 environment:
   ANACONDA_TOKEN:
-    secure: cKeC+a3Su46s2RrxdYhXLQ7G9APT03vq+hLxK0joIKZtWcjAx9GdFVoqWEtOg5dx
+    secure: eHo2wNajw+PYt3J2LQo7qTvpTJ3+wT6U2E80ZaWjZT+96k+19YQ22lepqjOThAvn
   matrix:
     - PYTHON_VERSION: 3.6
       PYTHON_ARCH: 64
