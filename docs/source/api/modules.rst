@@ -4,4 +4,4 @@ rio-terrain
 .. toctree::
    :maxdepth: 4
 
-   terrain
+   rio_terrain

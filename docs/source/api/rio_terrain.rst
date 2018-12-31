@@ -1,10 +1,7 @@
-terrain Package
-================
+rio_terrain Package
+===================
 
-:mod:`rio_terrain` Package
------------------------
-
-.. automodule:: rio_terrain.__init__
+.. automodule:: rio_terrain
     :members:
     :undoc-members:
     :show-inheritance:
