@@ -9,9 +9,9 @@ import click
 import numpy as np
 import rasterio
 
-import terrain
-import terrain.tools.messages as msg
-from terrain import __version__ as terrain_version
+import rio_terrain as rt
+import rio_terrain.tools.messages as msg
+from rio_terrain import __version__ as terrain_version
 
 
 def _thresh(data0, data1, level, default=0):
@@ -60,7 +60,7 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
                 blockxsize = None
                 blockysize = None
 
-            tiles = terrain.tile_grid_intersection(src0, src1, blockxsize=blockxsize, blockysize=blockysize)
+            tiles = rt.tile_grid_intersection(src0, src1, blockxsize=blockxsize, blockysize=blockysize)
             windows0, windows1, write_windows, affine, nrows, ncols = tiles
 
             profile.update(dtype=rasterio.int32, nodata=nodata, count=1,

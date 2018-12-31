@@ -9,9 +9,9 @@ import click
 import numpy as np
 import rasterio
 
-import terrain
-import terrain.tools.messages as msg
-from terrain import __version__ as terrain_version
+import rio_terrain as rt
+import rio_terrain.tools.messages as msg
+from rio_terrain import __version__ as terrain_version
 
 
 def _extract(data, categorical, category):
@@ -65,7 +65,7 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
                 blockxsize = None
                 blockysize = None
 
-            tiles = terrain.tile_grid_intersection(src, cat, blockxsize=blockxsize, blockysize=blockysize)
+            tiles = rt.tile_grid_intersection(src, cat, blockxsize=blockxsize, blockysize=blockysize)
             windows0, windows1, write_windows, affine, nrows, ncols = tiles
 
             profile.update(count=1, compress='lzw', bigtiff='yes',

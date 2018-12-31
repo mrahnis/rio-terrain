@@ -9,9 +9,9 @@ import click
 import numpy as np
 import rasterio
 
-import terrain
-import terrain.tools.messages as msg
-from terrain import __version__ as terrain_version
+import rio_terrain as rt
+import rio_terrain.tools.messages as msg
+from rio_terrain import __version__ as terrain_version
 
 
 @click.command()
@@ -50,27 +50,27 @@ def aspect(ctx, input, output, neighbors, pcs, njobs, verbose):
                 blockshape = (list(src.block_shapes))[0]
                 if (blockshape[0] == 1) or (blockshape[1] == 1):
                     warnings.warn((msg.STRIPED).format(blockshape))
-                read_windows = terrain.tile_grid(src.width, src.height,
-                                                 blockshape[0], blockshape[1],
-                                                 overlap=2)
-                write_windows = terrain.tile_grid(src.width, src.height,
-                                                  blockshape[0], blockshape[1],
-                                                  overlap=0)
+                read_windows = rt.tile_grid(src.width, src.height,
+                                            blockshape[0], blockshape[1],
+                                            overlap=2)
+                write_windows = rt.tile_grid(src.width, src.height,
+                                             blockshape[0], blockshape[1],
+                                             overlap=0)
 
             with rasterio.open(output, 'w', **profile) as dst:
                 if njobs < 1:
                     click.echo(msg.INMEMORY)
                     data = src.read(1)
                     data[data <= src.nodata+1] = np.nan
-                    result = terrain.aspect(data, step=step, pcs=pcs, neighbors=int(neighbors))
+                    result = rt.aspect(data, step=step, pcs=pcs, neighbors=int(neighbors))
                     dst.write(result, 1)
                 elif njobs == 1:
                     click.echo(msg.SEQUENTIAL)
                     for (read_window, write_window) in zip(read_windows, write_windows):
                         data = src.read(1, window=read_window)
                         data[data <= src.nodata+1] = np.nan
-                        arr = terrain.aspect(data, step=step, pcs=pcs, neighbors=int(neighbors))
-                        (left, upper, right, lower) = terrain.margins(read_window, write_window)
+                        arr = rt.aspect(data, step=step, pcs=pcs, neighbors=int(neighbors))
+                        (left, upper, right, lower) = rt.margins(read_window, write_window)
                         result = arr[left: - upper, right: - lower]
                         dst.write(result, 1, window=write_window)
                 else:
@@ -86,7 +86,7 @@ def aspect(ctx, input, output, neighbors, pcs, njobs, verbose):
 
                         future_to_window = {
                             executor.submit(
-                                terrain.aspect,
+                                rt.aspect,
                                 data,
                                 step=step,
                                 pcs=pcs,
@@ -96,7 +96,7 @@ def aspect(ctx, input, output, neighbors, pcs, njobs, verbose):
                         for future in concurrent.futures.as_completed(future_to_window):
                             read_window, write_window = future_to_window[future]
                             arr = future.result()
-                            (left, upper, right, lower) = terrain.margins(read_window, write_window)
+                            (left, upper, right, lower) = rt.margins(read_window, write_window)
                             result = arr[left: - upper, right: - lower]
                             dst.write(result, 1, window=write_window)
 

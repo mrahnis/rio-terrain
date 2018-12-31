@@ -1,10 +1,10 @@
 terrain Package
 ================
 
-:mod:`terrain` Package
+:mod:`rio_terrain` Package
 -----------------------
 
-.. automodule:: terrain.__init__
+.. automodule:: rio_terrain.__init__
     :members:
     :undoc-members:
     :show-inheritance:
@@ -13,7 +13,7 @@ terrain Package
 :mod:`terrain` Module
 --------------------
 
-.. automodule:: terrain.core.terrain
+.. automodule:: rio_terrain.core.terrain
     :members:
     :undoc-members:
     :show-inheritance:
@@ -21,7 +21,7 @@ terrain Package
 :mod:`windowing` Module
 --------------------
 
-.. automodule:: terrain.core.windowing
+.. automodule:: rio_terrain.core.windowing
     :members:
     :undoc-members:
     :show-inheritance:
@@ -30,7 +30,7 @@ terrain Package
 :mod:`statistics` Module
 --------------------
 
-.. automodule:: terrain.core.statistics
+.. automodule:: rio_terrain.core.statistics
     :members:
     :undoc-members:
     :show-inheritance:
@@ -39,7 +39,7 @@ terrain Package
 :mod:`focalstatistics` Module
 --------------------
 
-.. automodule:: terrain.core.focalstatistics
+.. automodule:: rio_terrain.core.focalstatistics
     :members:
     :undoc-members:
     :show-inheritance:

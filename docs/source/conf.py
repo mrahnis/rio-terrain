@@ -85,9 +85,9 @@ copyright = u'2018, Michael Rahnis'
 # built documents.
 #
 # The short X.Y version.
-import terrain
+import rio_terrain
 
-version = '%s' % (terrain.__version__)
+version = '%s' % (rio_terrain.__version__)
 
 # The full version, including alpha/beta/rc tags.
 release = version

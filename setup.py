@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 # Parse the version from the shapely module
-for line in open('terrain/__init__.py', 'r'):
+for line in open('rio_terrain/__init__.py', 'r'):
     if line.find("__version__") >= 0:
         version = line.split("=")[1].strip()
         version = version.strip('"')
@@ -31,17 +31,17 @@ setup(name='rio-terrain',
       ],
       entry_points='''
         [rasterio.rio_commands]
-        aspect=terrain.cli.aspect:aspect
-        curvature=terrain.cli.curvature:curvature
-        difference=terrain.cli.difference:difference
-        extract=terrain.cli.extract:extract
-        mad=terrain.cli.mad:mad
-        quantiles=terrain.cli.quantiles:quantiles
-        slice=terrain.cli.slice:slice
-        slope=terrain.cli.slope:slope
-        std=terrain.cli.std:std
-        threshold=terrain.cli.threshold:threshold
-        uncertainty=terrain.cli.uncertainty:uncertainty
+        aspect=rio_terrain.cli.aspect:aspect
+        curvature=rio_terrain.cli.curvature:curvature
+        difference=rio_terrain.cli.difference:difference
+        extract=rio_terrain.cli.extract:extract
+        mad=rio_terrain.cli.mad:mad
+        quantiles=rio_terrain.cli.quantiles:quantiles
+        slice=rio_terrain.cli.slice:slice
+        slope=rio_terrain.cli.slope:slope
+        std=rio_terrain.cli.std:std
+        threshold=rio_terrain.cli.threshold:threshold
+        uncertainty=rio_terrain.cli.uncertainty:uncertainty
       ''',
       keywords='LiDAR, surveying, elevation, raster, DEM',
       classifiers=[

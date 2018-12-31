@@ -5,14 +5,14 @@ from click.testing import CliRunner
 import rasterio
 from rasterio.rio.main import main_group
 
-import terrain
+import rio_terrain
 
 
 def test_version():
     runner = CliRunner()
     result = runner.invoke(main_group, ['aspect', '--version'])
     assert result.exit_code == 0
-    assert terrain.__version__ in result.output
+    assert rio_terrain.__version__ in result.output
 
 
 def test_all_registered():

@@ -9,9 +9,9 @@ import click
 import numpy as np
 import rasterio
 
-import terrain
-import terrain.tools.messages as msg
-from terrain import __version__ as terrain_version
+import rio_terrain as rt
+import rio_terrain.tools.messages as msg
+from rio_terrain import __version__ as terrain_version
 
 
 def _slice(data, minimum=None, maximum=None, keep_data=False, false_val=0):

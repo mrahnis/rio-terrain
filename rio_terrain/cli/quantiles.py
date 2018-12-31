@@ -15,9 +15,9 @@ from scipy import stats
 from scipy.stats.mstats import mquantiles
 import matplotlib.pyplot as plt
 
-import terrain
-import terrain.tools.messages as msg
-from terrain import __version__ as terrain_version
+import rio_terrain as rt
+import rio_terrain.tools.messages as msg
+from rio_terrain import __version__ as terrain_version
 
 
 def tdigest_mean(digest):
@@ -125,7 +125,7 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
 
             elif njobs == 1:
 
-                blocks = terrain.subsample(src.block_windows(), probability=fraction)
+                blocks = rt.subsample(src.block_windows(), probability=fraction)
                 digest = TDigest()
 
                 click.echo('Computing quantiles using t-digest...')
@@ -148,7 +148,7 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
 
             else:
 
-                blocks = terrain.subsample(src.block_windows(), probability=fraction)
+                blocks = rt.subsample(src.block_windows(), probability=fraction)
                 digest = TDigest()
 
                 click.echo('Computing quantiles using multiprocess t-digest...')

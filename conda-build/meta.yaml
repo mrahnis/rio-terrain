@@ -11,18 +11,18 @@ build:
   number: 1
   script: python setup.py install --single-version-externally-managed --record=record.txt
   entry_points:
-    - aspect = terrain.cli.aspect:aspect
-    - close = terrain.cli.close:close
-    - curvature = terrain.cli.curvature:curvature
-    - difference = terrain.cli.difference:difference
-    - extract = terrain.cli.extract:extract
-    - mad = terrain.cli.mad:mad
-    - quantiles = terrain.cli.quantiles:quantiles
-    - slice = terrain.cli.slice:slice
-    - slope = terrain.cli.slope:slope
-    - std = terrain.cli.std:std
-    - threshold = terrain.cli.threshold:threshold
-    - uncertainty = terrain.cli.uncertainty:uncertainty
+    - aspect = rio_terrain.cli.aspect:aspect
+    - close = rio_terrain.cli.close:close
+    - curvature = rio_terrain.cli.curvature:curvature
+    - difference = rio_terrain.cli.difference:difference
+    - extract = rio_terrain.cli.extract:extract
+    - mad = rio_terrain.cli.mad:mad
+    - quantiles = rio_terrain.cli.quantiles:quantiles
+    - slice = rio_terrain.cli.slice:slice
+    - slope = rio_terrain.cli.slope:slope
+    - std = rio_terrain.cli.std:std
+    - threshold = rio_terrain.cli.threshold:threshold
+    - uncertainty = rio_terrain.cli.uncertainty:uncertainty
 
 requirements:
   build:
@@ -38,7 +38,7 @@ requirements:
     - crick 
 test:
   imports:
-    - terrain
+    - rio_terrain
   commands:
     - rio aspect --help
     - rio curvature --help
