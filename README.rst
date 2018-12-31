@@ -2,7 +2,7 @@
 rio-terrain
 ===========
 
-Rio-terrain provides a set of rasterio plugins to perform common raster operations, and can write slope, aspect and curvature rasters.
+Rio-terrain provides a set of rasterio CLI plugins to perform common raster operations, and can write slope, aspect and curvature rasters.
 
 .. image:: https://travis-ci.org/mrahnis/rio-terrain.svg?branch=master
     :target: https://travis-ci.org/mrahnis/rio-terrain
@@ -17,25 +17,28 @@ Rio-terrain provides a set of rasterio plugins to perform common raster operatio
 .. image:: https://coveralls.io/repos/github/mrahnis/rio-terrain/badge.svg?branch=master
 	:target: https://coveralls.io/github/mrahnis/rio-terrain?branch=master
 
-Dependencies
-============
-
-- Python 3.x
-- numpy
-- scipy
-- matplotlib
-- rasterio
-- click
-- crick
-
 Installation
 ============
 
 To install from the Python Package Index:
 
+.. code-block:: console
+
 	$pip install rio-terrain
 
+To install from Anaconda Cloud:
+
+If you are starting from scratch the first thing to do is install the Anaconda Python distribution, add the necessary channels to obtain the dependencies and install rio-terrain.
+
+.. code-block:: console
+
+	$conda config --append channels conda-forge
+	$conda config --append channels mrahnis
+	$conda install rio-terrain
+
 To install from the source distribution execute the setup script in the rio-terrain directory:
+
+.. code-block:: console
 
 	$python setup.py install
 
@@ -52,4 +55,6 @@ BSD
 Documentation
 =============
 
-TODO
+Latest `html`_
+
+.. _html: http://rio-terrain.readthedocs.org/en/latest/
