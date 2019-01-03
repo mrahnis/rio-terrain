@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from time import clock
 import warnings
 import concurrent.futures
@@ -70,8 +68,7 @@ def aspect(ctx, input, output, neighbors, pcs, njobs, verbose):
                         data = src.read(1, window=read_window)
                         data[data <= src.nodata+1] = np.nan
                         arr = rt.aspect(data, step=step, pcs=pcs, neighbors=int(neighbors))
-                        (left, upper, right, lower) = rt.margins(read_window, write_window)
-                        result = arr[left: - upper, right: - lower]
+                        result = rt.trim(arr, rt.margins(read_window, write_window))
                         dst.write(result, 1, window=write_window)
                 else:
                     click.echo(msg.CONCURRENT)
@@ -96,8 +93,7 @@ def aspect(ctx, input, output, neighbors, pcs, njobs, verbose):
                         for future in concurrent.futures.as_completed(future_to_window):
                             read_window, write_window = future_to_window[future]
                             arr = future.result()
-                            (left, upper, right, lower) = rt.margins(read_window, write_window)
-                            result = arr[left: - upper, right: - lower]
+                            result = rt.trim(arr, rt.margins(read_window, write_window))
                             dst.write(result, 1, window=write_window)
 
     t1 = clock()

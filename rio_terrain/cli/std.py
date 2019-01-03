@@ -30,7 +30,7 @@ def std(ctx, input, output, neighborhood, njobs, verbose):
 
     \b
     Example:
-    rio stddev elevation.tif stddev.tif
+    rio std elevation.tif stddev.tif
 
     """
 
@@ -64,8 +64,7 @@ def std(ctx, input, output, neighborhood, njobs, verbose):
                         data = src.read(1, window=read_window)
                         data[data <= src.nodata+1] = np.nan
                         arr = focalstatistics.std(data, size=(neighborhood, neighborhood))
-                        (left, upper, right, lower) = rt.margins(read_window, write_window)
-                        result = arr[left: - upper, right: - lower]
+                        result = rt.trim(arr, rt.margins(read_window, write_window))
                         dst.write(result, 1, window=write_window)
                 else:
                     click.echo(msg.CONCURRENT)
@@ -88,8 +87,7 @@ def std(ctx, input, output, neighborhood, njobs, verbose):
                         for future in concurrent.futures.as_completed(future_to_window):
                             read_window, write_window = future_to_window[future]
                             arr = future.result()
-                            (left, upper, right, lower) = rt.margins(read_window, write_window)
-                            result = arr[left: - upper, right: - lower]
+                            result = rt.trim(arr, rt.margins(read_window, write_window))
                             dst.write(result, 1, window=write_window)
 
     click.echo('Writing standard deviation raster to {}'.format(output))

@@ -68,8 +68,7 @@ def mad(ctx, input, output, neighborhood, njobs, verbose):
                         data = src.read(1, window=read_window)
                         data[data <= src.nodata+1] = np.nan
                         arr = focalstatistics.mad(data, size=(neighborhood, neighborhood))
-                        (left, upper, right, lower) = rt.margins(read_window, write_window)
-                        result = arr[left: - upper, right: - lower]
+                        result = rt.trim(arr, rt.margins(read_window, write_window))
                         dst.write(result, 1, window=write_window)
                 else:
                     click.echo(msg.CONCURRENT)
@@ -92,8 +91,7 @@ def mad(ctx, input, output, neighborhood, njobs, verbose):
                         for future in concurrent.futures.as_completed(future_to_window):
                             read_window, write_window = future_to_window[future]
                             arr = future.result()
-                            (left, upper, right, lower) = rt.margins(read_window, write_window)
-                            result = arr[left: - upper, right: - lower]
+                            result = rt.trim(arr, rt.margins(read_window, write_window))
                             dst.write(result, 1, window=write_window)
 
     click.echo('Writing median absolute deviation raster to {}'.format(output))

@@ -204,6 +204,24 @@ def margins(window0, window1):
     return (int(left), int(upper), int(right), int(lower))
 
 
+def trim(arr, margins):
+    """Trim a 2D array by a set of margins
+
+    """
+    (left, upper, right, lower) = margins
+
+    if (right == 0) and (lower == 0):
+        result = arr[left:, upper:]
+    elif right == 0:
+        result = arr[left:, upper: -lower]
+    elif lower == 0:
+        result = arr[left: -right, upper:]
+    else:
+        result = arr[left: -right, upper: -lower]
+
+    return result
+
+
 def tile_grid(ncols, nrows, blockxsize, blockysize,
               col_offset=0, row_offset=0, overlap=0):
     """Return a generator containing read and write windows with a specified
