@@ -20,6 +20,12 @@ Rio-terrain provides a set of rasterio CLI plugins to perform common raster oper
 Installation
 ============
 
+.. image:: https://img.shields.io/pypi/v/rio-terrain.svg
+   :target: https://pypi.python.org/pypi/rio-terrain/
+
+.. image:: https://anaconda.org/mrahnis/rio-terrain/badges/version.svg
+	:target: https://anaconda.org/mrahnis/rio-terrain
+
 To install from the Python Package Index:
 
 .. code-block:: console
