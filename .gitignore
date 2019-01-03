@@ -65,3 +65,5 @@ target/
 
 # Examples
 examples/
+
+VERSION.txt
