@@ -30,7 +30,9 @@ def chunk_dim(dim, chunk_size, min_size=None):
     nchunks = floor(dim/chunk_size)
     remainder = dim % chunk_size
 
-    if min_size and (dim % chunk_size < min_size):
+    if nchunks == 0:
+        chunks = [remainder]
+    elif min_size and (nchunks > 1) and (remainder < min_size):
         chunks = [chunk_size]*(nchunks-1)
         chunks.append(chunk_size+remainder)
     else:
@@ -42,10 +44,10 @@ def chunk_dim(dim, chunk_size, min_size=None):
 
 def chunk_dims(shape, chunk_shape, min_size=None):
 
-    ww = chunk_dim(shape[0], chunk_shape[0], min_size=min_size)
-    hh = chunk_dim(shape[1], chunk_shape[1], min_size=min_size)
+    hh = chunk_dim(shape[0], chunk_shape[0], min_size=min_size)
+    ww = chunk_dim(shape[1], chunk_shape[1], min_size=min_size)
 
-    return ww, hh
+    return hh, ww
 
 
 def block_count(shape, block_shapes, band=1):
