@@ -1,4 +1,5 @@
-if (($env:appveyor_repo_tag -eq "true") -and ($env:appveyor_repo_tag_name.StartsWith("v"))) {
+# if (($env:APPVEYOR_REPO_TAG -eq "true") -and ($env:APPVEYOR_REPO_TAG_NAME.StartsWith("v"))) {
+if (($env:APPVEYOR_REPO_TAG -eq "true") -and ($env:GIT_DESCRIBE_TAG.StartsWith("v"))) {
     write-output "Deploying to anaconda main channel..."
     $channel = "main"
 } else {
