@@ -1,9 +1,10 @@
-from time import clock
+import time
 import warnings
 
 from itertools import repeat
 import concurrent.futures
 import multiprocessing
+from math import ceil
 
 import click
 import numpy as np
@@ -15,7 +16,7 @@ import matplotlib.pyplot as plt
 
 import rio_terrain as rt
 import rio_terrain.tools.messages as msg
-from rio_terrain import __version__ as terrain_version
+from rio_terrain import __version__ as plugin_version
 
 
 def tdigest_mean(digest):
@@ -86,7 +87,7 @@ def digest_window(file, window, absolute):
 @click.option('-j', '--jobs', 'njobs', type=int, default=multiprocessing.cpu_count(),
               help='Number of concurrent jobs to run')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode')
-@click.version_option(version=terrain_version, message='%(version)s')
+@click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, verbose):
     """Calculates and prints quantile values.
@@ -96,8 +97,12 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
     rio quantiles elevation.tif -q 0.5 -q 0.9
 
     """
+    if verbose:
+        np.warnings.filterwarnings('default')
+    else:
+        np.warnings.filterwarnings('ignore')
 
-    t0 = clock()
+    t0 = time.time()
 
     count = 0
 
@@ -110,7 +115,7 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
 
             if njobs < 1:
 
-                click.echo('Computing quantiles using scipy...')
+                click.echo('Running quantiles in-memory')
                 data = src.read(1)
                 data[data <= src.nodata+1] = np.nan
                 arr = data[np.isfinite(data)]
@@ -124,22 +129,25 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
             elif njobs == 1:
 
                 blocks = rt.subsample(src.block_windows(), probability=fraction)
+                n_blocks = ceil(rt.block_count(src.shape, src.block_shapes)*fraction)
                 digest = TDigest()
 
-                click.echo('Computing quantiles using t-digest...')
-                for ij, window in blocks:
-                    data = src.read(1, window=window)
-                    data[data <= src.nodata+1] = np.nan
-                    arr = data[np.isfinite(data[:])]
-                    if absolute:
-                        arr = np.absolute(arr)
+                click.echo('Running quantiles with sequential t-digest')
+                with click.progressbar(length=n_blocks, label='Blocks done:') as bar:
+                    for ij, window in blocks:
+                        data = src.read(1, window=window)
+                        data[data <= src.nodata+1] = np.nan
+                        arr = data[np.isfinite(data[:])]
+                        if absolute:
+                            arr = np.absolute(arr)
 
-                    window_count = np.count_nonzero(~np.isnan(data))
-                    if window_count > 0:
-                        window_digest = TDigest()
-                        window_digest.update(arr.flatten())
-                        digest.merge(window_digest)
-                        count += window_count
+                        window_count = np.count_nonzero(~np.isnan(data))
+                        if window_count > 0:
+                            window_digest = TDigest()
+                            window_digest.update(arr.flatten())
+                            digest.merge(window_digest)
+                            count += window_count
+                        bar.update(1)
 
                 description = tdigest_stats(digest)
                 results = zip(quantile, digest.quantile(quantile))
@@ -147,20 +155,22 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
             else:
 
                 blocks = rt.subsample(src.block_windows(), probability=fraction)
+                n_blocks = ceil(rt.block_count(src.shape, src.block_shapes)*fraction)
                 digest = TDigest()
 
-                click.echo('Computing quantiles using multiprocess t-digest...')
-                with concurrent.futures.ProcessPoolExecutor(max_workers=njobs) as executor:
+                click.echo('Running quantiles with multiprocess t-digest')
+                with concurrent.futures.ProcessPoolExecutor(max_workers=njobs) as executor, \
+                        click.progressbar(length=n_blocks, label='Blocks done:') as bar:
                     for (window, window_digest, window_count) in executor.map(digest_window, repeat(input), blocks, repeat(absolute)):
                         if window_count > 0:
                             digest.merge(window_digest)
                             count += window_count
+                        bar.update(1)
 
                 description = tdigest_stats(digest)
                 results = zip(quantile, digest.quantile(quantile))
 
-    t1 = clock()
-    click.echo('Finished in : {}'.format(msg.printtime(t0, t1)))
+    click.echo('Finished in : {}'.format(msg.printtime(t0, time.time())))
 
     click.echo(list(results))
     min, max, mean, std = description

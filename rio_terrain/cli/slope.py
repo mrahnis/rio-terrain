@@ -1,4 +1,4 @@
-from time import clock
+import time
 import warnings
 
 import concurrent.futures
@@ -10,7 +10,7 @@ import rasterio
 
 import rio_terrain as rt
 import rio_terrain.tools.messages as msg
-from rio_terrain import __version__ as terrain_version
+from rio_terrain import __version__ as plugin_version
 
 
 @click.command()
@@ -23,7 +23,7 @@ from rio_terrain import __version__ as terrain_version
 @click.option('-j', '--njobs', type=int, default=multiprocessing.cpu_count(),
               help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
-@click.version_option(version=terrain_version, message='%(version)s')
+@click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def slope(ctx, input, output, neighbors, units, njobs, verbose):
     """Calculates slope of a height raster.
@@ -33,8 +33,12 @@ def slope(ctx, input, output, neighbors, units, njobs, verbose):
     rio slope elevation.tif slope.tif
 
     """
+    if verbose:
+        np.warnings.filterwarnings('default')
+    else:
+        np.warnings.filterwarnings('ignore')
 
-    t0 = clock()
+    t0 = time.time()
 
     with rasterio.Env():
 
@@ -54,24 +58,23 @@ def slope(ctx, input, output, neighbors, units, njobs, verbose):
             with rasterio.open(output, 'w', **profile) as dst:
 
                 if njobs < 1:
-                    click.echo(msg.INMEMORY)
-
+                    click.echo((msg.STARTING).format('slope', msg.INMEMORY))
                     data = src.read(1)
                     data[data <= src.nodata+1] = np.nan
                     result = rt.slope(data, step=step, units=units, neighbors=int(neighbors))
                     dst.write(result, 1)
                 elif njobs == 1:
-                    click.echo(msg.SEQUENTIAL)
-
-                    # for (_, read_window, write_window, olap) in rt.tiled_windows(src.height, src.width, block_width=128, block_height=128, overlap=2):
-                    for (read_window, write_window) in zip(read_windows, write_windows):
-                        data = src.read(1, window=read_window)
-                        data[data <= src.nodata+1] = np.nan
-                        arr = rt.slope(data, step=step, units=units, neighbors=int(neighbors))
-                        result = rt.trim(arr, rt.margins(read_window, write_window))
-                        dst.write(result, 1, window=write_window)
+                    click.echo((msg.STARTING).format('slope', msg.SEQUENTIAL))
+                    with click.progressbar(length=src.width*src.height, label='Blocks done:') as bar:
+                        for (read_window, write_window) in zip(read_windows, write_windows):
+                            data = src.read(1, window=read_window)
+                            data[data <= src.nodata+1] = np.nan
+                            arr = rt.slope(data, step=step, units=units, neighbors=int(neighbors))
+                            result = rt.trim(arr, rt.margins(read_window, write_window))
+                            dst.write(result, 1, window=write_window)
+                            bar.update(result.size)
                 else:
-                    click.echo(msg.CONCURRENT)
+                    click.echo((msg.STARTING).format('slope', msg.CONCURRENT))
 
                     def jobs():
                         for (read_window, write_window) in zip(read_windows, write_windows):
@@ -79,7 +82,8 @@ def slope(ctx, input, output, neighbors, units, njobs, verbose):
                             data[data <= src.nodata+1] = np.nan
                             yield data, read_window, write_window
 
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor:
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor, \
+                            click.progressbar(length=src.width*src.height, label='Blocks done:') as bar:
 
                         future_to_window = {
                             executor.submit(
@@ -95,6 +99,7 @@ def slope(ctx, input, output, neighbors, units, njobs, verbose):
                             arr = future.result()
                             result = rt.trim(arr, rt.margins(read_window, write_window))
                             dst.write(result, 1, window=write_window)
+                            bar.update(result.size)
 
-    t1 = clock()
-    click.echo('Finished in : {}'.format(msg.printtime(t0, t1)))
+    click.echo((msg.WRITEOUT).format(output))
+    click.echo((msg.COMPLETION).format(msg.printtime(t0, time.time())))

@@ -1,4 +1,4 @@
-from time import clock
+import time
 import warnings
 import concurrent.futures
 import multiprocessing
@@ -9,7 +9,7 @@ import rasterio
 
 import rio_terrain as rt
 import rio_terrain.tools.messages as msg
-from rio_terrain import __version__ as terrain_version
+from rio_terrain import __version__ as plugin_version
 
 
 def _thresh(data0, data1, level, default=0):
@@ -27,7 +27,7 @@ def _thresh(data0, data1, level, default=0):
 @click.option('-j', '--njobs', type=int, default=multiprocessing.cpu_count(),
               help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
-@click.version_option(version=terrain_version, message='%(version)s')
+@click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
     """Thresholds a raster based on an uncertainty raster.
@@ -37,13 +37,22 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
     rio threshold diff.tif uncertainty.tif, detected.tif 1.68
 
     """
+    if verbose:
+        np.warnings.filterwarnings('default')
+    else:
+        np.warnings.filterwarnings('ignore')
 
-    t0 = clock()
+    t0 = time.time()
 
     with rasterio.Env():
 
         with rasterio.open(input) as src0, \
                 rasterio.open(uncertainty) as src1:
+
+            if not rt.is_raster_intersecting(src0, src1):
+                raise ValueError(msg.NONINTERSECTING)
+            if not rt.is_raster_aligned(src0, src1):
+                raise ValueError(msg.NONALIGNED)
 
             profile = src0.profile
             affine = src0.transform
@@ -67,20 +76,22 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
 
             with rasterio.open(output, 'w', **profile) as dst:
                 if njobs < 1:
-                    click.echo(msg.INMEMORY)
+                    click.echo((msg.STARTING).format('threshold', msg.INMEMORY))
                     data0 = src0.read(1, window=next(windows0))
                     data1 = src1.read(1, window=next(windows1))
                     result = _thresh(data0, data1, level, default=nodata)
                     dst.write(result, 1)
                 elif njobs == 1:
-                    click.echo(msg.SEQUENTIAL)
-                    for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
-                        data0 = src0.read(1, window=window0)
-                        data1 = src1.read(1, window=window1)
-                        result = _thresh(data0, data1, level, default=nodata)
-                        dst.write(result, 1, window=write_window)
+                    click.echo((msg.STARTING).format('threshold', msg.SEQUENTIAL))
+                    with click.progressbar(length=nrows*ncols, label='Blocks done:') as bar:
+                        for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
+                            data0 = src0.read(1, window=window0)
+                            data1 = src1.read(1, window=window1)
+                            result = _thresh(data0, data1, level, default=nodata)
+                            dst.write(result, 1, window=write_window)
+                            bar.update(result.size)
                 else:
-                    click.echo(msg.CONCURRENT)
+                    click.echo((msg.STARTING).format('threshold', msg.CONCURRENT))
 
                     def jobs():
                         for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
@@ -88,7 +99,8 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
                             data1 = src1.read(1, window=window1)
                             yield data0, data1, window0, window1, write_window
 
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor:
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor, \
+                            click.progressbar(length=nrows*ncols, label='Blocks done:') as bar:
 
                         future_to_window = {
                             executor.submit(
@@ -103,8 +115,7 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
                             window0, window1, write_window = future_to_window[future]
                             result = future.result()
                             dst.write(result, 1, window=write_window)
+                            bar.update(result.size)
 
-    click.echo('Wrote thresholded raster to {}'.format(output))
-
-    t1 = clock()
-    click.echo('Finished in : {}'.format(msg.printtime(t0, t1)))
+    click.echo((msg.WRITEOUT).format(output))
+    click.echo((msg.COMPLETION).format(msg.printtime(t0, time.time())))

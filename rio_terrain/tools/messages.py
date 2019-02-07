@@ -1,12 +1,21 @@
 import sys
 
-# Information
-INMEMORY = "Processing raster in-memory..." 
-SEQUENTIAL = "Processing raster blocks sequentially..."
-CONCURRENT = "Processing raster blocks concurrently..."
+# Startup information
+STARTING = "Running {} on {}"
+INMEMORY = "in-memory raster"
+SEQUENTIAL = "sequential raster blocks"
+CONCURRENT = "concurrent raster blocks"
 
-# Warning
+# Completion status
+COMPLETION = "Finished in {}"
+WRITEOUT = "Wrote output to {}"
+
+# Warnings
 STRIPED = 'Blocks are lines with shape {}. Rewrite the data blocks for faster out-of-core processing.'
+
+# Errors
+NONINTERSECTING = 'Input rasters are non-intersecting'
+NONALIGNED = 'Raster cells are not aligned between inputs'
 
 
 def printtime(t0, t1):

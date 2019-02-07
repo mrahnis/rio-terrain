@@ -1,4 +1,4 @@
-from time import clock
+import time
 import warnings
 import concurrent.futures
 import multiprocessing
@@ -9,7 +9,7 @@ import rasterio
 
 import rio_terrain as rt
 import rio_terrain.tools.messages as msg
-from rio_terrain import __version__ as terrain_version
+from rio_terrain import __version__ as plugin_version
 
 
 def _extract(data, categorical, category):
@@ -31,7 +31,7 @@ def _extract(data, categorical, category):
 @click.option('-j', '--njobs', type=int, default=multiprocessing.cpu_count(),
               help='Number of concurrent jobs to run')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
-@click.version_option(version=terrain_version, message='%(version)s')
+@click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def extract(ctx, input, categorical, output, category, njobs, verbose):
     """Extract areas from a raster by category.
@@ -43,13 +43,22 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
     rio extract diff.tif categorical.tif extract.tif -c 1 -c 3
 
     """
+    if verbose:
+        np.warnings.filterwarnings('default')
+    else:
+        np.warnings.filterwarnings('ignore')
 
-    t0 = clock()
+    t0 = time.time()
 
     with rasterio.Env():
 
         with rasterio.open(input) as src, \
                 rasterio.open(categorical) as cat:
+
+            if not rt.is_raster_intersecting(src, cat):
+                raise ValueError(msg.NONINTERSECTING)
+            if not rt.is_raster_aligned(src, cat):
+                raise ValueError(msg.NONALIGNED)
 
             profile = src.profile
             affine = src.transform
@@ -71,20 +80,22 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
 
             with rasterio.open(output, 'w', **profile) as dst:
                 if njobs < 1:
-                    click.echo(msg.INMEMORY)
+                    click.echo((msg.STARTING).format('extract', msg.INMEMORY))
                     data = src.read(1, window=next(windows0))
                     mask = cat.read(1, window=next(windows1))
                     result = _extract(data, mask, category)
                     dst.write(result, 1, window=next(write_windows))
                 elif njobs == 1:
-                    click.echo(msg.SEQUENTIAL)
-                    for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
-                        data = src.read(1, window=window0)
-                        mask = cat.read(1, window=window1)
-                        result = _extract(data, mask, category)
-                        dst.write(result, 1, window=write_window)
+                    click.echo((msg.STARTING).format('extract', msg.SEQUENTIAL))
+                    with click.progressbar(length=nrows*ncols, label='Blocks done:') as bar:
+                        for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
+                            data = src.read(1, window=window0)
+                            mask = cat.read(1, window=window1)
+                            result = _extract(data, mask, category)
+                            dst.write(result, 1, window=write_window)
+                            bar.update(result.size)
                 else:
-                    click.echo(msg.CONCURRENT)
+                    click.echo((msg.STARTING).format('extract', msg.CONCURRENT))
 
                     def jobs():
                         for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
@@ -92,7 +103,8 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
                             mask = cat.read(1, window=window1)
                             yield data, mask, window0, window1, write_window
 
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor:
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor, \
+                            click.progressbar(length=nrows*ncols, label='Blocks done:') as bar:
 
                         future_to_window = {
                             executor.submit(
@@ -106,8 +118,7 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
                             window0, window1, write_window = future_to_window[future]
                             result = future.result()
                             dst.write(result, 1, window=write_window)
+                            bar.update(result.size)
 
-    click.echo('Wrote extracted raster to {}'.format(output))
-
-    t1 = clock()
-    click.echo('Finished in : {}'.format(msg.printtime(t0, t1)))
+    click.echo((msg.WRITEOUT).format(output))
+    click.echo((msg.COMPLETION).format(msg.printtime(t0, time.time())))

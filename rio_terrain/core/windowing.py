@@ -336,6 +336,20 @@ def is_raster_congruent(src0, src1, band=1):
     return (window0 == window1) & (affine0 == affine1)
 
 
+def is_raster_intersecting(src0, src1):
+    """Tests two rasters fo overlap.
+
+    """
+    bbox0 = window_bounds(((0, 0), src0.shape),
+                          src0.transform, offset='ul')
+    bbox1 = window_bounds(((0, 0), src1.shape),
+                          src1.transform, offset='ul')
+
+    # is xmin2 < xmax1 and xmax2 > xmin1
+    return (bbox1[0] < bbox0[2]) & (bbox1[2] > bbox0[0]) & \
+        (bbox1[1] < bbox0[3]) & (bbox1[3] > bbox0[1])
+
+
 def is_raster_aligned(src0, src1):
     """Check two rasters for cell alignment.
 
@@ -357,4 +371,5 @@ def is_raster_aligned(src0, src1):
     ul0 = affine0[2::3]
     ul1 = affine1[2::3]
 
-    return np.array_equal(step0, step1) & np.array_equal(rot0, rot1) & ((ul0 - ul1) % step0 == 0).all()
+    return np.array_equal(step0, step1) & np.array_equal(rot0, rot1) & \
+        ((ul0 - ul1) % step0[0] == 0).all()

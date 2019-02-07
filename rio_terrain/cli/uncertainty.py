@@ -1,4 +1,4 @@
-from time import clock
+import time
 import warnings
 import concurrent.futures
 import multiprocessing
@@ -9,7 +9,7 @@ import rasterio
 
 import rio_terrain as rt
 import rio_terrain.tools.messages as msg
-from rio_terrain import __version__ as terrain_version
+from rio_terrain import __version__ as plugin_version
 
 
 def _propagate(data0, data1, instrumental0, instrumental1):
@@ -34,7 +34,7 @@ def _propagate(data0, data1, instrumental0, instrumental1):
 @click.option('-j', '--njobs', type=int, default=multiprocessing.cpu_count(),
               help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
-@click.version_option(version=terrain_version, message='%(version)s')
+@click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def uncertainty(ctx, uncertainty0, uncertainty1, output, instrumental0, instrumental1, njobs, verbose):
     """Calculates a minimum level of detection raster.
@@ -44,12 +44,23 @@ def uncertainty(ctx, uncertainty0, uncertainty1, output, instrumental0, instrume
     rio uncertainty roughness_t0.tif roughness_t1.tif uncertainty.tif
 
     """
+    if verbose:
+        np.warnings.filterwarnings('default')
+    else:
+        np.warnings.filterwarnings('ignore')
 
-    t0 = clock()
+    t0 = time.time()
 
     with rasterio.Env():
 
-        with rasterio.open(uncertainty0) as src0, rasterio.open(uncertainty1) as src1:
+        with rasterio.open(uncertainty0) as src0, \
+                rasterio.open(uncertainty1) as src1:
+
+            if not rt.is_raster_intersecting(src0, src1):
+                raise ValueError(msg.NONINTERSECTING)
+            if not rt.is_raster_aligned(src0, src1):
+                raise ValueError(msg.NONALIGNED)
+
             profile = src0.profile
             affine = src0.transform
             step = (affine[0], affine[4])
@@ -71,20 +82,22 @@ def uncertainty(ctx, uncertainty0, uncertainty1, output, instrumental0, instrume
 
             with rasterio.open(output, 'w', **profile) as dst:
                 if njobs < 1:
-                    click.echo(msg.INMEMORY)
+                    click.echo((msg.STARTING).format('uncertainty', msg.INMEMORY))
                     data0 = src0.read(1)
                     data1 = src1.read(1)
                     result = _propagate(data0, data1, instrumental0, instrumental1)
                     dst.write(result.astype(np.float32), 1)
                 elif njobs == 1:
-                    click.echo(msg.SEQUENTIAL)
-                    for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
-                        data0 = src0.read(1, window=window0)
-                        data1 = src1.read(1, window=window1)
-                        result = _propagate(data0, data1, instrumental0, instrumental1)
-                        dst.write(result.astype(np.float32), 1, window=write_window)
+                    click.echo((msg.STARTING).format('uncertainty', msg.SEQUENTIAL))
+                    with click.progressbar(length=nrows*ncols, label='Blocks done:') as bar:
+                        for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
+                            data0 = src0.read(1, window=window0)
+                            data1 = src1.read(1, window=window1)
+                            result = _propagate(data0, data1, instrumental0, instrumental1)
+                            dst.write(result.astype(np.float32), 1, window=write_window)
+                            bar.update(result.size)
                 else:
-                    click.echo(msg.CONCURRENT)
+                    click.echo((msg.STARTING).format('uncertainty', msg.CONCURRENT))
 
                     def jobs():
                         for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
@@ -92,7 +105,8 @@ def uncertainty(ctx, uncertainty0, uncertainty1, output, instrumental0, instrume
                             data1 = src1.read(1, window=window1)
                             yield data0, data1, window0, window1, write_window
 
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor:
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor, \
+                            click.progressbar(length=nrows*ncols, label='Blocks done:') as bar:
 
                         future_to_window = {
                             executor.submit(
@@ -107,8 +121,7 @@ def uncertainty(ctx, uncertainty0, uncertainty1, output, instrumental0, instrume
                             write_window = future_to_window[future]
                             result = future.result()
                             dst.write(result.astype(np.float32), 1, window=write_window)
+                            bar.update(result.size)
 
-    click.echo('Wrote uncertainty raster to {}'.format(output))
-
-    t1 = clock()
-    click.echo('Finished in : {}'.format(msg.printtime(t0, t1)))
+    click.echo((msg.WRITEOUT).format(output))
+    click.echo((msg.COMPLETION).format(msg.printtime(t0, time.time())))

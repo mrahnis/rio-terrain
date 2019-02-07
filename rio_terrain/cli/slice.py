@@ -1,4 +1,4 @@
-from time import clock
+import time
 import warnings
 import concurrent.futures
 import multiprocessing
@@ -9,7 +9,7 @@ import rasterio
 
 import rio_terrain as rt
 import rio_terrain.tools.messages as msg
-from rio_terrain import __version__ as terrain_version
+from rio_terrain import __version__ as plugin_version
 
 
 def _slice(data, minimum=None, maximum=None, keep_data=False, false_val=0):
@@ -47,14 +47,14 @@ def _slice(data, minimum=None, maximum=None, keep_data=False, false_val=0):
               help='Minimum value to extract.')
 @click.option('--maximum', nargs=1, type=float, default=None,
               help='Maximum value to extract.')
-@click.option('--keep-data', is_flag=True,
+@click.option('--keep-data/--no-keep-data', is_flag=True,
               help='Return the input data. Default is to return ones.')
 @click.option('--zeros/--no-zeros', is_flag=True,
               help='Use the raster nodata value or zeros for False condition')
 @click.option('-j', '--njobs', type=int, default=multiprocessing.cpu_count(),
               help='Number of concurrent jobs to run')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
-@click.version_option(version=terrain_version, message='%(version)s')
+@click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose):
     """Extract areas from a raster by a data range.
@@ -67,8 +67,12 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
     rio range diff.tif extracted.tif --minumum -2.0 --maximum 2.0
 
     """
+    if verbose:
+        np.warnings.filterwarnings('default')
+    else:
+        np.warnings.filterwarnings('ignore')
 
-    t0 = clock()
+    t0 = time.time()
 
     with rasterio.Env():
 
@@ -95,25 +99,28 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
 
             with rasterio.open(output, 'w', **profile) as dst:
                 if njobs < 1:
-                    click.echo(msg.INMEMORY)
+                    click.echo((msg.STARTING).format('slice', msg.INMEMORY))
                     data = src.read(1)
                     result = _slice(data, minimum, maximum, keep_data, false_val)
                     dst.write(result.astype(dtype), 1)
                 elif njobs == 1:
-                    click.echo(msg.SEQUENTIAL)
-                    for (ij, window) in src.block_windows():
-                        data = src.read(1, window=window)
-                        result = _slice(data, minimum, maximum, keep_data, false_val)
-                        dst.write(result.astype(dtype), 1, window=window)
+                    click.echo((msg.STARTING).format('slice', msg.SEQUENTIAL))
+                    with click.progressbar(length=src.width*src.height, label='Blocks done:') as bar:
+                        for (ij, window) in src.block_windows():
+                            data = src.read(1, window=window)
+                            result = _slice(data, minimum, maximum, keep_data, false_val)
+                            dst.write(result.astype(dtype), 1, window=window)
+                            bar.update(result.size)
                 else:
-                    click.echo(msg.CONCURRENT)
+                    click.echo((msg.STARTING).format('slice', msg.CONCURRENT))
 
                     def jobs():
                         for (ij, window) in src.block_windows():
                             data = src.read(1, window=window)
                             yield data, window
 
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor:
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor, \
+                            click.progressbar(length=src.width*src.height, label='Blocks done:') as bar:
 
                         future_to_window = {
                             executor.submit(
@@ -129,8 +136,7 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
                             window = future_to_window[future]
                             result = future.result()
                             dst.write(result.astype(dtype), 1, window=window)
+                            bar.update(result.size)
 
-    click.echo('Wrote extracted raster to {}'.format(output))
-
-    t1 = clock()
-    click.echo('Finished in : {}'.format(msg.printtime(t0, t1)))
+    click.echo((msg.WRITEOUT).format(output))
+    click.echo((msg.COMPLETION).format(msg.printtime(t0, time.time())))

@@ -1,4 +1,4 @@
-from time import clock
+import time
 import warnings
 import concurrent.futures
 import multiprocessing
@@ -10,7 +10,7 @@ import rasterio
 import rio_terrain as rt
 import rio_terrain.tools.messages as msg
 from rio_terrain.core import focalstatistics
-from rio_terrain import __version__ as terrain_version
+from rio_terrain import __version__ as plugin_version
 
 
 @click.command()
@@ -21,7 +21,7 @@ from rio_terrain import __version__ as terrain_version
 @click.option('-j', '--njobs', type=int, default=multiprocessing.cpu_count(),
               help='Number of concurrent jobs to run')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
-@click.version_option(version=terrain_version, message='%(version)s')
+@click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def std(ctx, input, output, neighborhood, njobs, verbose):
     """Calculates a standard deviation raster.
@@ -31,8 +31,12 @@ def std(ctx, input, output, neighborhood, njobs, verbose):
     rio std elevation.tif stddev.tif
 
     """
+    if verbose:
+        np.warnings.filterwarnings('default')
+    else:
+        np.warnings.filterwarnings('ignore')
 
-    t0 = clock()
+    t0 = time.time()
 
     with rasterio.Env():
 
@@ -51,21 +55,23 @@ def std(ctx, input, output, neighborhood, njobs, verbose):
 
             with rasterio.open(output, 'w', **profile) as dst:
                 if njobs < 1:
-                    click.echo(msg.INMEMORY)
+                    click.echo((msg.STARTING).format('std', msg.INMEMORY))
                     data = src.read(1)
                     data[data <= src.nodata+1] = np.nan
                     result = focalstatistics.std(data, size=(neighborhood, neighborhood))
                     dst.write(result, 1)
                 elif njobs == 1:
-                    click.echo(msg.SEQUENTIAL)
-                    for (read_window, write_window) in zip(read_windows, write_windows):
-                        data = src.read(1, window=read_window)
-                        data[data <= src.nodata+1] = np.nan
-                        arr = focalstatistics.std(data, size=(neighborhood, neighborhood))
-                        result = rt.trim(arr, rt.margins(read_window, write_window))
-                        dst.write(result, 1, window=write_window)
+                    click.echo((msg.STARTING).format('std', msg.SEQUENTIAL))
+                    with click.progressbar(length=src.width*src.height, label='Blocks done:') as bar:
+                        for (read_window, write_window) in zip(read_windows, write_windows):
+                            data = src.read(1, window=read_window)
+                            data[data <= src.nodata+1] = np.nan
+                            arr = focalstatistics.std(data, size=(neighborhood, neighborhood))
+                            result = rt.trim(arr, rt.margins(read_window, write_window))
+                            dst.write(result, 1, window=write_window)
+                            bar.update(result.size)
                 else:
-                    click.echo(msg.CONCURRENT)
+                    click.echo((msg.STARTING).format('std', msg.CONCURRENT))
 
                     def jobs():
                         for (read_window, write_window) in zip(read_windows, write_windows):
@@ -73,7 +79,8 @@ def std(ctx, input, output, neighborhood, njobs, verbose):
                             data[data <= src.nodata+1] = np.nan
                             yield data, read_window, write_window
 
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor:
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor, \
+                            click.progressbar(length=src.width*src.height, label='Blocks done:') as bar:
 
                         future_to_window = {
                             executor.submit(
@@ -87,7 +94,7 @@ def std(ctx, input, output, neighborhood, njobs, verbose):
                             arr = future.result()
                             result = rt.trim(arr, rt.margins(read_window, write_window))
                             dst.write(result, 1, window=write_window)
+                            bar.update(result.size)
 
-    click.echo('Writing standard deviation raster to {}'.format(output))
-    t1 = clock()
-    click.echo('Finished in : {}'.format(msg.printtime(t0, t1)))
+    click.echo((msg.WRITEOUT).format(output))
+    click.echo((msg.COMPLETION).format(msg.printtime(t0, time.time())))
