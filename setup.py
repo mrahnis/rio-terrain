@@ -1,7 +1,6 @@
 from setuptools import setup, find_packages
 
 
-# Parse the version from the shapely module
 for line in open('rio_terrain/__init__.py', 'r'):
     if line.find("__version__") >= 0:
         version = line.split("=")[1].strip()
@@ -35,6 +34,7 @@ setup(name='rio-terrain',
         curvature=rio_terrain.cli.curvature:curvature
         difference=rio_terrain.cli.difference:difference
         extract=rio_terrain.cli.extract:extract
+        label=rio_terrain.cli.label:label
         mad=rio_terrain.cli.mad:mad
         quantiles=rio_terrain.cli.quantiles:quantiles
         slice=rio_terrain.cli.slice:slice
