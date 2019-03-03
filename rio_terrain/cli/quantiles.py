@@ -221,7 +221,8 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
         plt.show()
 
         # cumulative probability distribution
-        samples = np.arange(ctr['mean'].min(), ctr['mean'].max(), 1.0)
+        spacing = (digest.max() - digest.min())/100
+        samples = np.arange(ctr['mean'].min(), ctr['mean'].max(), spacing)
         cdf = digest.cdf(samples)
 
         plt.plot(samples, cdf, 'r.')
