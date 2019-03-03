@@ -13,9 +13,17 @@ import rio_terrain.tools.messages as msg
 from rio_terrain import __version__ as plugin_version
 
 
+BOX = np.ones((3, 3))
+CROSS = np.array([[0, 1, 0],
+                  [1, 1, 1],
+                  [0, 1, 0]])
+
+
 @click.command()
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
+@click.option('--diagonals/--no-diagonals', 'diagonals', default=False,
+                help='Label diagonals as connected')
 @click.option('--zeros/--no-zeros', is_flag=True,
               help='Use the raster nodata value or zeros for False condition')
 @click.option('-j', '--njobs', type=int, default=0,
@@ -23,7 +31,7 @@ from rio_terrain import __version__ as plugin_version
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
-def label(ctx, input, output, zeros, njobs, verbose):
+def label(ctx, input, output, diagonals, zeros, njobs, verbose):
     """Label areas in a raster.
 
     \b
@@ -56,11 +64,17 @@ def label(ctx, input, output, zeros, njobs, verbose):
             else:
                 false_val = nodata
 
+            if diagonals is True:
+                structure = BOX
+            else:
+                structure = CROSS
+
             with rasterio.open(output, 'w', **profile) as dst:
                 if njobs < 1:
                     click.echo((msg.STARTING).format('label', msg.INMEMORY))
                     data = src.read(1)
-                    labels, count = scipy.ndimage.label(data, structure=np.ones((3, 3)))
+                    labels, count = scipy.ndimage.label(data, structure=structure)
+                    labels[data == nodata] = false_val
                     labels[labels == 0] = false_val
                     dst.write(labels.astype(dtype), 1)
                 elif njobs == 1:
@@ -76,7 +90,7 @@ def label(ctx, input, output, zeros, njobs, verbose):
                     total = 0
                     for (read_window, write_window) in zip(read_windows, write_windows):
                         data = src.read(1, window=read_window)
-                        labels, count = scipy.ndimage.label(data, structure=np.ones((3, 3)))
+                        labels, count = scipy.ndimage.label(data, structure=structure)
 
                         if overlap is not None:
                             # remap values based on overlap
