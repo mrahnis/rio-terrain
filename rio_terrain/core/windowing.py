@@ -17,7 +17,7 @@ def tile_dim(dim, tile_size, min_size=None):
 
 
 def tile_dims(shape, tile_shape, min_size=None):
-    """Chunk a 2D array using a minimum chunk size
+    """Chunk a 2D array
 
     """
     xx = tile_dim(shape[0], tile_shape[0], min_size=min_size)
@@ -27,6 +27,9 @@ def tile_dims(shape, tile_shape, min_size=None):
 
 
 def chunk_dim(dim, chunk_size, min_size=None):
+    """Chunk a 1D array
+
+    """
     nchunks = floor(dim/chunk_size)
     remainder = dim % chunk_size
 
@@ -43,7 +46,9 @@ def chunk_dim(dim, chunk_size, min_size=None):
 
 
 def chunk_dims(shape, chunk_shape, min_size=None):
+    """Chunk a 2D array
 
+    """
     hh = chunk_dim(shape[0], chunk_shape[0], min_size=min_size)
     ww = chunk_dim(shape[1], chunk_shape[1], min_size=min_size)
 
@@ -285,7 +290,6 @@ def tile_grid_intersection(src0, src1, blockxsize=None, blockysize=None):
         nrows (int) : write raster height in rows
 
     """
-    # transform to coordinates
     bbox0 = window_bounds(((0, 0), src0.shape),
                           src0.transform, offset='ul')
 
@@ -337,7 +341,7 @@ def is_raster_congruent(src0, src1, band=1):
 
 
 def is_raster_intersecting(src0, src1):
-    """Tests two rasters fo overlap.
+    """Test two rasters for overlap
 
     """
     bbox0 = window_bounds(((0, 0), src0.shape),
@@ -351,7 +355,7 @@ def is_raster_intersecting(src0, src1):
 
 
 def is_raster_aligned(src0, src1):
-    """Check two rasters for cell alignment.
+    """Check two rasters for cell alignment
 
     Parameters:
         src0 : rasterio read source

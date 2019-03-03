@@ -35,7 +35,7 @@ def std(arr, size=(3, 3)):
 
 
 def std_ndimage(arr, size=(3, 3)):
-    """Calculates the standard deviation for a neighborhood.
+    """Calculates the standard deviation for a neighborhood
 
     """
     from scipy.ndimage.filters import convolve
