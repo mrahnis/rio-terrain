@@ -18,12 +18,14 @@ from rio_terrain import __version__ as plugin_version
 @click.argument('output', nargs=1, type=click.Path())
 @click.option('-n', '--neighborhood', nargs=1, default=3,
               help='Neighborhood size in cells.')
+@click.option('-b', '--blocks', 'blocks', nargs=1, type=int, default=40,
+              help='Multiply TIFF block size by an amount to make chunks')
 @click.option('-j', '--njobs', type=int, default=multiprocessing.cpu_count(),
               help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
-def mad(ctx, input, output, neighborhood, njobs, verbose):
+def mad(ctx, input, output, neighborhood, blocks, njobs, verbose):
     """Calculates a median absolute deviation raster.
 
     \b
@@ -51,10 +53,10 @@ def mad(ctx, input, output, neighborhood, njobs, verbose):
                 if (blockshape[0] == 1) or (blockshape[1] == 1):
                     warnings.warn((msg.STRIPED).format(blockshape))
                 read_windows = rt.tile_grid(src.width, src.height,
-                                            blockshape[0], blockshape[1],
+                                            blockshape[0]*blocks, blockshape[1]*blocks,
                                             overlap=neighborhood)
                 write_windows = rt.tile_grid(src.width, src.height,
-                                             blockshape[0], blockshape[1],
+                                             blockshape[0]*blocks, blockshape[1]*blocks,
                                              overlap=0)
 
             with rasterio.open(output, 'w', **profile) as dst:

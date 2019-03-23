@@ -20,12 +20,14 @@ from rio_terrain import __version__ as plugin_version
               help='Specifies the number of neighboring cells to use.')
 @click.option('-u', '--units', type=click.Choice(['grade','degrees']), default='grade',
               help='Specifies the units of slope.')
+@click.option('-b', '--blocks', 'blocks', nargs=1, type=int, default=40,
+              help='Multiply TIFF block size by an amount to make chunks')
 @click.option('-j', '--njobs', type=int, default=multiprocessing.cpu_count(),
               help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
-def slope(ctx, input, output, neighbors, units, njobs, verbose):
+def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
     """Calculates slope of a height raster.
 
     \b
@@ -52,8 +54,8 @@ def slope(ctx, input, output, neighbors, units, njobs, verbose):
                 blockshape = (list(src.block_shapes))[0]
                 if (blockshape[0] == 1) or (blockshape[1] == 1):
                     warnings.warn((msg.STRIPED).format(blockshape))
-                read_windows = rt.tile_grid(src.width, src.height, blockshape[0], blockshape[1], overlap=2)
-                write_windows = rt.tile_grid(src.width, src.height, blockshape[0], blockshape[1], overlap=0)
+                read_windows = rt.tile_grid(src.width, src.height, blockshape[0]*blocks, blockshape[1]*blocks, overlap=2)
+                write_windows = rt.tile_grid(src.width, src.height, blockshape[0]*blocks, blockshape[1]*blocks, overlap=0)
 
             with rasterio.open(output, 'w', **profile) as dst:
 

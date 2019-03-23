@@ -16,12 +16,14 @@ from rio_terrain import __version__ as plugin_version
 @click.argument('input_t0', nargs=1, type=click.Path(exists=True))
 @click.argument('input_t1', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
+@click.option('-b', '--blocks', 'blocks', nargs=1, type=int, default=40,
+              help='Multiply TIFF block size by an amount to make chunks')
 @click.option('-j', '--njobs', type=int, default=multiprocessing.cpu_count(),
               help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
-def difference(ctx, input_t0, input_t1, output, njobs, verbose):
+def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
     """Subtracts one raster from another.
 
     \b
@@ -57,7 +59,7 @@ def difference(ctx, input_t0, input_t1, output, njobs, verbose):
                 blockxsize = None
                 blockysize = None
 
-            tiles = rt.tile_grid_intersection(src0, src1, blockxsize=blockxsize, blockysize=blockysize)
+            tiles = rt.tile_grid_intersection(src0, src1, blockxsize=blockxsize*blocks, blockysize=blockysize*blocks)
             windows0, windows1, write_windows, affine, nrows, ncols = tiles
 
             profile.update(dtype=rasterio.float32, count=1,
