@@ -1,18 +1,19 @@
-# if (($env:APPVEYOR_REPO_TAG -eq "true") -and ($env:APPVEYOR_REPO_TAG_NAME.StartsWith("v"))) {
-if (($env:APPVEYOR_REPO_TAG -eq "true") -and ($env:GIT_DESCRIBE_TAG.StartsWith("v"))) {
-    write-output "Deploying to anaconda main channel..."
-    $channel = "main"
+if (($Env:APPVEYOR_REPO_TAG -eq "true") -and
+    ($Env:APPVEYOR_REPO_NAME -eq ${Env:GITHUB_REPO_NAME})) {
+  $tar_glob = ".\conda-bld\noarch\${Env:PYPKG}-${Env:APPVEYOR_REPO_TAG_NAME}-*.tar.bz2";
+  Write-Host "distribution file: $tar_glob";
+  if ($env:APPVEYOR_REPO_TAG_NAME.StartsWith("v")) {
+    $anaconda_label = "main"
+  } elseif ($Env:APPVEYOR_REPO_TAG_NAME.EndsWith("-beta")) {
+    $anaconda_label = "beta"
+  } elseif ($Env:APPVEYOR_REPO_TAG_NAME.EndsWith("-dev")) {
+    $anaconda_label = "dev"
+  } else {
+    Write-Host "Tag not for deployment, skipping conda package deployment."
+    Return
+  };
+  Write-Host "anaconda_label $anaconda_label";
+  Invoke-Expression "anaconda upload $file_to_upload -t $env:ANACONDA_TOKEN --label $anaconda_label --force"
 } else {
-    write-output "Deploying to anaconda dev channel..."
-    $channel = "dev"
-    $env:BUILD_STR = "dev"
+  Write-Host "Not tagged, skipping conda package deployment."
 }
-
-Invoke-Expression "conda config --set anaconda_upload no"
-
-$file_to_upload = (conda build --output .) | Out-String
-
-write-output "Uploading $file_to_upload..."
-Invoke-Expression "anaconda -t $env:ANACONDA_TOKEN upload --force --user mrahnis --channel $channel $file_to_upload"
-
-write-output "Upload sucess"
