@@ -42,6 +42,6 @@ after_test:
 artifacts:
   - path: 'conda-bld\noarch\*.tar.bz2'
 
-on-success:
+on_success:
   - ps: ci\appveyor\deploy_to_anaconda2.ps1
 
