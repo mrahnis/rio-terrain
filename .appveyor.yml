@@ -36,8 +36,11 @@ test_script:
   - conda install pytest
   - pytest
 
+after_test:
+  - ps: Copy-Item $Env:MINICONDA\conda-bld -Destination . -Recurse
+
 artifacts:
-  - path: '%MINICONDA%\conda-bld\noarch\*.tar.bz2'
+  - path: 'conda-bld\noarch\*.tar.bz2'
 
 on_success:
   - ps: ci\appveyor\deploy_to_anaconda.ps1
