@@ -1,6 +1,6 @@
 package:
   name: rio-terrain
-  version: 0.0.12
+  version: 0.0.15
 
 source:
   git_url: ../

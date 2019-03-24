@@ -5,7 +5,7 @@ environment:
     secure: iTF8kOBGKYYFOx5c0inHuvqyiTzjxM68i4bfZjgEpdmYCIhTwwtGj8NWWFf9AbFV
   PROJECT_NAME: rio-terrain
   GITHUB_REPO_NAME: mrahnis/rio-terrain
-  
+
   matrix:
     - PYTHON_VERSION: 3.6
       PYTHON_ARCH: 64
@@ -24,9 +24,9 @@ install:
   - '"%MINICONDA%\Scripts\activate.bat"'
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
-  - conda install conda-build anaconda-client
-  - conda info -a
+  - conda install conda-build anaconda-client pytest
   - conda config --add channels conda-forge
+  - conda info -a
 
 build: false
 
@@ -37,7 +37,7 @@ test_script:
   - pytest
 
 after_test:
-  - move %MINICONDA%\conda-bld .
+  - cmd: copy %MINICONDA%\conda-bld .
 
 artifacts:
   - path: 'conda-bld\noarch\*.tar.bz2'
