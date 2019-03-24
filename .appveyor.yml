@@ -37,7 +37,7 @@ test_script:
   - pytest
 
 after_test:
-  - cmd: copy %MINICONDA%\conda-bld .
+  - cmd: move %MINICONDA%\conda-bld .
 
 artifacts:
   - path: 'conda-bld\noarch\*.tar.bz2'
