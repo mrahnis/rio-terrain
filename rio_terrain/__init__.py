@@ -5,7 +5,7 @@ from rio_terrain.core.statistics import *
 from rio_terrain.core.windowing import *
 
 __author__ = "Mike Rahnis"
-__version__ = '0.0.17'
+__version__ = '0.0.18'
 
 
 logger = logging.getLogger(__name__)

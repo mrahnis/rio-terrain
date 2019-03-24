@@ -25,7 +25,7 @@ If (($Env:APPVEYOR_REPO_TAG -eq "true") -and
   };
 
   Write-Host "anaconda_label $anaconda_label";
-  Invoke-Expression "anaconda upload $file_to_upload -t $env:ANACONDA_TOKEN -u mrahnis --label $anaconda_label --force"
+  Invoke-Expression "anaconda -t $Env:ANACONDA_TOKEN upload $file_to_upload -u mrahnis --label $anaconda_label --force"
   # Invoke-Expression "anaconda upload $tar_glob -t $env:ANACONDA_TOKEN -u mrahnis --label $anaconda_label --force"
 } Else {
   Write-Host "Not tagged, skipping conda package deployment."
