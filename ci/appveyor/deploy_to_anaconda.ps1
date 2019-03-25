@@ -14,7 +14,7 @@ If (($Env:APPVEYOR_REPO_TAG -eq "true") -and
     } ElseIf ($Env:APPVEYOR_REPO_TAG_NAME.EndsWith("-dev")) {
       $anaconda_label = "dev"
     }
-  Else {
+  } Else {
     Write-Host "Tag not for deployment, skipping conda package deployment."
     Return
   }
