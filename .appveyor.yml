@@ -24,7 +24,7 @@ install:
   - '"%MINICONDA%\Scripts\activate.bat"'
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
-  - conda install conda-build anaconda-client pytest
+  - conda install conda-build conda-verify anaconda-client pytest
   - conda config --add channels conda-forge
   - conda info -a
 
@@ -33,7 +33,6 @@ build: false
 test_script:
   - conda build .
   - conda install %PROJECT_NAME% --use-local
-  - conda install pytest
   - pytest
 
 after_test:
