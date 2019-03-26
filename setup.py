@@ -12,15 +12,14 @@ for line in open('rio_terrain/__init__.py', 'r'):
 with open('VERSION.txt', 'w') as fp:
     fp.write(version)
 
-
 current_directory = path.abspath(path.dirname(__file__))
-with open(path.join(current_directory, 'README.rst', 'r'), encoding='utf-8') as f:
+with open(path.join(current_directory, 'README.rst'), 'r', encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='rio-terrain',
       version=version,
       author='Michael Rahnis',
-      author_email='michael.rahnis@fandm.edu',
+      author_email='mike@topomatrix.com',
       description='Rasterio CLI plugin to perform common operations on single-band elevation rasters',
       long_description=long_description,
       long_description_content_type='text/x-rst',
