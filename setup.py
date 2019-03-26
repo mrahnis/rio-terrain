@@ -1,3 +1,4 @@
+from os import path
 from setuptools import setup, find_packages
 
 
@@ -11,11 +12,18 @@ for line in open('rio_terrain/__init__.py', 'r'):
 with open('VERSION.txt', 'w') as fp:
     fp.write(version)
 
+
+current_directory = path.abspath(path.dirname(__file__))
+with open(path.join(current_directory, 'README.rst', 'r'), encoding='utf-8') as f:
+    long_description = f.read()
+
 setup(name='rio-terrain',
       version=version,
       author='Michael Rahnis',
       author_email='michael.rahnis@fandm.edu',
-      description='Rasterio CLI plugin to perform common operations on height rasters.',
+      description='Rasterio CLI plugin to perform common operations on single-band elevation rasters',
+      long_description=long_description,
+      long_description_content_type='text/x-rst',
       url='http://github.com/mrahnis/rio-terrain',
       license='BSD',
       packages=find_packages(exclude=['examples']),

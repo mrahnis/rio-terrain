@@ -39,8 +39,7 @@ If you are starting from scratch the first thing to do is install the Anaconda P
 .. code-block:: console
 
 	$conda config --append channels conda-forge
-	$conda config --append channels mrahnis
-	$conda install rio-terrain
+	$conda install rio-terrain -c mrahnis
 
 To install from the source distribution execute the setup script in the rio-terrain directory:
 
