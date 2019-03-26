@@ -54,5 +54,6 @@ test:
 
 about:
   home: https://github.com/mrahnis/rio-terrain
+  description: Rasterio CLI plugin to perform common operations on single-band elevation rasters
   license: BSD
   license_file: LICENSE.txt

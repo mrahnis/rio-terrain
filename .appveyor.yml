@@ -43,4 +43,3 @@ artifacts:
 
 on_success:
   - ps: ci\appveyor\deploy_to_anaconda.ps1
-
