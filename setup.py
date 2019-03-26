@@ -16,6 +16,7 @@ current_directory = path.abspath(path.dirname(__file__))
 with open(path.join(current_directory, 'README.rst'), 'r', encoding='utf-8') as f:
     long_description = f.read()
 
+
 setup(name='rio-terrain',
       version=version,
       author='Michael Rahnis',

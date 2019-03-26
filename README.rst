@@ -7,8 +7,8 @@ Rio-terrain provides a set of rasterio CLI plugins to perform common raster oper
 .. image:: https://travis-ci.org/mrahnis/rio-terrain.svg?branch=master
     :target: https://travis-ci.org/mrahnis/rio-terrain
 
-.. image:: https://ci.appveyor.com/api/projects/status/github/mrahnis/rio-terrain?svg=true
-	:target: https://ci.appveyor.com/api/projects/status/github/mrahnis/rio-terrain?svg=true
+.. image:: https://ci.appveyor.com/api/projects/status/90fk8n3stif0yp5f?svg=true
+	:target: https://ci.appveyor.com/project/mrahnis/rio-terrain
 
 .. image:: https://readthedocs.org/projects/rio-terrain/badge/?version=latest
 	:target: http://rio-terrain.readthedocs.io/en/latest/?badge=latest
