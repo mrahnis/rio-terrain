@@ -47,12 +47,12 @@ def tdigest_stats(digest):
     """Estimate descriptive statistics from a tdigest
 
     """
-    min = digest.min()
-    max = digest.max()
-    mean = tdigest_mean(digest)
-    std = tdigest_std(digest)
+    minX = digest.min()
+    maxX = digest.max()
+    meanX = tdigest_mean(digest)
+    stdX = tdigest_std(digest)
 
-    return (min, max, mean, std)
+    return (minX, maxX, meanX, stdX)
 
 
 def digest_window(file, window, absolute):
@@ -129,7 +129,7 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
             elif njobs == 1:
 
                 blocks = rt.subsample(src.block_windows(), probability=fraction)
-                n_blocks = ceil(rt.block_count(src.shape, src.block_shapes)*fraction)
+                n_blocks = ceil(rt.block_count(src.shape, src.block_shapes) * fraction)
                 digest = TDigest()
 
                 click.echo('Running quantiles with sequential t-digest')
@@ -173,14 +173,14 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
     click.echo('Finished in : {}'.format(msg.printtime(t0, time.time())))
 
     click.echo(list(results))
-    min, max, mean, std = description
+    minX, maxX, meanX, stdX = description
 
     if describe:
-        click.echo('min:', min)
-        click.echo('max:', max)
-        click.echo('mean:', mean)
-        click.echo('std:', std)
-        click.echo('count:', count)
+        click.echo("min: {}".format(minX))
+        click.echo("max: {}".format(maxX))
+        click.echo("mean: {}".format(meanX))
+        click.echo("std: {}".format(stdX))
+        click.echo("count: {}".format(count))
 
     if njobs > 0 and plot is True:
 
@@ -198,7 +198,7 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
         """
         qx_predicted_laplace = stats.laplace.ppf(digest.cdf(ctr['mean']))
         qx_laplace = np.linspace(start=stats.laplace.ppf(0.001), stop=stats.laplace.ppf(0.999), num=250)
-        qz_laplace = qx_laplace*std + mean
+        qz_laplace = qx_laplace*stdX + mean
         cum_laplace = stats.laplace.cdf(qx_laplace)
         """
 
@@ -228,19 +228,19 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
         plt.plot(samples, cdf, 'r.')
         plt.plot(qz_norm, cum_norm, linestyle='dashed', c='black')
         # plt.plot(qz_laplace, cum_laplace, linestyle='dotted', c='gray')
-        plt.plot([mean], [digest.cdf(mean)], 'k+', markersize=12)
         plt.xlabel('Value')
         plt.ylabel('Probability')
         plt.title('Cumulative Distribution')
+        plt.plot([meanX], [digest.cdf(meanX)], "k+", markersize=12)
         plt.show()
 
         # theoretic normal
         plt.plot(qx_predicted_norm, ctr['mean'], 'r.')
         plt.plot(qx_norm, qz_norm, linestyle='dashed', c='black')
-        plt.plot([0], [mean], 'k+', markersize=12)
         plt.xlabel('Standard Normal Variate')
         plt.ylabel('Value')
         plt.title('QQ-plot on theoretic standard normal')
+        plt.plot([0], [meanX], "k+", markersize=12)
         plt.show()
 
         # theoretic laplace
@@ -270,28 +270,28 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
         qx_predicted_norm = stats.norm.ppf(cdf)
 
         qx_norm = np.linspace(start=stats.norm.ppf(0.001), stop=stats.norm.ppf(0.999), num=250)
-        qz_norm = qx_norm*std + mean
+        qz_norm = qx_norm * stdX + meanX
         cum_norm = stats.norm.cdf(qx_norm)
 
         plt.plot(bin_edges[:-1], cdf, 'r.')
         plt.plot(qz_norm, cum_norm, linestyle='dashed', c='black')
-        plt.plot([mean], [0], 'k+', markersize=12)
         plt.xlabel('Value')
         plt.ylabel('Probability')
         plt.title('Cumulative Distribution')
+        plt.plot([meanX], [0], "k+", markersize=12)
         plt.show()
 
         # theoretic normal
 
         # full dataset is too large!
-        # zscore = (arr - mean)/std
+        # zscore = (arr - mean)/stdX
         # plt.plot(zscore, arr, 'r.')
 
         plt.plot(qx_predicted_norm, bin_edges[:-1], 'r.')
         plt.plot(qx_norm, qz_norm, linestyle='dashed', c='black')
-        plt.plot([0], [mean], 'k+', markersize=12)
         plt.xlabel('Standard Normal Variate')
         plt.ylabel('Value')
         #plt.yscale('symlog')
         plt.title('QQ-plot on theoretic standard normal')
+        plt.plot([0], [meanX], "k+", markersize=12)
         plt.show()
