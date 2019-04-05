@@ -30,16 +30,16 @@ def chunk_dim(dim, chunk_size, min_size=None):
     """Chunk a 1D array
 
     """
-    nchunks = floor(dim / chunk_size)
+    nchunks = floor(dim/chunk_size)
     remainder = dim % chunk_size
 
     if nchunks == 0:
         chunks = [remainder]
     elif min_size and (nchunks > 1) and (remainder < min_size):
-        chunks = [chunk_size] * (nchunks - 1)
-        chunks.append(chunk_size + remainder)
+        chunks = [chunk_size]*(nchunks-1)
+        chunks.append(chunk_size+remainder)
     else:
-        chunks = [chunk_size] * nchunks
+        chunks = [chunk_size]*nchunks
         chunks.append(remainder)
 
     return np.array(chunks)
@@ -67,12 +67,12 @@ def block_count(shape, block_shapes, band=1):
         result (int) : number of blocks in the raster
 
     """
-    block_shape = block_shapes[band - 1]
+    block_shape = block_shapes[band-1]
 
-    blocks_wide = ceil(shape[1] / block_shape[1])
-    blocks_high = ceil(shape[0] / block_shape[0])
+    blocks_wide = ceil(shape[1]/block_shape[1])
+    blocks_high = ceil(shape[0]/block_shape[0])
 
-    return blocks_high * blocks_wide
+    return blocks_high*blocks_wide
 
 
 def subsample(blocks, probability=1.0):
@@ -117,7 +117,8 @@ def expand_window(window, src_shape, margin=10):
     row_stop = src_shape[1] if row_stop > src_shape[1] else row_stop
     col_stop = src_shape[0] if col_stop > src_shape[0] else col_stop
 
-    result = Window.from_slices(slice(col_start, col_stop), slice(row_start, row_stop))
+    result = Window.from_slices(slice(col_start, col_stop),
+                                slice(row_start, row_stop))
 
     return result
 
@@ -152,7 +153,7 @@ def slices_to_window(rows, cols):
     return Window.from_slices(rows, cols)
 
 
-def window_bounds(window, affine, offset="center"):
+def window_bounds(window, affine, offset='center'):
     """Create bounds coordinates from a rasterio window
 
     Parameters:
@@ -217,18 +218,17 @@ def trim(arr, margins):
     if (right == 0) and (lower == 0):
         result = arr[left:, upper:]
     elif right == 0:
-        result = arr[left:, upper:-lower]
+        result = arr[left:, upper: -lower]
     elif lower == 0:
-        result = arr[left:-right, upper:]
+        result = arr[left: -right, upper:]
     else:
-        result = arr[left:-right, upper:-lower]
+        result = arr[left: -right, upper: -lower]
 
     return result
 
 
-def tile_grid(
-    ncols, nrows, blockxsize, blockysize, col_offset=0, row_offset=0, overlap=0
-):
+def tile_grid(ncols, nrows, blockxsize, blockysize,
+              col_offset=0, row_offset=0, overlap=0):
     """Return a generator containing read and write windows with a specified
     dimensions and overlap
 
@@ -261,12 +261,10 @@ def tile_grid(
     lr_cols[lr_cols > ncols] = ncols
     lr_rows[lr_rows > nrows] = nrows
 
-    for (ul_row, ul_col, lr_row, lr_col) in zip(
-        ul_rows.ravel() + row_offset,
-        ul_cols.ravel() + col_offset,
-        lr_rows.ravel() + row_offset,
-        lr_cols.ravel() + col_offset,
-    ):
+    for (ul_row, ul_col, lr_row, lr_col) in zip(ul_rows.ravel()+row_offset,
+                                                ul_cols.ravel()+col_offset,
+                                                lr_rows.ravel()+row_offset,
+                                                lr_cols.ravel()+col_offset):
 
         yield Window.from_slices(slice(ul_row, lr_row), slice(ul_col, lr_col))
 
@@ -292,18 +290,16 @@ def tile_grid_intersection(src0, src1, blockxsize=None, blockysize=None):
         nrows (int) : write raster height in rows
 
     """
-    bbox0 = window_bounds(((0, 0), src0.shape), src0.transform, offset="ul")
+    bbox0 = window_bounds(((0, 0), src0.shape),
+                          src0.transform, offset='ul')
 
-    bbox1 = window_bounds(((0, 0), src1.shape), src1.transform, offset="ul")
+    bbox1 = window_bounds(((0, 0), src1.shape),
+                          src1.transform, offset='ul')
 
     bounds = intersect_bounds(bbox0, bbox1)
 
-    (row_start0, row_stop0), (col_start0, col_stop0) = bounds_window(
-        bounds, src0.transform
-    )
-    (row_start1, row_stop1), (col_start1, col_stop1) = bounds_window(
-        bounds, src1.transform
-    )
+    (row_start0, row_stop0), (col_start0, col_stop0) = bounds_window(bounds, src0.transform)
+    (row_start1, row_stop1), (col_start1, col_stop1) = bounds_window(bounds, src1.transform)
 
     ncols = col_stop0 - col_start0
     nrows = row_stop0 - row_start0
@@ -314,22 +310,10 @@ def tile_grid_intersection(src0, src1, blockxsize=None, blockysize=None):
     if blockysize is None:
         blockysize = nrows
 
-    windows0 = tile_grid(
-        ncols,
-        nrows,
-        blockxsize,
-        blockysize,
-        col_offset=col_start0,
-        row_offset=row_start0,
-    )
-    windows1 = tile_grid(
-        ncols,
-        nrows,
-        blockxsize,
-        blockysize,
-        col_offset=col_start1,
-        row_offset=row_start1,
-    )
+    windows0 = tile_grid(ncols, nrows, blockxsize, blockysize,
+                         col_offset=col_start0, row_offset=row_start0)
+    windows1 = tile_grid(ncols, nrows, blockxsize, blockysize,
+                         col_offset=col_start1, row_offset=row_start1)
     write_windows = tile_grid(ncols, nrows, blockxsize, blockysize)
 
     return (windows0, windows1, write_windows, affine, nrows, ncols)
@@ -360,16 +344,14 @@ def is_raster_intersecting(src0, src1):
     """Test two rasters for overlap
 
     """
-    bbox0 = window_bounds(((0, 0), src0.shape), src0.transform, offset="ul")
-    bbox1 = window_bounds(((0, 0), src1.shape), src1.transform, offset="ul")
+    bbox0 = window_bounds(((0, 0), src0.shape),
+                          src0.transform, offset='ul')
+    bbox1 = window_bounds(((0, 0), src1.shape),
+                          src1.transform, offset='ul')
 
     # is xmin2 < xmax1 and xmax2 > xmin1
-    return (
-        (bbox1[0] < bbox0[2])
-        & (bbox1[2] > bbox0[0])
-        & (bbox1[1] < bbox0[3])
-        & (bbox1[3] > bbox0[1])
-    )
+    return (bbox1[0] < bbox0[2]) & (bbox1[2] > bbox0[0]) & \
+        (bbox1[1] < bbox0[3]) & (bbox1[3] > bbox0[1])
 
 
 def is_raster_aligned(src0, src1):
@@ -393,8 +375,5 @@ def is_raster_aligned(src0, src1):
     ul0 = affine0[2::3]
     ul1 = affine1[2::3]
 
-    return (
-        np.array_equal(step0, step1)
-        & np.array_equal(rot0, rot1)
-        & ((ul0 - ul1) % step0[0] == 0).all()
-    )
+    return np.array_equal(step0, step1) & np.array_equal(rot0, rot1) & \
+        ((ul0 - ul1) % step0[0] == 0).all()
