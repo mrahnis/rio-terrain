@@ -115,7 +115,7 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
 
             if njobs < 1:
 
-                click.echo('Running quantiles in-memory')
+                click.echo("Running quantiles in-memory")
                 data = src.read(1)
                 data[data <= src.nodata+1] = np.nan
                 arr = data[np.isfinite(data)]
@@ -132,7 +132,7 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
                 n_blocks = ceil(rt.block_count(src.shape, src.block_shapes) * fraction)
                 digest = TDigest()
 
-                click.echo('Running quantiles with sequential t-digest')
+                click.echo("Running quantiles with sequential t-digest")
                 with click.progressbar(length=n_blocks, label='Blocks done:') as bar:
                     for ij, window in blocks:
                         data = src.read(1, window=window)
@@ -158,7 +158,7 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
                 n_blocks = ceil(rt.block_count(src.shape, src.block_shapes)*fraction)
                 digest = TDigest()
 
-                click.echo('Running quantiles with multiprocess t-digest')
+                click.echo("Running quantiles with multiprocess t-digest")
                 with concurrent.futures.ProcessPoolExecutor(max_workers=njobs) as executor, \
                         click.progressbar(length=n_blocks, label='Blocks done:') as bar:
                     for (window, window_digest, window_count) in executor.map(digest_window, repeat(input), blocks, repeat(absolute)):
@@ -170,7 +170,7 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
                 description = tdigest_stats(digest)
                 results = zip(quantile, digest.quantile(quantile))
 
-    click.echo('Finished in : {}'.format(msg.printtime(t0, time.time())))
+    click.echo("Finished in : {}".format(msg.printtime(t0, time.time())))
 
     click.echo(list(results))
     minX, maxX, meanX, stdX = description

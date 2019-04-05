@@ -35,23 +35,22 @@ def minmax(src, windows, njobs):
 
     if njobs < 1:
         data = src.read(1)
-        data[data <= src.nodata+1] = np.nan
+        data[data <= src.nodata + 1] = np.nan
         src_min, src_max = _minmax(data)
         return src_min, src_max
     else:
+
         def jobs():
             for ij, window in windows:
                 data = src.read(1, window=window)
-                data[data <= src.nodata+1] = np.nan
+                data[data <= src.nodata + 1] = np.nan
                 yield data, window
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor:
 
             future_to_window = {
-                executor.submit(
-                    _minmax,
-                    data): (window)
-                for data, window in jobs()}
+                executor.submit(_minmax, data): (window) for data, window in jobs()
+            }
 
             for future in concurrent.futures.as_completed(future_to_window):
                 # window = future_to_window[future]
@@ -94,7 +93,7 @@ def mean(src, windows, njobs):
 
     if njobs < 1:
         data = src.read(1)
-        data[data <= src.nodata+1] = np.nan
+        data[data <= src.nodata + 1] = np.nan
         vals = data[np.isfinite(data[:])]
         mean = np.nanmean(vals)
     else:
@@ -102,7 +101,7 @@ def mean(src, windows, njobs):
         def jobs():
             for ij, window in windows:
                 data = src.read(1, window=window)
-                data[data <= src.nodata+1] = np.nan
+                data[data <= src.nodata + 1] = np.nan
                 yield data, window
 
         src_sum = 0.0
@@ -111,10 +110,8 @@ def mean(src, windows, njobs):
         with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor:
 
             future_to_window = {
-                executor.submit(
-                    _accumulate,
-                    data): (window)
-                for data, window in jobs()}
+                executor.submit(_accumulate, data): (window) for data, window in jobs()
+            }
 
             for future in concurrent.futures.as_completed(future_to_window):
                 # window = future_to_window[future]
@@ -142,16 +139,17 @@ def stddev(src, mean, windows, njobs):
     stddev =  23.5554506735
     ArcGIS = 23.555450665488
     """
+
     def _accumulate(arr):
         mask = np.isfinite(arr[:])
-        sum_ = np.sum(np.square(arr[mask]-mean))
+        sum_ = np.sum(np.square(arr[mask] - mean))
         count_ = np.count_nonzero(mask)
 
         return sum_, count_
 
     if njobs < 1:
         data = src.read(1)
-        data[data <= src.nodata+1] = np.nan
+        data[data <= src.nodata + 1] = np.nan
         vals = data[np.isfinite(data[:])]
         stddev = np.nanstd(vals)
     else:
@@ -159,7 +157,7 @@ def stddev(src, mean, windows, njobs):
         def jobs():
             for ij, window in windows:
                 data = src.read(1, window=window)
-                data[data <= src.nodata+1] = np.nan
+                data[data <= src.nodata + 1] = np.nan
                 yield data, window
 
         src_dev_sum = 0.0
@@ -168,10 +166,8 @@ def stddev(src, mean, windows, njobs):
         with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor:
 
             future_to_window = {
-                executor.submit(
-                    _accumulate,
-                    data): (window)
-                for data, window in jobs()}
+                executor.submit(_accumulate, data): (window) for data, window in jobs()
+            }
 
             for future in concurrent.futures.as_completed(future_to_window):
                 # window = future_to_window[future]
@@ -179,6 +175,6 @@ def stddev(src, mean, windows, njobs):
                 src_dev_sum += window_dev_sum
                 src_dev_count += window_dev_count
 
-            stddev = np.sqrt(src_dev_sum / (src_dev_count-1))
+            stddev = np.sqrt(src_dev_sum / (src_dev_count - 1))
 
     return stddev

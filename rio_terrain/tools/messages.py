@@ -11,11 +11,11 @@ COMPLETION = "Finished in {}"
 WRITEOUT = "Wrote output to {}"
 
 # Warnings
-STRIPED = 'Blocks are lines with shape {}. Rewrite the data blocks for faster out-of-core processing.'
+STRIPED = "Blocks are lines with shape {}. Rewrite the data blocks for faster out-of-core processing."
 
 # Errors
-NONINTERSECTING = 'Input rasters are non-intersecting'
-NONALIGNED = 'Raster cells are not aligned between inputs'
+NONINTERSECTING = "Input rasters are non-intersecting"
+NONALIGNED = "Raster cells are not aligned between inputs"
 
 
 def printtime(t0, t1):
@@ -40,8 +40,10 @@ def progress(value, endvalue, bar_length=20, msg=None):
     progress = done_char * int(round(percent * bar_length))
     spaces = todo_char * (bar_length - len(progress))
 
-    message = "\rPercent: [{0}] {1}%    {2}".format(progress + spaces, int(round(percent * 100)), msg)
+    message = "\rPercent: [{0}] {1}%    {2}".format(
+        progress + spaces, int(round(percent * 100)), msg
+    )
     sys.stdout.write(message)
-    if value == endvalue-1:
+    if value == endvalue - 1:
         sys.stdout.write('\n')
     sys.stdout.flush()
