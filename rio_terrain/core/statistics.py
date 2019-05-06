@@ -6,7 +6,7 @@ import numpy as np
 def minmax(src, windows, njobs):
     """Calculates the minimum and maximum values in a rasterio source.
 
-    Args:
+    Parameters:
         src : rasterio source
         windows : iterable of read and write windows
         njobs (integer) : number of processing jobs
@@ -72,7 +72,7 @@ def minmax(src, windows, njobs):
 def mean(src, windows, njobs):
     """Calculates the mean of a rasterio source
 
-    Args:
+    Parameters:
         src : rasterio source
         windows : iterable of read and write windows
         njobs (integer) : number of processing jobs
@@ -127,7 +127,7 @@ def mean(src, windows, njobs):
 def stddev(src, mean, windows, njobs):
     """Calculates the standard deviation of a rasterio source
 
-    Args:
+    Parameters:
         src : rasterio source
         mean : mean value
         windows : iterable of read and write windows
