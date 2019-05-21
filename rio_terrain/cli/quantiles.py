@@ -190,7 +190,7 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
         # calculate positions relative to standard normal distribution
         qx_predicted_norm = stats.norm.ppf(digest.cdf(ctr['mean']))
         qx_norm = np.linspace(start=stats.norm.ppf(0.001), stop=stats.norm.ppf(0.999), num=250)
-        qz_norm = qx_norm*std + mean
+        qz_norm = qx_norm*stdX + meanX
         cum_norm = stats.norm.cdf(qx_norm)
 
         # scaled to theoretic laplace
@@ -204,7 +204,7 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
 
         # frequency at centroid (irregular width bins)
         plt.plot(ctr['mean'], ctr['weight'], 'r.')
-        plt.plot([mean], [0], 'k+', markersize=12)
+        plt.plot([meanX], [0], 'k+', markersize=12)
         plt.xlabel('Centroid Value')
         plt.ylabel('Counts')
         plt.title('Centroid Counts')
@@ -284,14 +284,13 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
         # theoretic normal
 
         # full dataset is too large!
-        # zscore = (arr - mean)/stdX
+        # zscore = (arr - meanX)/stdX
         # plt.plot(zscore, arr, 'r.')
 
         plt.plot(qx_predicted_norm, bin_edges[:-1], 'r.')
         plt.plot(qx_norm, qz_norm, linestyle='dashed', c='black')
         plt.xlabel('Standard Normal Variate')
         plt.ylabel('Value')
-        #plt.yscale('symlog')
         plt.title('QQ-plot on theoretic standard normal')
         plt.plot([0], [meanX], "k+", markersize=12)
         plt.show()
