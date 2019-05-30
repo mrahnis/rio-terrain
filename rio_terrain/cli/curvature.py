@@ -79,7 +79,7 @@ def curvature(ctx, input, output, neighbors, stats, njobs, verbose):
                     data = src.read(1)
                     data[data <= src.nodata + 1] = np.nan
                     result = rt.curvature(data, step=step, neighbors=int(neighbors))
-                    dst.write(result.astype(np.float32), 1)
+                    dst.write(result.astype(profile['dtype']), 1)
                 elif njobs == 1:
                     click.echo((msg.STARTING).format('curvature', msg.SEQUENTIAL))
                     with click.progressbar(
@@ -94,7 +94,7 @@ def curvature(ctx, input, output, neighbors, stats, njobs, verbose):
                                 data, step=step, neighbors=int(neighbors)
                             )
                             result = rt.trim(arr, rt.margins(read_window, write_window))
-                            dst.write(result.astype(np.float32), 1, window=write_window)
+                            dst.write(result.astype(profile['dtype']), 1, window=write_window)
                             bar.update(result.size)
                 else:
 
@@ -124,7 +124,7 @@ def curvature(ctx, input, output, neighbors, stats, njobs, verbose):
                             read_window, write_window = future_to_window[future]
                             arr = future.result()
                             result = rt.trim(arr, rt.margins(read_window, write_window))
-                            dst.write(result.astype(np.float32), 1, window=write_window)
+                            dst.write(result.astype(profile['dtype']), 1, window=write_window)
                             bar.update(result.size)
 
     click.echo((msg.WRITEOUT).format(output))

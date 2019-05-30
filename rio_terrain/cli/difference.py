@@ -97,7 +97,7 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
                     data0[data0 <= src0.nodata + 1] = np.nan
                     data1[data1 <= src1.nodata + 1] = np.nan
                     result = data1 - data0
-                    dst.write(result.astype(np.float32), 1, window=next(write_windows))
+                    dst.write(result.astype(profile['dtype']), 1, window=next(write_windows))
                 elif njobs == 1:
                     click.echo((msg.STARTING).format('difference', msg.SEQUENTIAL))
                     with click.progressbar(
@@ -111,7 +111,7 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
                             data0[data0 <= src0.nodata + 1] = np.nan
                             data1[data1 <= src1.nodata + 1] = np.nan
                             result = data1 - data0
-                            dst.write(result.astype(np.float32), 1, window=write_window)
+                            dst.write(result.astype(profile['dtype']), 1, window=write_window)
                             bar.update(result.size)
                 else:
                     click.echo((msg.STARTING).format('difference', msg.CONCURRENT))
@@ -147,7 +147,7 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
                         for future in concurrent.futures.as_completed(future_to_window):
                             window0, window1, write_window = future_to_window[future]
                             result = future.result()
-                            dst.write(result.astype(np.float32), 1, window=write_window)
+                            dst.write(result.astype(profile['dtype']), 1, window=write_window)
                             bar.update(result.size)
 
     click.echo((msg.WRITEOUT).format(output))

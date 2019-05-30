@@ -95,7 +95,7 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
                     data = src.read(1, window=next(windows0))
                     mask = cat.read(1, window=next(windows1))
                     result = _extract(data, mask, category)
-                    dst.write(result, 1, window=next(write_windows))
+                    dst.write(result.astype(profile['dtype']), 1, window=next(write_windows))
                 elif njobs == 1:
                     click.echo((msg.STARTING).format('extract', msg.SEQUENTIAL))
                     with click.progressbar(
@@ -107,7 +107,7 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
                             data = src.read(1, window=window0)
                             mask = cat.read(1, window=window1)
                             result = _extract(data, mask, category)
-                            dst.write(result, 1, window=write_window)
+                            dst.write(result.astype(profile['dtype']), 1, window=write_window)
                             bar.update(result.size)
                 else:
                     click.echo((msg.STARTING).format('extract', msg.CONCURRENT))
@@ -138,7 +138,7 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
                         for future in concurrent.futures.as_completed(future_to_window):
                             window0, window1, write_window = future_to_window[future]
                             result = future.result()
-                            dst.write(result, 1, window=write_window)
+                            dst.write(result.astype(profile['dtype']), 1, window=write_window)
                             bar.update(result.size)
 
     click.echo((msg.WRITEOUT).format(output))

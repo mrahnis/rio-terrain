@@ -79,7 +79,7 @@ def aspect(ctx, input, output, neighbors, pcs, njobs, verbose):
                     result = rt.aspect(
                         data, step=step, pcs=pcs, neighbors=int(neighbors)
                     )
-                    dst.write(result.astype(np.float32), 1)
+                    dst.write(result.astype(profile['dtype']), 1)
                 elif njobs == 1:
                     click.echo((msg.STARTING).format('aspect', msg.SEQUENTIAL))
                     with click.progressbar(
@@ -94,7 +94,7 @@ def aspect(ctx, input, output, neighbors, pcs, njobs, verbose):
                                 data, step=step, pcs=pcs, neighbors=int(neighbors)
                             )
                             result = rt.trim(arr, rt.margins(read_window, write_window))
-                            dst.write(result.astype(np.float32), 1, window=write_window)
+                            dst.write(result.astype(profile['dtype']), 1, window=write_window)
                             bar.update(result.size)
                 else:
                     click.echo((msg.STARTING).format('aspect', msg.CONCURRENT))
@@ -128,7 +128,7 @@ def aspect(ctx, input, output, neighbors, pcs, njobs, verbose):
                             read_window, write_window = future_to_window[future]
                             arr = future.result()
                             result = rt.trim(arr, rt.margins(read_window, write_window))
-                            dst.write(result.astype(np.float32), 1, window=write_window)
+                            dst.write(result.astype(profile['dtype']), 1, window=write_window)
                             bar.update(result.size)
 
     click.echo((msg.WRITEOUT).format(output))
