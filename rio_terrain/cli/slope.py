@@ -99,7 +99,7 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
                     result = rt.slope(
                         data, step=step, units=units, neighbors=int(neighbors)
                     )
-                    dst.write(result, 1)
+                    dst.write(result.astype(np.float32), 1)
                 elif njobs == 1:
                     click.echo((msg.STARTING).format('slope', msg.SEQUENTIAL))
                     with click.progressbar(
@@ -114,7 +114,7 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
                                 data, step=step, units=units, neighbors=int(neighbors)
                             )
                             result = rt.trim(arr, rt.margins(read_window, write_window))
-                            dst.write(result, 1, window=write_window)
+                            dst.write(result.astype(np.float32), 1, window=write_window)
                             bar.update(result.size)
                 else:
                     click.echo((msg.STARTING).format('slope', msg.CONCURRENT))
@@ -148,7 +148,7 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
                             read_window, write_window = future_to_window[future]
                             arr = future.result()
                             result = rt.trim(arr, rt.margins(read_window, write_window))
-                            dst.write(result, 1, window=write_window)
+                            dst.write(result.astype(np.float32), 1, window=write_window)
                             bar.update(result.size)
 
     click.echo((msg.WRITEOUT).format(output))

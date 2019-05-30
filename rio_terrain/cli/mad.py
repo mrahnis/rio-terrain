@@ -88,7 +88,7 @@ def mad(ctx, input, output, neighborhood, blocks, njobs, verbose):
                     result = focalstatistics.mad(
                         data, size=(neighborhood, neighborhood)
                     )
-                    dst.write(result, 1)
+                    dst.write(result.astype(np.float32), 1)
                 elif njobs == 1:
                     click.echo((msg.STARTING).format('mad', msg.SEQUENTIAL))
                     with click.progressbar(
@@ -103,7 +103,7 @@ def mad(ctx, input, output, neighborhood, blocks, njobs, verbose):
                                 data, size=(neighborhood, neighborhood)
                             )
                             result = rt.trim(arr, rt.margins(read_window, write_window))
-                            dst.write(result, 1, window=write_window)
+                            dst.write(result.astype(np.float32), 1, window=write_window)
                             bar.update(result.size)
                 else:
                     click.echo((msg.STARTING).format('mad', msg.CONCURRENT))
@@ -135,7 +135,7 @@ def mad(ctx, input, output, neighborhood, blocks, njobs, verbose):
                             read_window, write_window = future_to_window[future]
                             arr = future.result()
                             result = rt.trim(arr, rt.margins(read_window, write_window))
-                            dst.write(result, 1, window=write_window)
+                            dst.write(result.astype(np.float32), 1, window=write_window)
                             bar.update(result.size)
 
     click.echo((msg.WRITEOUT).format(output))

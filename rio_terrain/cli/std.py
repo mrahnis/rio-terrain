@@ -91,7 +91,7 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
                     result = focalstatistics.std(
                         data, size=(neighborhood, neighborhood)
                     )
-                    dst.write(result, 1)
+                    dst.write(result.astype(np.float32), 1)
                 elif njobs == 1:
                     click.echo((msg.STARTING).format('std', msg.SEQUENTIAL))
                     with click.progressbar(
@@ -106,7 +106,7 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
                                 data, size=(neighborhood, neighborhood)
                             )
                             result = rt.trim(arr, rt.margins(read_window, write_window))
-                            dst.write(result, 1, window=write_window)
+                            dst.write(result.astype(np.float32), 1, window=write_window)
                             bar.update(result.size)
                 else:
                     click.echo((msg.STARTING).format('std', msg.CONCURRENT))
