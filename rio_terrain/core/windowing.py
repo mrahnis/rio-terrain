@@ -386,15 +386,15 @@ def is_raster_aligned(src0, src1):
     affine0 = np.array(src0.transform)
     affine1 = np.array(src1.transform)
 
-    step0 = affine0[0::3]
-    step1 = affine1[0::3]
+    res0 = affine0[0::3]
+    res1 = affine1[0::3]
     rot0 = affine0[1::3]
     rot1 = affine1[1::3]
     ul0 = affine0[2::3]
     ul1 = affine1[2::3]
 
     return (
-        np.array_equal(step0, step1)
+        np.array_equal(res0, res1)
         & np.array_equal(rot0, rot1)
-        & ((ul0 - ul1) % step0[0] == 0).all()
+        & ((ul0 - ul1) % res0[0] == 0).all()
     )

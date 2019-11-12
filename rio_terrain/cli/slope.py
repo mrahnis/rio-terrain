@@ -68,7 +68,7 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
         with rasterio.open(input) as src:
             profile = src.profile
             affine = src.transform
-            step = (affine[0], affine[4])
+            res = (affine[0], affine[4])
             profile.update(dtype=rasterio.float32, count=1, compress='lzw')
 
             if njobs >= 1:
@@ -97,7 +97,7 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
                     data = src.read(1)
                     data[data <= src.nodata + 1] = np.nan
                     result = rt.slope(
-                        data, step=step, units=units, neighbors=int(neighbors)
+                        data, res=res, units=units, neighbors=int(neighbors)
                     )
                     dst.write(result.astype(profile['dtype']), 1)
                 elif njobs == 1:
@@ -111,7 +111,7 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
                             data = src.read(1, window=read_window)
                             data[data <= src.nodata + 1] = np.nan
                             arr = rt.slope(
-                                data, step=step, units=units, neighbors=int(neighbors)
+                                data, res=res, units=units, neighbors=int(neighbors)
                             )
                             result = rt.trim(arr, rt.margins(read_window, write_window))
                             dst.write(result.astype(profile['dtype']), 1, window=write_window)
@@ -137,7 +137,7 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
                             executor.submit(
                                 rt.slope,
                                 data,
-                                step=step,
+                                res=res,
                                 units=units,
                                 neighbors=int(neighbors),
                             ): (read_window, write_window)
