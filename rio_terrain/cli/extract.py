@@ -65,7 +65,6 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
 
             profile = src.profile
             affine = src.transform
-            step = (affine[0], affine[4])
 
             if njobs >= 1:
                 block_shape = (src.block_shapes)[0]

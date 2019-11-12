@@ -111,7 +111,6 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
         with rasterio.open(input) as src:
             profile = src.profile
             affine = src.transform
-            step = (affine[0], affine[4])
 
             if njobs < 1:
 

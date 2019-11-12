@@ -93,7 +93,6 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
 
             profile = src.profile
             affine = src.transform
-            step = (affine[0], affine[4])
 
             if keep_data:
                 dtype = profile['dtype']

@@ -59,7 +59,6 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
         with rasterio.open(input) as src:
             profile = src.profile
             affine = src.transform
-            step = (affine[0], affine[4])
             profile.update(
                 dtype=rasterio.float32, count=1, compress='lzw', bigtiff='yes'
             )

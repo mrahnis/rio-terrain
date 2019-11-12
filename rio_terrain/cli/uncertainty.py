@@ -86,7 +86,6 @@ def uncertainty(
 
             profile = src0.profile
             affine = src0.transform
-            step = (affine[0], affine[4])
 
             if njobs >= 1:
                 block_shape = (src0.block_shapes)[0]

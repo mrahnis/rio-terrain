@@ -58,7 +58,6 @@ def label(ctx, input, output, diagonals, zeros, njobs, verbose):
 
             profile = src.profile
             affine = src.transform
-            step = (affine[0], affine[4])
 
             dtype = 'int32'
             nodata = np.iinfo(np.int32).min

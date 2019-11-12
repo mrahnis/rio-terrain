@@ -60,7 +60,6 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
 
             profile = src0.profile
             affine = src0.transform
-            step = (affine[0], affine[4])
             nodata = np.iinfo(np.int32).min
 
             if njobs >= 1:

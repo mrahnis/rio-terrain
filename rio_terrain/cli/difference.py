@@ -61,7 +61,6 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
 
             profile = src0.profile
             affine = src0.transform
-            step = (affine[0], affine[4])
 
             if njobs >= 1:
                 block_shape = (src0.block_shapes)[0]
