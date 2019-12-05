@@ -72,7 +72,7 @@ def digest_window(file, window, absolute):
     return window, digest_, count_
 
 
-@click.command()
+@click.command('quantiles')
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.option('-q', '--quantile', multiple=True, type=float,
               help='Print quantile value')
@@ -103,71 +103,70 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
         np.warnings.filterwarnings('ignore')
 
     t0 = time.time()
+    command = click.get_current_context().info_name
 
     count = 0
 
-    with rasterio.Env():
+    with rasterio.open(input) as src:
+        profile = src.profile
+        affine = src.transform
 
-        with rasterio.open(input) as src:
-            profile = src.profile
-            affine = src.transform
+        if njobs < 1:
 
-            if njobs < 1:
+            click.echo("Running quantiles in-memory")
+            data = src.read(1)
+            data[data <= src.nodata+1] = np.nan
+            arr = data[np.isfinite(data)]
+            if absolute:
+                arr = np.absolute(arr)
 
-                click.echo("Running quantiles in-memory")
-                data = src.read(1)
-                data[data <= src.nodata+1] = np.nan
-                arr = data[np.isfinite(data)]
-                if absolute:
-                    arr = np.absolute(arr)
+            count = np.count_nonzero(~np.isnan(data))
+            description = (arr.min(), arr.max(), arr.mean(), arr.std())
+            results = zip(quantile, mquantiles(arr, np.array(quantile)))
 
-                count = np.count_nonzero(~np.isnan(data))
-                description = (arr.min(), arr.max(), arr.mean(), arr.std())
-                results = zip(quantile, mquantiles(arr, np.array(quantile)))
+        elif njobs == 1:
 
-            elif njobs == 1:
+            blocks = rt.subsample(src.block_windows(), probability=fraction)
+            n_blocks = ceil(rt.block_count(src.shape, src.block_shapes) * fraction)
+            digest = TDigest()
 
-                blocks = rt.subsample(src.block_windows(), probability=fraction)
-                n_blocks = ceil(rt.block_count(src.shape, src.block_shapes) * fraction)
-                digest = TDigest()
+            click.echo("Running quantiles with sequential t-digest")
+            with click.progressbar(length=n_blocks, label='Blocks done:') as bar:
+                for ij, window in blocks:
+                    data = src.read(1, window=window)
+                    data[data <= src.nodata+1] = np.nan
+                    arr = data[np.isfinite(data[:])]
+                    if absolute:
+                        arr = np.absolute(arr)
 
-                click.echo("Running quantiles with sequential t-digest")
-                with click.progressbar(length=n_blocks, label='Blocks done:') as bar:
-                    for ij, window in blocks:
-                        data = src.read(1, window=window)
-                        data[data <= src.nodata+1] = np.nan
-                        arr = data[np.isfinite(data[:])]
-                        if absolute:
-                            arr = np.absolute(arr)
+                    window_count = np.count_nonzero(~np.isnan(data))
+                    if window_count > 0:
+                        window_digest = TDigest()
+                        window_digest.update(arr.flatten())
+                        digest.merge(window_digest)
+                        count += window_count
+                    bar.update(1)
 
-                        window_count = np.count_nonzero(~np.isnan(data))
-                        if window_count > 0:
-                            window_digest = TDigest()
-                            window_digest.update(arr.flatten())
-                            digest.merge(window_digest)
-                            count += window_count
-                        bar.update(1)
+            description = tdigest_stats(digest)
+            results = zip(quantile, digest.quantile(quantile))
 
-                description = tdigest_stats(digest)
-                results = zip(quantile, digest.quantile(quantile))
+        else:
 
-            else:
+            blocks = rt.subsample(src.block_windows(), probability=fraction)
+            n_blocks = ceil(rt.block_count(src.shape, src.block_shapes)*fraction)
+            digest = TDigest()
 
-                blocks = rt.subsample(src.block_windows(), probability=fraction)
-                n_blocks = ceil(rt.block_count(src.shape, src.block_shapes)*fraction)
-                digest = TDigest()
+            click.echo("Running quantiles with multiprocess t-digest")
+            with concurrent.futures.ProcessPoolExecutor(max_workers=njobs) as executor, \
+                    click.progressbar(length=n_blocks, label='Blocks done:') as bar:
+                for (window, window_digest, window_count) in executor.map(digest_window, repeat(input), blocks, repeat(absolute)):
+                    if window_count > 0:
+                        digest.merge(window_digest)
+                        count += window_count
+                    bar.update(1)
 
-                click.echo("Running quantiles with multiprocess t-digest")
-                with concurrent.futures.ProcessPoolExecutor(max_workers=njobs) as executor, \
-                        click.progressbar(length=n_blocks, label='Blocks done:') as bar:
-                    for (window, window_digest, window_count) in executor.map(digest_window, repeat(input), blocks, repeat(absolute)):
-                        if window_count > 0:
-                            digest.merge(window_digest)
-                            count += window_count
-                        bar.update(1)
-
-                description = tdigest_stats(digest)
-                results = zip(quantile, digest.quantile(quantile))
+            description = tdigest_stats(digest)
+            results = zip(quantile, digest.quantile(quantile))
 
     click.echo("Finished in : {}".format(msg.printtime(t0, time.time())))
 

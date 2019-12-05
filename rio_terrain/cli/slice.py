@@ -40,7 +40,7 @@ def _slice(data, minimum=None, maximum=None, keep_data=False, false_val=0):
     return result
 
 
-@click.command()
+@click.command('slice')
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
 @click.option(
@@ -86,74 +86,73 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
         np.warnings.filterwarnings('ignore')
 
     t0 = time.time()
+    command = click.get_current_context().info_name
 
-    with rasterio.Env():
+    with rasterio.open(input) as src:
 
-        with rasterio.open(input) as src:
+        profile = src.profile
+        affine = src.transform
 
-            profile = src.profile
-            affine = src.transform
+        if keep_data:
+            dtype = profile['dtype']
+            nodata = profile['nodata']
+            profile.update(count=1, compress='lzw')
+        else:
+            dtype = 'int32'
+            nodata = np.iinfo(np.int32).min
+            profile.update(
+                dtype=rasterio.int32, nodata=nodata, count=1, compress='lzw'
+            )
 
-            if keep_data:
-                dtype = profile['dtype']
-                nodata = profile['nodata']
-                profile.update(count=1, compress='lzw')
+        if zeros:
+            false_val = 0
+        else:
+            false_val = nodata
+
+        with rasterio.open(output, 'w', **profile) as dst:
+            if njobs < 1:
+                click.echo((msg.STARTING).format(command, msg.INMEMORY))
+                data = src.read(1)
+                result = _slice(data, minimum, maximum, keep_data, false_val)
+                dst.write(result.astype(dtype), 1)
+            elif njobs == 1:
+                click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
+                with click.progressbar(
+                    length=src.width * src.height, label='Blocks done:'
+                ) as bar:
+                    for (ij, window) in src.block_windows():
+                        data = src.read(1, window=window)
+                        result = _slice(
+                            data, minimum, maximum, keep_data, false_val
+                        )
+                        dst.write(result.astype(dtype), 1, window=window)
+                        bar.update(result.size)
             else:
-                dtype = 'int32'
-                nodata = np.iinfo(np.int32).min
-                profile.update(
-                    dtype=rasterio.int32, nodata=nodata, count=1, compress='lzw'
-                )
+                click.echo((msg.STARTING).format(command, msg.CONCURRENT))
 
-            if zeros:
-                false_val = 0
-            else:
-                false_val = nodata
+                def jobs():
+                    for (ij, window) in src.block_windows():
+                        data = src.read(1, window=window)
+                        yield data, window
 
-            with rasterio.open(output, 'w', **profile) as dst:
-                if njobs < 1:
-                    click.echo((msg.STARTING).format('slice', msg.INMEMORY))
-                    data = src.read(1)
-                    result = _slice(data, minimum, maximum, keep_data, false_val)
-                    dst.write(result.astype(dtype), 1)
-                elif njobs == 1:
-                    click.echo((msg.STARTING).format('slice', msg.SEQUENTIAL))
-                    with click.progressbar(
-                        length=src.width * src.height, label='Blocks done:'
-                    ) as bar:
-                        for (ij, window) in src.block_windows():
-                            data = src.read(1, window=window)
-                            result = _slice(
-                                data, minimum, maximum, keep_data, false_val
-                            )
-                            dst.write(result.astype(dtype), 1, window=window)
-                            bar.update(result.size)
-                else:
-                    click.echo((msg.STARTING).format('slice', msg.CONCURRENT))
+                with concurrent.futures.ThreadPoolExecutor(
+                    max_workers=njobs
+                ) as executor, click.progressbar(
+                    length=src.width * src.height, label='Blocks done:'
+                ) as bar:
 
-                    def jobs():
-                        for (ij, window) in src.block_windows():
-                            data = src.read(1, window=window)
-                            yield data, window
+                    future_to_window = {
+                        executor.submit(
+                            _slice, data, minimum, maximum, keep_data, false_val
+                        ): (window)
+                        for (data, window) in jobs()
+                    }
 
-                    with concurrent.futures.ThreadPoolExecutor(
-                        max_workers=njobs
-                    ) as executor, click.progressbar(
-                        length=src.width * src.height, label='Blocks done:'
-                    ) as bar:
-
-                        future_to_window = {
-                            executor.submit(
-                                _slice, data, minimum, maximum, keep_data, false_val
-                            ): (window)
-                            for (data, window) in jobs()
-                        }
-
-                        for future in concurrent.futures.as_completed(future_to_window):
-                            window = future_to_window[future]
-                            result = future.result()
-                            dst.write(result.astype(dtype), 1, window=window)
-                            bar.update(result.size)
+                    for future in concurrent.futures.as_completed(future_to_window):
+                        window = future_to_window[future]
+                        result = future.result()
+                        dst.write(result.astype(dtype), 1, window=window)
+                        bar.update(result.size)
 
     click.echo((msg.WRITEOUT).format(output))
     click.echo((msg.COMPLETION).format(msg.printtime(t0, time.time())))

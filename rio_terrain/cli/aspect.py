@@ -12,7 +12,7 @@ import rio_terrain.tools.messages as msg
 from rio_terrain import __version__ as plugin_version
 
 
-@click.command()
+@click.command('aspect')
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
 @click.option(
@@ -51,85 +51,84 @@ def aspect(ctx, input, output, neighbors, pcs, njobs, verbose):
         np.warnings.filterwarnings('ignore')
 
     t0 = time.time()
+    command = click.get_current_context().info_name
 
-    with rasterio.Env():
+    with rasterio.open(input) as src:
+        profile = src.profile
+        affine = src.transform
+        res = (affine[0], affine[4])
+        profile.update(dtype=rasterio.float32, count=1, compress='lzw')
 
-        with rasterio.open(input) as src:
-            profile = src.profile
-            affine = src.transform
-            res = (affine[0], affine[4])
-            profile.update(dtype=rasterio.float32, count=1, compress='lzw')
+        if njobs >= 1:
+            blockshape = (list(src.block_shapes))[0]
+            if (blockshape[0] == 1) or (blockshape[1] == 1):
+                warnings.warn((msg.STRIPED).format(blockshape))
+            read_windows = rt.tile_grid(
+                src.width, src.height, blockshape[0], blockshape[1], overlap=2
+            )
+            write_windows = rt.tile_grid(
+                src.width, src.height, blockshape[0], blockshape[1], overlap=0
+            )
 
-            if njobs >= 1:
-                blockshape = (list(src.block_shapes))[0]
-                if (blockshape[0] == 1) or (blockshape[1] == 1):
-                    warnings.warn((msg.STRIPED).format(blockshape))
-                read_windows = rt.tile_grid(
-                    src.width, src.height, blockshape[0], blockshape[1], overlap=2
+        with rasterio.open(output, 'w', **profile) as dst:
+            if njobs < 1:
+                click.echo((msg.STARTING).format(command, msg.INMEMORY))
+                data = src.read(1)
+                data[data <= src.nodata + 1] = np.nan
+                result = rt.aspect(
+                    data, res=res, pcs=pcs, neighbors=int(neighbors)
                 )
-                write_windows = rt.tile_grid(
-                    src.width, src.height, blockshape[0], blockshape[1], overlap=0
-                )
+                dst.write(result.astype(profile['dtype']), 1)
+            elif njobs == 1:
+                click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
+                with click.progressbar(
+                    length=src.width * src.height, label='Blocks done:'
+                ) as bar:
+                    for (read_window, write_window) in zip(
+                        read_windows, write_windows
+                    ):
+                        data = src.read(1, window=read_window)
+                        data[data <= src.nodata + 1] = np.nan
+                        arr = rt.aspect(
+                            data, res=res, pcs=pcs, neighbors=int(neighbors)
+                        )
+                        result = rt.trim(arr, rt.margins(read_window, write_window))
+                        dst.write(result.astype(profile['dtype']), 1, window=write_window)
+                        bar.update(result.size)
+            else:
+                click.echo((msg.STARTING).format(command, msg.CONCURRENT))
 
-            with rasterio.open(output, 'w', **profile) as dst:
-                if njobs < 1:
-                    click.echo((msg.STARTING).format('aspect', msg.INMEMORY))
-                    data = src.read(1)
-                    data[data <= src.nodata + 1] = np.nan
-                    result = rt.aspect(
-                        data, res=res, pcs=pcs, neighbors=int(neighbors)
-                    )
-                    dst.write(result.astype(profile['dtype']), 1)
-                elif njobs == 1:
-                    click.echo((msg.STARTING).format('aspect', msg.SEQUENTIAL))
-                    with click.progressbar(
-                        length=src.width * src.height, label='Blocks done:'
-                    ) as bar:
-                        for (read_window, write_window) in zip(
-                            read_windows, write_windows
-                        ):
-                            data = src.read(1, window=read_window)
-                            data[data <= src.nodata + 1] = np.nan
-                            arr = rt.aspect(
-                                data, res=res, pcs=pcs, neighbors=int(neighbors)
-                            )
-                            result = rt.trim(arr, rt.margins(read_window, write_window))
-                            dst.write(result.astype(profile['dtype']), 1, window=write_window)
-                            bar.update(result.size)
-                else:
-                    click.echo((msg.STARTING).format('aspect', msg.CONCURRENT))
+                def jobs():
+                    for (read_window, write_window) in zip(
+                        read_windows, write_windows
+                    ):
+                        data = src.read(1, window=read_window)
+                        data[data <= src.nodata + 1] = np.nan
+                        yield data, read_window, write_window
 
-                    def jobs():
-                        for (read_window, write_window) in zip(
-                            read_windows, write_windows
-                        ):
-                            data = src.read(1, window=read_window)
-                            data[data <= src.nodata + 1] = np.nan
-                            yield data, read_window, write_window
+                with concurrent.futures.ThreadPoolExecutor(
+                    max_workers=njobs
+                ) as executor, click.progressbar(
+                    length=src.width * src.height, label='Blocks done:'
+                ) as bar:
 
-                    with concurrent.futures.ThreadPoolExecutor(
-                        max_workers=njobs
-                    ) as executor, click.progressbar(
-                        length=src.width * src.height, label='Blocks done:'
-                    ) as bar:
+                    future_to_window = {
+                        executor.submit(
+                            rt.aspect,
+                            data,
+                            res=res,
+                            pcs=pcs,
+                            neighbors=int(neighbors),
+                        ): (read_window, write_window)
+                        for (data, read_window, write_window) in jobs()
+                    }
 
-                        future_to_window = {
-                            executor.submit(
-                                rt.aspect,
-                                data,
-                                res=res,
-                                pcs=pcs,
-                                neighbors=int(neighbors),
-                            ): (read_window, write_window)
-                            for (data, read_window, write_window) in jobs()
-                        }
-
-                        for future in concurrent.futures.as_completed(future_to_window):
-                            read_window, write_window = future_to_window[future]
-                            arr = future.result()
-                            result = rt.trim(arr, rt.margins(read_window, write_window))
-                            dst.write(result.astype(profile['dtype']), 1, window=write_window)
-                            bar.update(result.size)
+                    for future in concurrent.futures.as_completed(future_to_window):
+                        read_window, write_window = future_to_window[future]
+                        arr = future.result()
+                        result = rt.trim(arr, rt.margins(read_window, write_window))
+                        dst.write(result.astype(profile['dtype']), 1, window=write_window)
+                        bar.update(result.size)
 
     click.echo((msg.WRITEOUT).format(output))
     click.echo((msg.COMPLETION).format(msg.printtime(t0, time.time())))
