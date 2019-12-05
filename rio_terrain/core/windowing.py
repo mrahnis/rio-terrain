@@ -117,7 +117,7 @@ def expand_window(window, src_shape, margin=10):
     row_stop = src_shape[1] if row_stop > src_shape[1] else row_stop
     col_stop = src_shape[0] if col_stop > src_shape[0] else col_stop
 
-    result = Window.from_slices(slice(col_start, col_stop), slice(row_start, row_stop))
+    result = Window.from_slices(slice(col_start, col_stop, 1), slice(row_start, row_stop, 1))
 
     return result
 
