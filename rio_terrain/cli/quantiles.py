@@ -168,7 +168,7 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
             description = tdigest_stats(digest)
             results = zip(quantile, digest.quantile(quantile))
 
-    click.echo("Finished in : {}".format(msg.printtime(t0, time.time())))
+    click.echo((msg.COMPLETION).format(msg.printtime(t0, time.time())))
 
     click.echo(list(results))
     minX, maxX, meanX, stdX = description
