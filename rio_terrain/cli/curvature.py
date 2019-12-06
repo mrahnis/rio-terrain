@@ -61,7 +61,7 @@ def curvature(ctx, input, output, neighbors, stats, njobs, verbose):
         res = (affine[0], affine[4])
         profile.update(dtype=rasterio.float32, count=1, compress='lzw')
 
-        if njobs >= 1:
+        if (njobs >= 1) and src.is_tiled:
             blockshape = (list(src.block_shapes))[0]
             if (blockshape[0] == 1) or (blockshape[1] == 1):
                 warnings.warn((msg.STRIPED).format(blockshape))
@@ -71,6 +71,8 @@ def curvature(ctx, input, output, neighbors, stats, njobs, verbose):
             write_windows = rt.tile_grid(
                 src.width, src.height, blockshape[0], blockshape[1], overlap=0
             )
+        else:
+            warnings.warn((msg.NOTILING).format(blockshape))
 
         with rasterio.open(output, 'w', **profile) as dst:
             if njobs < 1:

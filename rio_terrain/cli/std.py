@@ -62,7 +62,7 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
             dtype=rasterio.float32, count=1, compress='lzw', bigtiff='yes'
         )
 
-        if njobs >= 1:
+        if (njobs >= 1) and src.is_tiled:
             blockshape = (list(src.block_shapes))[0]
             if (blockshape[0] == 1) or (blockshape[1] == 1):
                 warnings.warn((msg.STRIPED).format(blockshape))
@@ -80,6 +80,8 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
                 blockshape[1] * blocks,
                 overlap=0,
             )
+        else:
+            warnings.warn((msg.NOTILING).format(blockshape))
 
         with rasterio.open(output, 'w', **profile) as dst:
             if njobs < 1:

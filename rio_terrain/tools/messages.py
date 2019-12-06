@@ -11,7 +11,8 @@ COMPLETION = "Finished in {}"
 WRITEOUT = "Wrote output to {}"
 
 # Warnings
-STRIPED = "Blocks are lines with shape {}. Rewrite the data blocks for faster out-of-core processing."
+STRIPED = "Blocks are lines with shape {}. Rewrite the data blocks for sequential and parallel processing."
+NOTILING = "Raster with shape {} is not tiled. Rewrite the data with tiling for sequential and parallel processing."
 
 # Errors
 NONINTERSECTING = "Input rasters are non-intersecting"
