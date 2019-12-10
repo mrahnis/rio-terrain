@@ -55,7 +55,7 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
 
         if not rt.is_raster_intersecting(src0, src1):
             raise ValueError(msg.NONINTERSECTING)
-        #if not rt.is_raster_aligned(src0, src1):
+        # if not rt.is_raster_aligned(src0, src1):
         #    raise ValueError(msg.NONALIGNED)
 
         profile = src0.profile
@@ -90,11 +90,11 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
         with rasterio.open(output, 'w', **profile) as dst:
             if njobs < 1:
                 click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                data0 = src0.read(1, window=next(windows0))
-                data1 = src1.read(1, window=next(windows1))
-                data0[data0 <= src0.nodata + 1] = np.nan
-                data1[data1 <= src1.nodata + 1] = np.nan
-                result = data1 - data0
+                img0 = src0.read(1, window=next(windows0))
+                img1 = src1.read(1, window=next(windows1))
+                img0[img0 <= src0.nodata + 1] = np.nan
+                img1[img1 <= src1.nodata + 1] = np.nan
+                result = img1 - img0
                 dst.write(result.astype(profile['dtype']), 1, window=next(write_windows))
             elif njobs == 1:
                 click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
@@ -104,11 +104,11 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
                     for (window0, window1, write_window) in zip(
                         windows0, windows1, write_windows
                     ):
-                        data0 = src0.read(1, window=window0)
-                        data1 = src1.read(1, window=window1)
-                        data0[data0 <= src0.nodata + 1] = np.nan
-                        data1[data1 <= src1.nodata + 1] = np.nan
-                        result = data1 - data0
+                        img0 = src0.read(1, window=window0)
+                        img1 = src1.read(1, window=window1)
+                        img0[img0 <= src0.nodata + 1] = np.nan
+                        img1[img1 <= src1.nodata + 1] = np.nan
+                        result = img1 - img0
                         dst.write(result.astype(profile['dtype']), 1, window=write_window)
                         bar.update(result.size)
             else:
@@ -118,14 +118,14 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
                     for (window0, window1, write_window) in zip(
                         windows0, windows1, write_windows
                     ):
-                        data0 = src0.read(1, window=window0)
-                        data1 = src1.read(1, window=window1)
-                        data0[data0 <= src0.nodata + 1] = np.nan
-                        data1[data1 <= src1.nodata + 1] = np.nan
-                        yield data0, data1, window0, window1, write_window
+                        img0 = src0.read(1, window=window0)
+                        img1 = src1.read(1, window=window1)
+                        img0[img0 <= src0.nodata + 1] = np.nan
+                        img1[img1 <= src1.nodata + 1] = np.nan
+                        yield img0, img1, window0, window1, write_window
 
-                def diff(data0, data1):
-                    return data1 - data0
+                def diff(img0, img1):
+                    return img1 - img0
 
                 with concurrent.futures.ThreadPoolExecutor(
                     max_workers=njobs
@@ -134,12 +134,12 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
                 ) as bar:
 
                     future_to_window = {
-                        executor.submit(diff, data0, data1): (
+                        executor.submit(diff, img0, img1): (
                             window0,
                             window1,
                             write_window,
                         )
-                        for (data0, data1, window0, window1, write_window) in jobs()
+                        for (img0, img1, window0, window1, write_window) in jobs()
                     }
 
                     for future in concurrent.futures.as_completed(future_to_window):

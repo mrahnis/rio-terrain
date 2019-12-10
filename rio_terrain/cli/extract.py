@@ -12,13 +12,13 @@ import rio_terrain.tools.messages as msg
 from rio_terrain import __version__ as plugin_version
 
 
-def _extract(data, categorical, category):
+def do_extract(img, categorical, category):
     if category is None:
         _category = [1]
     else:
         _category = list(category)
     mask = np.isin(categorical, _category)
-    result = data * mask
+    result = img * mask
     return result
 
 
@@ -90,9 +90,9 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
         with rasterio.open(output, 'w', **profile) as dst:
             if njobs < 1:
                 click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                data = src.read(1, window=next(windows0))
+                img = src.read(1, window=next(windows0))
                 mask = cat.read(1, window=next(windows1))
-                result = _extract(data, mask, category)
+                result = do_extract(img, mask, category)
                 dst.write(result.astype(profile['dtype']), 1, window=next(write_windows))
             elif njobs == 1:
                 click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
@@ -102,9 +102,9 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
                     for (window0, window1, write_window) in zip(
                         windows0, windows1, write_windows
                     ):
-                        data = src.read(1, window=window0)
+                        img = src.read(1, window=window0)
                         mask = cat.read(1, window=window1)
-                        result = _extract(data, mask, category)
+                        result = do_extract(img, mask, category)
                         dst.write(result.astype(profile['dtype']), 1, window=write_window)
                         bar.update(result.size)
             else:
@@ -114,9 +114,9 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
                     for (window0, window1, write_window) in zip(
                         windows0, windows1, write_windows
                     ):
-                        data = src.read(1, window=window0)
+                        img = src.read(1, window=window0)
                         mask = cat.read(1, window=window1)
-                        yield data, mask, window0, window1, write_window
+                        yield img, mask, window0, window1, write_window
 
                 with concurrent.futures.ThreadPoolExecutor(
                     max_workers=njobs
@@ -125,12 +125,12 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
                 ) as bar:
 
                     future_to_window = {
-                        executor.submit(_extract, data, mask, category): (
+                        executor.submit(do_extract, img, mask, category): (
                             window0,
                             window1,
                             write_window,
                         )
-                        for (data, mask, window0, window1, write_window) in jobs()
+                        for (img, mask, window0, window1, write_window) in jobs()
                     }
 
                     for future in concurrent.futures.as_completed(future_to_window):

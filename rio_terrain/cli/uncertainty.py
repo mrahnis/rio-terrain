@@ -12,13 +12,13 @@ import rio_terrain.tools.messages as msg
 from rio_terrain import __version__ as plugin_version
 
 
-def _propagate(data0, data1, instrumental0, instrumental1):
+def propagate(img0, img1, instrumental0, instrumental1):
     if instrumental0:
-        data0[data0 < instrumental0] = instrumental0
+        img0[img0 < instrumental0] = instrumental0
     if instrumental1:
-        data1[data1 < instrumental1] = instrumental1
+        img1[img1 < instrumental1] = instrumental1
 
-    result = np.sqrt(np.square(data1) + np.square(data0))
+    result = np.sqrt(np.square(img1) + np.square(img0))
 
     return result
 
@@ -112,9 +112,9 @@ def uncertainty(
         with rasterio.open(output, 'w', **profile) as dst:
             if njobs < 1:
                 click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                data0 = src0.read(1)
-                data1 = src1.read(1)
-                result = _propagate(data0, data1, instrumental0, instrumental1)
+                img0 = src0.read(1)
+                img1 = src1.read(1)
+                result = propagate(img0, img1, instrumental0, instrumental1)
                 dst.write(result.astype(np.float32), 1)
             elif njobs == 1:
                 click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
@@ -124,10 +124,10 @@ def uncertainty(
                     for (window0, window1, write_window) in zip(
                         windows0, windows1, write_windows
                     ):
-                        data0 = src0.read(1, window=window0)
-                        data1 = src1.read(1, window=window1)
-                        result = _propagate(
-                            data0, data1, instrumental0, instrumental1
+                        img0 = src0.read(1, window=window0)
+                        img1 = src1.read(1, window=window1)
+                        result = propagate(
+                            img0, img1, instrumental0, instrumental1
                         )
                         dst.write(result.astype(np.float32), 1, window=write_window)
                         bar.update(result.size)
@@ -138,9 +138,9 @@ def uncertainty(
                     for (window0, window1, write_window) in zip(
                         windows0, windows1, write_windows
                     ):
-                        data0 = src0.read(1, window=window0)
-                        data1 = src1.read(1, window=window1)
-                        yield data0, data1, window0, window1, write_window
+                        img0 = src0.read(1, window=window0)
+                        img1 = src1.read(1, window=window1)
+                        yield img0, img1, window0, window1, write_window
 
                 with concurrent.futures.ThreadPoolExecutor(
                     max_workers=njobs
@@ -150,9 +150,9 @@ def uncertainty(
 
                     future_to_window = {
                         executor.submit(
-                            _propagate, data0, data1, instrumental0, instrumental1
+                            propagate, img0, img1, instrumental0, instrumental1
                         ): (write_window)
-                        for (data0, data1, window0, window1, write_window) in jobs()
+                        for (img0, img1, window0, window1, write_window) in jobs()
                     }
 
                     for future in concurrent.futures.as_completed(future_to_window):

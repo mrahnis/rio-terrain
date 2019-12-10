@@ -77,9 +77,9 @@ def curvature(ctx, input, output, neighbors, stats, njobs, verbose):
         with rasterio.open(output, 'w', **profile) as dst:
             if njobs < 1:
                 click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                data = src.read(1)
-                data[data <= src.nodata + 1] = np.nan
-                result = rt.curvature(data, res=res, neighbors=int(neighbors))
+                img = src.read(1)
+                img[img <= src.nodata + 1] = np.nan
+                result = rt.curvature(img, res=res, neighbors=int(neighbors))
                 dst.write(result.astype(profile['dtype']), 1)
             elif njobs == 1:
                 click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
@@ -89,10 +89,10 @@ def curvature(ctx, input, output, neighbors, stats, njobs, verbose):
                     for (read_window, write_window) in zip(
                         read_windows, write_windows
                     ):
-                        data = src.read(1, window=read_window)
-                        data[data <= src.nodata + 1] = np.nan
+                        img = src.read(1, window=read_window)
+                        img[img <= src.nodata + 1] = np.nan
                         arr = rt.curvature(
-                            data, res=res, neighbors=int(neighbors)
+                            img, res=res, neighbors=int(neighbors)
                         )
                         result = rt.trim(arr, rt.margins(read_window, write_window))
                         dst.write(result.astype(profile['dtype']), 1, window=write_window)
@@ -103,9 +103,9 @@ def curvature(ctx, input, output, neighbors, stats, njobs, verbose):
                     for (read_window, write_window) in zip(
                         read_windows, write_windows
                     ):
-                        data = src.read(1, window=read_window)
-                        data[data <= src.nodata + 1] = np.nan
-                        yield data, read_window, write_window
+                        img = src.read(1, window=read_window)
+                        img[img <= src.nodata + 1] = np.nan
+                        yield img, read_window, write_window
 
                 click.echo((msg.STARTING).format(command, msg.CONCURRENT))
                 with concurrent.futures.ThreadPoolExecutor(
@@ -116,9 +116,9 @@ def curvature(ctx, input, output, neighbors, stats, njobs, verbose):
 
                     future_to_window = {
                         executor.submit(
-                            rt.curvature, data, res=res, neighbors=int(neighbors)
+                            rt.curvature, img, res=res, neighbors=int(neighbors)
                         ): (read_window, write_window)
-                        for data, read_window, write_window in jobs()
+                        for img, read_window, write_window in jobs()
                     }
 
                     for future in concurrent.futures.as_completed(future_to_window):

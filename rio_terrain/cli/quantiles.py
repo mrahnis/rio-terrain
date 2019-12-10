@@ -60,12 +60,12 @@ def digest_window(file, window, absolute):
 
     '''
     with rasterio.open(file) as src:
-        data = src.read(1, window=window[1])
-        data[data <= src.nodata+1] = np.nan
-        arr = data[np.isfinite(data)]
+        img = src.read(1, window=window[1])
+        img[img <= src.nodata+1] = np.nan
+        arr = img[np.isfinite(img)]
         if absolute:
             arr = np.absolute(arr)
-        count_ = np.count_nonzero(~np.isnan(data))
+        count_ = np.count_nonzero(~np.isnan(img))
         digest_ = TDigest()
         digest_.update(arr.flatten())
 
@@ -114,13 +114,13 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
         if njobs < 1:
 
             click.echo("Running quantiles in-memory")
-            data = src.read(1)
-            data[data <= src.nodata+1] = np.nan
-            arr = data[np.isfinite(data)]
+            img = src.read(1)
+            img[img <= src.nodata+1] = np.nan
+            arr = img[np.isfinite(img)]
             if absolute:
                 arr = np.absolute(arr)
 
-            count = np.count_nonzero(~np.isnan(data))
+            count = np.count_nonzero(~np.isnan(img))
             description = (arr.min(), arr.max(), arr.mean(), arr.std())
             results = zip(quantile, mquantiles(arr, np.array(quantile)))
 
@@ -133,13 +133,13 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
             click.echo("Running quantiles with sequential t-digest")
             with click.progressbar(length=n_blocks, label='Blocks done:') as bar:
                 for ij, window in blocks:
-                    data = src.read(1, window=window)
-                    data[data <= src.nodata+1] = np.nan
-                    arr = data[np.isfinite(data[:])]
+                    img = src.read(1, window=window)
+                    img[img <= src.nodata+1] = np.nan
+                    arr = img[np.isfinite(img[:])]
                     if absolute:
                         arr = np.absolute(arr)
 
-                    window_count = np.count_nonzero(~np.isnan(data))
+                    window_count = np.count_nonzero(~np.isnan(img))
                     if window_count > 0:
                         window_digest = TDigest()
                         window_digest.update(arr.flatten())

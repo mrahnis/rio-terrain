@@ -95,10 +95,10 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
 
             if njobs < 1:
                 click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                data = src.read(1)
-                data[data <= src.nodata + 1] = np.nan
+                img = src.read(1)
+                img[img <= src.nodata + 1] = np.nan
                 result = rt.slope(
-                    data, res=res, units=units, neighbors=int(neighbors)
+                    img, res=res, units=units, neighbors=int(neighbors)
                 )
                 dst.write(result.astype(profile['dtype']), 1)
             elif njobs == 1:
@@ -109,10 +109,10 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
                     for (read_window, write_window) in zip(
                         read_windows, write_windows
                     ):
-                        data = src.read(1, window=read_window)
-                        data[data <= src.nodata + 1] = np.nan
+                        img = src.read(1, window=read_window)
+                        img[img <= src.nodata + 1] = np.nan
                         arr = rt.slope(
-                            data, res=res, units=units, neighbors=int(neighbors)
+                            img, res=res, units=units, neighbors=int(neighbors)
                         )
                         result = rt.trim(arr, rt.margins(read_window, write_window))
                         dst.write(result.astype(profile['dtype']), 1, window=write_window)
@@ -124,9 +124,9 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
                     for (read_window, write_window) in zip(
                         read_windows, write_windows
                     ):
-                        data = src.read(1, window=read_window)
-                        data[data <= src.nodata + 1] = np.nan
-                        yield data, read_window, write_window
+                        img = src.read(1, window=read_window)
+                        img[img <= src.nodata + 1] = np.nan
+                        yield img, read_window, write_window
 
                 with concurrent.futures.ThreadPoolExecutor(
                     max_workers=njobs
@@ -137,12 +137,12 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
                     future_to_window = {
                         executor.submit(
                             rt.slope,
-                            data,
+                            img,
                             res=res,
                             units=units,
                             neighbors=int(neighbors),
                         ): (read_window, write_window)
-                        for (data, read_window, write_window) in jobs()
+                        for (img, read_window, write_window) in jobs()
                     }
 
                     for future in concurrent.futures.as_completed(future_to_window):

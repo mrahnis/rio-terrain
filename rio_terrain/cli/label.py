@@ -75,9 +75,9 @@ def label(ctx, input, output, diagonals, zeros, njobs, verbose):
         with rasterio.open(output, 'w', **profile) as dst:
             if njobs < 1:
                 click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                data = src.read(1)
-                labels, count = scipy.ndimage.label(data, structure=structure)
-                labels[data == nodata] = false_val
+                img = src.read(1)
+                labels, count = scipy.ndimage.label(img, structure=structure)
+                labels[img == nodata] = false_val
                 labels[labels == 0] = false_val
                 dst.write(labels.astype(dtype), 1)
             elif njobs == 1:
@@ -96,13 +96,13 @@ def label(ctx, input, output, diagonals, zeros, njobs, verbose):
                 overlap = None
                 total = 0
                 for (read_window, write_window) in zip(read_windows, write_windows):
-                    data = src.read(1, window=read_window)
-                    labels, count = scipy.ndimage.label(data, structure=structure)
+                    img = src.read(1, window=read_window)
+                    labels, count = scipy.ndimage.label(img, structure=structure)
 
                     if overlap is not None:
                         # remap values based on overlap
                         stack = np.stack(
-                            [np.squeeze(overlap), np.squeeze(data[:1, :])]
+                            [np.squeeze(overlap), np.squeeze(img[:1, :])]
                         )
                         pairs = np.unique(stack.T, axis=0)
                         idx = np.all(pairs > 0, axis=1)

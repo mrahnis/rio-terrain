@@ -12,11 +12,11 @@ import rio_terrain.tools.messages as msg
 from rio_terrain import __version__ as plugin_version
 
 
-def _slice(data, minimum=None, maximum=None, keep_data=False, false_val=0):
+def do_slice(img, minimum=None, maximum=None, keep_data=False, false_val=0):
     """Slice data or ones from an array given a value range.
 
     Parameters:
-        data (ndarray)
+        img (ndarray)
         minimum (float)
         maximum (float)
         keep_data (bool)
@@ -28,14 +28,14 @@ def _slice(data, minimum=None, maximum=None, keep_data=False, false_val=0):
 
     # default bounds
     if minimum is None:
-        minimum = np.nanmin(data)
+        minimum = np.nanmin(img)
     if maximum is None:
-        maximum = np.nanmax(data)
+        maximum = np.nanmax(img)
 
     if keep_data:
-        result = np.where((data >= minimum) & (data <= maximum), data, false_val)
+        result = np.where((img >= minimum) & (img <= maximum), img, false_val)
     else:
-        result = np.where((data >= minimum) & (data <= maximum), 1, false_val)
+        result = np.where((img >= minimum) & (img <= maximum), 1, false_val)
 
     return result
 
@@ -112,8 +112,8 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
         with rasterio.open(output, 'w', **profile) as dst:
             if njobs < 1:
                 click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                data = src.read(1)
-                result = _slice(data, minimum, maximum, keep_data, false_val)
+                img = src.read(1)
+                result = do_slice(img, minimum, maximum, keep_data, false_val)
                 dst.write(result.astype(dtype), 1)
             elif njobs == 1:
                 click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
@@ -121,9 +121,9 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
                     length=src.width * src.height, label='Blocks done:'
                 ) as bar:
                     for (ij, window) in src.block_windows():
-                        data = src.read(1, window=window)
-                        result = _slice(
-                            data, minimum, maximum, keep_data, false_val
+                        img = src.read(1, window=window)
+                        result = do_slice(
+                            img, minimum, maximum, keep_data, false_val
                         )
                         dst.write(result.astype(dtype), 1, window=window)
                         bar.update(result.size)
@@ -132,8 +132,8 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
 
                 def jobs():
                     for (ij, window) in src.block_windows():
-                        data = src.read(1, window=window)
-                        yield data, window
+                        img = src.read(1, window=window)
+                        yield img, window
 
                 with concurrent.futures.ThreadPoolExecutor(
                     max_workers=njobs
@@ -143,9 +143,9 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
 
                     future_to_window = {
                         executor.submit(
-                            _slice, data, minimum, maximum, keep_data, false_val
+                            do_slice, img, minimum, maximum, keep_data, false_val
                         ): (window)
-                        for (data, window) in jobs()
+                        for (img, window) in jobs()
                     }
 
                     for future in concurrent.futures.as_completed(future_to_window):

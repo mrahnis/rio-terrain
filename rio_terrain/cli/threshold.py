@@ -12,8 +12,8 @@ import rio_terrain.tools.messages as msg
 from rio_terrain import __version__ as plugin_version
 
 
-def _thresh(data0, data1, level, default=0):
-    conditions = [data0 >= data1 * level, data0 <= -data1 * level]
+def do_threshold(img0, img1, level, default=0):
+    conditions = [img0 >= img1 * level, img0 <= -img1 * level]
     choices = [1, -1]
     result = np.select(conditions, choices, default=default)
     return result
@@ -88,9 +88,9 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
         with rasterio.open(output, 'w', **profile) as dst:
             if njobs < 1:
                 click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                data0 = src0.read(1, window=next(windows0))
-                data1 = src1.read(1, window=next(windows1))
-                result = _thresh(data0, data1, level, default=nodata)
+                img0 = src0.read(1, window=next(windows0))
+                img1 = src1.read(1, window=next(windows1))
+                result = do_threshold(img0, img1, level, default=nodata)
                 dst.write(result, 1)
             elif njobs == 1:
                 click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
@@ -100,9 +100,9 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
                     for (window0, window1, write_window) in zip(
                         windows0, windows1, write_windows
                     ):
-                        data0 = src0.read(1, window=window0)
-                        data1 = src1.read(1, window=window1)
-                        result = _thresh(data0, data1, level, default=nodata)
+                        img0 = src0.read(1, window=window0)
+                        img1 = src1.read(1, window=window1)
+                        result = do_threshold(img0, img1, level, default=nodata)
                         dst.write(result, 1, window=write_window)
                         bar.update(result.size)
             else:
@@ -112,9 +112,9 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
                     for (window0, window1, write_window) in zip(
                         windows0, windows1, write_windows
                     ):
-                        data0 = src0.read(1, window=window0)
-                        data1 = src1.read(1, window=window1)
-                        yield data0, data1, window0, window1, write_window
+                        img0 = src0.read(1, window=window0)
+                        img1 = src1.read(1, window=window1)
+                        yield img0, img1, window0, window1, write_window
 
                 with concurrent.futures.ThreadPoolExecutor(
                     max_workers=njobs
@@ -124,9 +124,9 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
 
                     future_to_window = {
                         executor.submit(
-                            _thresh, data0, data1, level, default=nodata
+                            do_threshold, img0, img1, level, default=nodata
                         ): (window0, window1, write_window)
-                        for (data0, data1, window0, window1, write_window) in jobs()
+                        for (img0, img1, window0, window1, write_window) in jobs()
                     }
 
                     for future in concurrent.futures.as_completed(future_to_window):

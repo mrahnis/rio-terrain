@@ -86,10 +86,10 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
         with rasterio.open(output, 'w', **profile) as dst:
             if njobs < 1:
                 click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                data = src.read(1)
-                data[data <= src.nodata + 1] = np.nan
+                img = src.read(1)
+                img[img <= src.nodata + 1] = np.nan
                 result = focalstatistics.std(
-                    data, size=(neighborhood, neighborhood)
+                    img, size=(neighborhood, neighborhood)
                 )
                 dst.write(result.astype(profile['dtype']), 1)
             elif njobs == 1:
@@ -100,10 +100,10 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
                     for (read_window, write_window) in zip(
                         read_windows, write_windows
                     ):
-                        data = src.read(1, window=read_window)
-                        data[data <= src.nodata + 1] = np.nan
+                        img = src.read(1, window=read_window)
+                        img[img <= src.nodata + 1] = np.nan
                         arr = focalstatistics.std(
-                            data, size=(neighborhood, neighborhood)
+                            img, size=(neighborhood, neighborhood)
                         )
                         result = rt.trim(arr, rt.margins(read_window, write_window))
                         dst.write(result.astype(profile['dtype']), 1, window=write_window)
@@ -118,8 +118,8 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
                     for (read_window, write_window) in zip(
                         read_windows, write_windows
                     ):
-                        data = src.read(1, window=read_window)
-                        data[data <= src.nodata + 1] = np.nan
+                        img = src.read(1, window=read_window)
+                        img[img <= src.nodata + 1] = np.nan
 
                         chunks_wanted = 100
                         bw = ceil(
@@ -133,12 +133,12 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
                             / blockshape[1]
                         )
                         hh, ww = rt.chunk_dims(
-                            (data.shape[0], data.shape[1]),
+                            (img.shape[0], img.shape[1]),
                             (blockshape[0] * bw, blockshape[1] * bh),
                             min_size=blockshape[0] * 2,
                         )
 
-                        arr = da.from_array(data, chunks=(tuple(hh), tuple(ww)))
+                        arr = da.from_array(img, chunks=(tuple(hh), tuple(ww)))
                         tiles_in = da.overlap.overlap(
                             arr,
                             depth={0: neighborhood, 1: neighborhood},
@@ -165,9 +165,9 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
                 """
                 def jobs():
                     for (read_window, write_window) in zip(read_windows, write_windows):
-                        data = src.read(1, window=read_window)
-                        data[data <= src.nodata+1] = np.nan
-                        yield data, read_window, write_window
+                        img = src.read(1, window=read_window)
+                        img[img <= src.nodata+1] = np.nan
+                        yield img, read_window, write_window
 
                 with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor, \
                         click.progressbar(length=src.width*src.height, label='Blocks done:') as bar:
@@ -175,9 +175,9 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
                     future_to_window = {
                         executor.submit(
                             focalstatistics.std,
-                            data,
+                            img,
                             size=(neighborhood, neighborhood)): (read_window, write_window)
-                        for (data, read_window, write_window) in jobs()}
+                        for (img, read_window, write_window) in jobs()}
 
                     for future in concurrent.futures.as_completed(future_to_window):
                         read_window, write_window = future_to_window[future]
