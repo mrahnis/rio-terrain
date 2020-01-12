@@ -1,3 +1,5 @@
+"""Calculate and print quantile values from a single-band raster."""
+
 import time
 import warnings
 
@@ -72,7 +74,7 @@ def digest_window(file, window, absolute):
     return window, digest_, count_
 
 
-@click.command('quantiles')
+@click.command('quantiles', short_help="Calculate quantile values.")
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.option('-q', '--quantile', multiple=True, type=float,
               help='Print quantile value')
@@ -90,7 +92,9 @@ def digest_window(file, window, absolute):
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, verbose):
-    """Calculates and prints quantile values.
+    """Calculate and print quantile values.
+
+    INPUT should be a single-band raster.
 
     \b
     Example:
@@ -112,7 +116,6 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
         affine = src.transform
 
         if njobs < 1:
-
             click.echo("Running quantiles in-memory")
             img = src.read(1)
             img[img <= src.nodata+1] = np.nan
@@ -125,7 +128,6 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
             results = zip(quantile, mquantiles(arr, np.array(quantile)))
 
         elif njobs == 1:
-
             blocks = rt.subsample(src.block_windows(), probability=fraction)
             n_blocks = ceil(rt.block_count(src.shape, src.block_shapes) * fraction)
             digest = TDigest()

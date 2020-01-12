@@ -1,7 +1,8 @@
+"""Threshold a raster with an uncertainty raster."""
+
 import time
 import warnings
 import concurrent.futures
-import multiprocessing
 
 import click
 import numpy as np
@@ -19,23 +20,21 @@ def do_threshold(img0, img1, level, default=0):
     return result
 
 
-@click.command('threshold')
+@click.command('threshold', short_help="Threshold a raster with an uncertainty raster.")
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.argument('uncertainty', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
 @click.argument('level', nargs=1, type=float)
-@click.option(
-    '-j',
-    '--njobs',
-    type=int,
-    default=multiprocessing.cpu_count(),
-    help='Number of concurrent jobs to run.',
-)
+@click.option('-j', '--njobs', type=int, default=1, help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
-    """Thresholds a raster based on an uncertainty raster.
+    """Threshold a raster with an uncertainty raster.
+
+    \b
+    INPUT should be a single-band raster.
+    UNCERTAINTY should be a single-band raster representing uncertainty.
 
     \b
     Example:
@@ -94,12 +93,8 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
                 dst.write(result, 1)
             elif njobs == 1:
                 click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
-                with click.progressbar(
-                    length=nrows * ncols, label='Blocks done:'
-                ) as bar:
-                    for (window0, window1, write_window) in zip(
-                        windows0, windows1, write_windows
-                    ):
+                with click.progressbar(length=nrows * ncols, label='Blocks done:') as bar:
+                    for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
                         img0 = src0.read(1, window=window0)
                         img1 = src1.read(1, window=window1)
                         result = do_threshold(img0, img1, level, default=nodata)
@@ -109,18 +104,13 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
                 click.echo((msg.STARTING).format(command, msg.CONCURRENT))
 
                 def jobs():
-                    for (window0, window1, write_window) in zip(
-                        windows0, windows1, write_windows
-                    ):
+                    for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
                         img0 = src0.read(1, window=window0)
                         img1 = src1.read(1, window=window1)
                         yield img0, img1, window0, window1, write_window
 
-                with concurrent.futures.ThreadPoolExecutor(
-                    max_workers=njobs
-                ) as executor, click.progressbar(
-                    length=nrows * ncols, label='Blocks done:'
-                ) as bar:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor, \
+                        click.progressbar(length=nrows * ncols, label='Blocks done:') as bar:
 
                     future_to_window = {
                         executor.submit(

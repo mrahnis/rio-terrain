@@ -1,8 +1,9 @@
+"""Calculate slope of a raster."""
+
 import time
 import warnings
 
 import concurrent.futures
-import multiprocessing
 
 import click
 import numpy as np
@@ -13,43 +14,23 @@ import rio_terrain.tools.messages as msg
 from rio_terrain import __version__ as plugin_version
 
 
-@click.command('slope')
+@click.command('slope', short_help="Calculate slope.")
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
-@click.option(
-    '--neighbors',
-    type=click.Choice(['4', '8']),
-    default='4',
-    help='Specifies the number of neighboring cells to use.',
-)
-@click.option(
-    '-u',
-    '--units',
-    type=click.Choice(['grade', 'degrees']),
-    default='grade',
-    help='Specifies the units of slope.',
-)
-@click.option(
-    '-b',
-    '--blocks',
-    'blocks',
-    nargs=1,
-    type=int,
-    default=40,
-    help='Multiply TIFF block size by an amount to make chunks',
-)
-@click.option(
-    '-j',
-    '--njobs',
-    type=int,
-    default=multiprocessing.cpu_count(),
-    help='Number of concurrent jobs to run.',
-)
+@click.option('--neighbors', type=click.Choice(['4', '8']), default='4',
+              help='Specifies the number of neighboring cells to use.')
+@click.option('-u', '--units', type=click.Choice(['grade', 'degrees']), default='grade',
+              help='Specifies the units of slope.')
+@click.option('-b', '--blocks', 'blocks', nargs=1, type=int, default=40,
+              help='Multiply TIFF block size by an amount to make chunks')
+@click.option('-j', '--njobs', type=int, default=1, help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
-    """Calculates slope of a height raster.
+    """Calculate slope of a raster.
+
+    INPUT should be a single-band raster.
 
     \b
     Example:
@@ -97,23 +78,15 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
                 click.echo((msg.STARTING).format(command, msg.INMEMORY))
                 img = src.read(1)
                 img[img <= src.nodata + 1] = np.nan
-                result = rt.slope(
-                    img, res=res, units=units, neighbors=int(neighbors)
-                )
+                result = rt.slope(img, res=res, units=units, neighbors=int(neighbors))
                 dst.write(result.astype(profile['dtype']), 1)
             elif njobs == 1:
                 click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
-                with click.progressbar(
-                    length=src.width * src.height, label='Blocks done:'
-                ) as bar:
-                    for (read_window, write_window) in zip(
-                        read_windows, write_windows
-                    ):
+                with click.progressbar(length=src.width * src.height, label='Blocks done:') as bar:
+                    for (read_window, write_window) in zip(read_windows, write_windows):
                         img = src.read(1, window=read_window)
                         img[img <= src.nodata + 1] = np.nan
-                        arr = rt.slope(
-                            img, res=res, units=units, neighbors=int(neighbors)
-                        )
+                        arr = rt.slope(img, res=res, units=units, neighbors=int(neighbors))
                         result = rt.trim(arr, rt.margins(read_window, write_window))
                         dst.write(result.astype(profile['dtype']), 1, window=write_window)
                         bar.update(result.size)
@@ -121,18 +94,13 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
                 click.echo((msg.STARTING).format(command, msg.CONCURRENT))
 
                 def jobs():
-                    for (read_window, write_window) in zip(
-                        read_windows, write_windows
-                    ):
+                    for (read_window, write_window) in zip(read_windows, write_windows):
                         img = src.read(1, window=read_window)
                         img[img <= src.nodata + 1] = np.nan
                         yield img, read_window, write_window
 
-                with concurrent.futures.ThreadPoolExecutor(
-                    max_workers=njobs
-                ) as executor, click.progressbar(
-                    length=src.width * src.height, label='Blocks done:'
-                ) as bar:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor, \
+                        click.progressbar(length=src.width * src.height, label='Blocks done:') as bar:
 
                     future_to_window = {
                         executor.submit(

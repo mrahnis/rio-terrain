@@ -1,7 +1,8 @@
+"""Subtract one single-band raster from another."""
+
 import time
 import warnings
 import concurrent.futures
-import multiprocessing
 
 import numpy as np
 import click
@@ -12,31 +13,22 @@ import rio_terrain.tools.messages as msg
 from rio_terrain import __version__ as plugin_version
 
 
-@click.command('difference')
+@click.command('difference', short_help="Subtract one raster from another.")
 @click.argument('input_t0', nargs=1, type=click.Path(exists=True))
 @click.argument('input_t1', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
-@click.option(
-    '-b',
-    '--blocks',
-    'blocks',
-    nargs=1,
-    type=int,
-    default=40,
-    help='Multiply TIFF block size by an amount to make chunks',
-)
-@click.option(
-    '-j',
-    '--njobs',
-    type=int,
-    default=multiprocessing.cpu_count(),
-    help='Number of concurrent jobs to run.',
-)
+@click.option('-b', '--blocks', 'blocks', nargs=1, type=int, default=40,
+              help='Multiply TIFF block size by an amount to make chunks')
+@click.option('-j', '--njobs', type=int, default=1, help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
-    """Subtracts one raster from another.
+    """Subtract INPUT_T0 from INPUT_T1.
+
+    \b
+    INPUT_T0 should be a single-band raster at time t0.
+    INPUT_T1 should be a single-band raster at time t1.
 
     \b
     Example:
@@ -70,11 +62,7 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
             blockysize = None
 
         tiles = rt.tile_grid_intersection(
-            src0,
-            src1,
-            blockxsize=blockxsize * blocks,
-            blockysize=blockysize * blocks,
-        )
+            src0, src1, blockxsize=blockxsize * blocks, blockysize=blockysize * blocks)
         windows0, windows1, write_windows, affine, nrows, ncols = tiles
 
         profile.update(
@@ -98,12 +86,8 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
                 dst.write(result.astype(profile['dtype']), 1, window=next(write_windows))
             elif njobs == 1:
                 click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
-                with click.progressbar(
-                    length=nrows * ncols, label='Blocks done:'
-                ) as bar:
-                    for (window0, window1, write_window) in zip(
-                        windows0, windows1, write_windows
-                    ):
+                with click.progressbar(length=nrows * ncols, label='Blocks done:') as bar:
+                    for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
                         img0 = src0.read(1, window=window0)
                         img1 = src1.read(1, window=window1)
                         img0[img0 <= src0.nodata + 1] = np.nan
@@ -115,9 +99,7 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
                 click.echo((msg.STARTING).format(command, msg.CONCURRENT))
 
                 def jobs():
-                    for (window0, window1, write_window) in zip(
-                        windows0, windows1, write_windows
-                    ):
+                    for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
                         img0 = src0.read(1, window=window0)
                         img1 = src1.read(1, window=window1)
                         img0[img0 <= src0.nodata + 1] = np.nan
@@ -127,11 +109,8 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
                 def diff(img0, img1):
                     return img1 - img0
 
-                with concurrent.futures.ThreadPoolExecutor(
-                    max_workers=njobs
-                ) as executor, click.progressbar(
-                    length=nrows * ncols, label='Blocks done:'
-                ) as bar:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor, \
+                        click.progressbar(length=nrows * ncols, label='Blocks done:') as bar:
 
                     future_to_window = {
                         executor.submit(diff, img0, img1): (

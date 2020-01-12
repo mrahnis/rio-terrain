@@ -1,7 +1,8 @@
+"""Label regions in a single-band raster."""
+
 import time
 import warnings
 import concurrent.futures
-import multiprocessing
 
 import click
 import numpy as np
@@ -17,29 +18,22 @@ BOX = np.ones((3, 3))
 CROSS = np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])
 
 
-@click.command('label')
+@click.command('label', short_help="Label regions.")
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
-@click.option(
-    '--diagonals/--no-diagonals',
-    'diagonals',
-    default=False,
-    help='Label diagonals as connected',
-)
-@click.option(
-    '--zeros/--no-zeros',
-    is_flag=True,
-    help='Use the raster nodata value or zeros for False condition',
-)
-@click.option(
-    '-j', '--njobs', type=int, default=0, help='Number of concurrent jobs to run'
-)
+@click.option('--diagonals/--no-diagonals', 'diagonals', default=False,
+              help='Label diagonals as connected')
+@click.option('--zeros/--no-zeros', is_flag=True,
+    help='Use the raster nodata value or zeros for False condition')
+@click.option('-j', '--njobs', type=int, default=0, help='Number of concurrent jobs to run')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def label(ctx, input, output, diagonals, zeros, njobs, verbose):
-    """Label areas in a raster.
+    """Label regions in a raster.
 
+    INPUT should be a single-band raster.
+    
     \b
     Example:
     rio label blobs.tif labeled_blobs.tif
@@ -87,11 +81,9 @@ def label(ctx, input, output, diagonals, zeros, njobs, verbose):
                 if (blockshape[0] == 1) or (blockshape[1] == 1):
                     warnings.warn((msg.STRIPED).format(blockshape))
                 read_windows = rt.tile_grid(
-                    src.width, src.height, src.width, blockshape[1], overlap=1
-                )
+                    src.width, src.height, src.width, blockshape[1], overlap=1)
                 write_windows = rt.tile_grid(
-                    src.width, src.height, src.width, blockshape[1], overlap=0
-                )
+                    src.width, src.height, src.width, blockshape[1], overlap=0)
 
                 overlap = None
                 total = 0
@@ -101,9 +93,7 @@ def label(ctx, input, output, diagonals, zeros, njobs, verbose):
 
                     if overlap is not None:
                         # remap values based on overlap
-                        stack = np.stack(
-                            [np.squeeze(overlap), np.squeeze(img[:1, :])]
-                        )
+                        stack = np.stack([np.squeeze(overlap), np.squeeze(img[:1, :])])
                         pairs = np.unique(stack.T, axis=0)
                         idx = np.all(pairs > 0, axis=1)
                         print(pairs[idx])

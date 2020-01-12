@@ -20,9 +20,9 @@ NONALIGNED = "Raster cells are not aligned between inputs"
 
 
 def printtime(t0, t1):
-    '''Return the elapsed time between t0 and t1 in h:m:s formatted string
+    """Return the elapsed time between t0 and t1 in h:m:s formatted string
 
-    '''
+    """
     m, s = divmod(t1 - t0, 60)
     h, m = divmod(m, 60)
     fmt = '%d:%02d:%02d' % (h, m, s)

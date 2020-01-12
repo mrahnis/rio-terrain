@@ -1,7 +1,6 @@
 import time
 import warnings
 import concurrent.futures
-import multiprocessing
 
 import click
 import numpy as np
@@ -40,38 +39,25 @@ def do_slice(img, minimum=None, maximum=None, keep_data=False, false_val=0):
     return result
 
 
-@click.command('slice')
+@click.command('slice', short_help="Extract regions by data range.")
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
-@click.option(
-    '--minimum', nargs=1, type=float, default=None, help='Minimum value to extract.'
-)
-@click.option(
-    '--maximum', nargs=1, type=float, default=None, help='Maximum value to extract.'
-)
-@click.option(
-    '--keep-data/--no-keep-data',
-    is_flag=True,
-    help='Return the input data. Default is to return ones.',
-)
-@click.option(
-    '--zeros/--no-zeros',
-    is_flag=True,
-    help='Use the raster nodata value or zeros for False condition',
-)
-@click.option(
-    '-j',
-    '--njobs',
-    type=int,
-    default=multiprocessing.cpu_count(),
-    help='Number of concurrent jobs to run',
-)
+@click.option('--minimum', nargs=1, type=float, default=None, help='Minimum value to extract.')
+@click.option('--maximum', nargs=1, type=float, default=None, help='Maximum value to extract.')
+@click.option('--keep-data/--no-keep-data', is_flag=True,
+              help='Return the input data. Default is to return ones.')
+@click.option('--zeros/--no-zeros', is_flag=True,
+              help='Use the raster nodata value or zeros for False condition')
+@click.option('-j', '--njobs', type=int, default=1, help='Number of concurrent jobs to run')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose):
-    """Extract areas from a raster by a data range.
+    """Extract regions from a raster by a data range.
 
+    INPUT should be a single-band raster.
+
+    \b
     Setting the --keep-data option will return the data values.
     The default is to return a raster of ones and zeros.
 
@@ -117,14 +103,10 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
                 dst.write(result.astype(dtype), 1)
             elif njobs == 1:
                 click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
-                with click.progressbar(
-                    length=src.width * src.height, label='Blocks done:'
-                ) as bar:
+                with click.progressbar(length=src.width * src.height, label='Blocks done:') as bar:
                     for (ij, window) in src.block_windows():
                         img = src.read(1, window=window)
-                        result = do_slice(
-                            img, minimum, maximum, keep_data, false_val
-                        )
+                        result = do_slice(img, minimum, maximum, keep_data, false_val)
                         dst.write(result.astype(dtype), 1, window=window)
                         bar.update(result.size)
             else:
@@ -135,11 +117,8 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
                         img = src.read(1, window=window)
                         yield img, window
 
-                with concurrent.futures.ThreadPoolExecutor(
-                    max_workers=njobs
-                ) as executor, click.progressbar(
-                    length=src.width * src.height, label='Blocks done:'
-                ) as bar:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor, \
+                        click.progressbar(length=src.width*src.height, label='Blocks done:') as bar:
 
                     future_to_window = {
                         executor.submit(

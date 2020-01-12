@@ -1,7 +1,8 @@
+"""Extract regions from a raster by category."""
+
 import time
 import warnings
 import concurrent.futures
-import multiprocessing
 
 import click
 import numpy as np
@@ -22,25 +23,23 @@ def do_extract(img, categorical, category):
     return result
 
 
-@click.command('extract')
+@click.command('extract', short_help="Extract regions by category.")
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.argument('categorical', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
 @click.option('-c', '--category', multiple=True, type=int, help='Category to extract.')
-@click.option(
-    '-j',
-    '--njobs',
-    type=int,
-    default=multiprocessing.cpu_count(),
-    help='Number of concurrent jobs to run',
-)
+@click.option('-j', '--njobs', type=int, default=1, help='Number of concurrent jobs to run')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def extract(ctx, input, categorical, output, category, njobs, verbose):
-    """Extract areas from a raster by category.
+    """Extract regions from a raster by category.
 
-    The categorical raster may be the input raster or another raster.
+    \b
+    INPUT should be a single-band raster.
+    CATEGORICAL should be a single-band raster with categories to extract.
+
+    The categorical data may be the input raster or another raster.
 
     \b
     Example:
@@ -73,9 +72,7 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
             blockxsize = None
             blockysize = None
 
-        tiles = rt.tile_grid_intersection(
-            src, cat, blockxsize=blockxsize, blockysize=blockysize
-        )
+        tiles = rt.tile_grid_intersection(src, cat, blockxsize=blockxsize, blockysize=blockysize)
         windows0, windows1, write_windows, affine, nrows, ncols = tiles
 
         profile.update(
@@ -96,12 +93,8 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
                 dst.write(result.astype(profile['dtype']), 1, window=next(write_windows))
             elif njobs == 1:
                 click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
-                with click.progressbar(
-                    length=nrows * ncols, label='Blocks done:'
-                ) as bar:
-                    for (window0, window1, write_window) in zip(
-                        windows0, windows1, write_windows
-                    ):
+                with click.progressbar(length=nrows * ncols, label='Blocks done:') as bar:
+                    for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
                         img = src.read(1, window=window0)
                         mask = cat.read(1, window=window1)
                         result = do_extract(img, mask, category)
@@ -111,18 +104,13 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
                 click.echo((msg.STARTING).format(command, msg.CONCURRENT))
 
                 def jobs():
-                    for (window0, window1, write_window) in zip(
-                        windows0, windows1, write_windows
-                    ):
+                    for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
                         img = src.read(1, window=window0)
                         mask = cat.read(1, window=window1)
                         yield img, mask, window0, window1, write_window
 
-                with concurrent.futures.ThreadPoolExecutor(
-                    max_workers=njobs
-                ) as executor, click.progressbar(
-                    length=nrows * ncols, label='Blocks done:'
-                ) as bar:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor, \
+                        click.progressbar(length=nrows * ncols, label='Blocks done:') as bar:
 
                     future_to_window = {
                         executor.submit(do_extract, img, mask, category): (
