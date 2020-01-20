@@ -20,8 +20,8 @@ from rio_terrain import __version__ as plugin_version
 @click.argument('output', nargs=1, type=click.Path())
 @click.option('-n', '--neighborhood', nargs=1, default=3, help='Neigborhood size in cells.')
 @click.option('-b', '--blocks', 'blocks', nargs=1, type=int, default=40,
-              help='Multiply TIFF block size by an amount to make chunks')
-@click.option('-j', '--njobs', type=int, default=1, help='Number of concurrent jobs to run')
+              help='Multiple internal blocks to chunk.')
+@click.option('-j', '--njobs', type=int, default=1, help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context

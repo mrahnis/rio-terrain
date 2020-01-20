@@ -18,7 +18,7 @@ from rio_terrain import __version__ as plugin_version
 @click.argument('input_t1', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
 @click.option('-b', '--blocks', 'blocks', nargs=1, type=int, default=40,
-              help='Multiply TIFF block size by an amount to make chunks')
+              help='Multiple internal blocks to chunk.')
 @click.option('-j', '--njobs', type=int, default=1, help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')

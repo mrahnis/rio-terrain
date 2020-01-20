@@ -77,18 +77,18 @@ def digest_window(file, window, absolute):
 @click.command('quantiles', short_help="Calculate quantile values.")
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.option('-q', '--quantile', multiple=True, type=float,
-              help='Print quantile value')
+              help='Print quantile value.')
 @click.option('-f', '--fraction', nargs=1, default=1.0,
-              help='Randomly sample a fraction of data blocks')
+              help='Randomly sample a fraction of internal blocks.')
 @click.option('--absolute/--no-absolute', default=False,
-              help='Calculate quantiles based on the set of absolute values')
+              help='Calculate quantiles for the absolute values.')
 @click.option('--describe/--no-describe', default=False,
-              help='Print descriptive statistics to the console')
+              help='Print descriptive statistics to the console.')
 @click.option('--plot/--no-plot', default=False,
-              help='Display statistics plots')
+              help='Display statistics plots.')
 @click.option('-j', '--jobs', 'njobs', type=int, default=multiprocessing.cpu_count(),
-              help='Number of concurrent jobs to run')
-@click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode')
+              help='Number of concurrent jobs to run.')
+@click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, verbose):

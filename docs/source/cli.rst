@@ -314,9 +314,8 @@ uncertainty
 
 	  Calculate a level-of-detection raster.
 
-	  UNCERTAINTY0 should be a single-band raster representing level of
-	  uncertainty at time 0. UNVERTAINTY1 should be a single-band raster
-	  representing level of uncertainty at time 1.
+	  UNCERTAINTY0 should be a single-band raster representing level of uncertainty at time 0.
+	  UNCERTAINTY1 should be a single-band raster representing level of uncertainty at time 1.
 
 	  Example:
 	  rio uncertainty roughness_t0.tif roughness_t1.tif uncertainty.tif

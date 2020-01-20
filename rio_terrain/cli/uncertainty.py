@@ -29,9 +29,9 @@ def propagate(img0, img1, instrumental0, instrumental1):
 @click.argument('uncertainty1', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
 @click.option('--instrumental0', nargs=1, default=None, type=float,
-              help='Instrumental or minimum uncertainty for the first raster.')
+              help='Minimum uncertainty for the first raster.')
 @click.option('--instrumental1', nargs=1, default=None, type=float,
-              help='Instrumental or minimum uncertainty for the second raster.')
+              help='Minimum uncertainty for the second raster.')
 @click.option('-j', '--njobs', type=int, default=1, help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
@@ -48,8 +48,9 @@ def uncertainty(
 ):
     """Calculate a level-of-detection raster.
 
-    UNCERTAINTY0 should be a single-band raster representing level of uncertainty at time 0.
-    UNVERTAINTY1 should be a single-band raster representing level of uncertainty at time 1.
+    \b
+    UNCERTAINTY0 should be a single-band raster for uncertainty at time 0.
+    UNCERTAINTY1 should be a single-band raster for uncertainty at time 1.
 
     \b
     Example:

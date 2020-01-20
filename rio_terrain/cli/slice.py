@@ -1,3 +1,5 @@
+"""Extract regions from a raster by a data range."""
+
 import time
 import warnings
 import concurrent.futures
@@ -45,10 +47,10 @@ def do_slice(img, minimum=None, maximum=None, keep_data=False, false_val=0):
 @click.option('--minimum', nargs=1, type=float, default=None, help='Minimum value to extract.')
 @click.option('--maximum', nargs=1, type=float, default=None, help='Maximum value to extract.')
 @click.option('--keep-data/--no-keep-data', is_flag=True,
-              help='Return the input data. Default is to return ones.')
+              help='Return the input data, or return ones.')
 @click.option('--zeros/--no-zeros', is_flag=True,
-              help='Use the raster nodata value or zeros for False condition')
-@click.option('-j', '--njobs', type=int, default=1, help='Number of concurrent jobs to run')
+              help='Use the raster nodata value or zeros for False condition.')
+@click.option('-j', '--njobs', type=int, default=1, help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context

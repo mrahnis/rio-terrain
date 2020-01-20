@@ -22,10 +22,10 @@ CROSS = np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
 @click.option('--diagonals/--no-diagonals', 'diagonals', default=False,
-              help='Label diagonals as connected')
+              help='Connect diagonal cells (8-connected).')
 @click.option('--zeros/--no-zeros', is_flag=True,
-    help='Use the raster nodata value or zeros for False condition')
-@click.option('-j', '--njobs', type=int, default=0, help='Number of concurrent jobs to run')
+              help='Use the raster nodata value or zeros for False condition.')
+@click.option('-j', '--njobs', type=int, default=0, help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context

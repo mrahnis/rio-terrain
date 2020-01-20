@@ -20,7 +20,7 @@ from rio_terrain import __version__ as plugin_version
               help='Specifies the number of neighboring cells to use.')
 @click.option('--pcs', type=click.Choice(['compass', 'cartesian']), default='cartesian',
               help='Specifies the polar coordinate system.')
-@click.option('-j', '--njobs', type=int, default=1, help='Number of concurrent jobs to run')
+@click.option('-j', '--njobs', type=int, default=1, help='Number of concurrent jobs to run.')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
