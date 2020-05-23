@@ -10,18 +10,14 @@ on:
 
 jobs:
   example-1:
-    name: Ex1 (${{ matrix.python-version }}, ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        python-version: ['3.8']
+    name: Ex1 Windows
+    runs-on: windows-latest
     steps:
       - uses: goanpeca/setup-miniconda@v1
         with:
+          miniconda-version: 'latest'
+          activate-environment: rio
           auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
           channels: conda-forge
           allow-softlinks: true
           channel-priority: flexible
