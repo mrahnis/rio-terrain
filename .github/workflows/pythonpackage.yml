@@ -45,7 +45,6 @@ jobs:
         pytest
     - uses: actions/upload-artifact@v2
     - name: Package and upload build artifact
-        if: success()
-        with:
-          name: wheel-artifact-${{ github.ref }}
-          path: dist/*.whl
+      with:
+        name: wheel-artifact-${{ github.ref }}
+        path: dist/*.whl
