@@ -1,6 +1,6 @@
 # Test Conda Package
 
-name: Conda Package
+name: Conda package
 
 on:
   push:
@@ -22,6 +22,11 @@ jobs:
         with:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+          allow-softlinks: true
+          channel-priority: flexible
+          show-channel-urls: true
+          use-only-tar-bz2: true
       - name: Conda info
         shell: bash -l {0}
         run: conda info
