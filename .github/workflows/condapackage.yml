@@ -16,15 +16,17 @@ jobs:
       - uses: goanpeca/setup-miniconda@v1
         with:
           miniconda-version: 'latest'
+          activate-environment: rio
           auto-update-conda: true
           channels: conda-forge
           allow-softlinks: true
           channel-priority: flexible
           show-channel-urls: true
-          use-only-tar-bz2: false
+          use-only-tar-bz2: true
       - name: Conda build setup
         shell: pwsh
         run: |
+          conda activate rio
           conda config --set always_yes yes --set changeps1 no
           conda update -q conda
           conda install conda-build conda-verify anaconda-client pytest
@@ -32,9 +34,14 @@ jobs:
       - name: Conda build
         shell: pwsh
         run: |
+          conda activate rio
           conda build .
+      - name: Test
+        shell: pwsh
+        run: |
           conda install rio-terrain --use-local
           pytest
+      - name: Upload artifact
       - uses: actions/upload-artifact@v2
         with:
           name: conda-bld-artifacts
