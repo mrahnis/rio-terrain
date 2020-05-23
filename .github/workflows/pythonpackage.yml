@@ -43,8 +43,8 @@ jobs:
       run: |
         pip install pytest
         pytest
+    - uses: actions/upload-artifact@v2
     - name: Package and upload build artifact
-      - uses: actions/upload-artifact@v2
         if: success()
         with:
           name: wheel-artifact-${{ github.ref }}
