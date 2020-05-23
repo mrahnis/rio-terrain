@@ -32,3 +32,6 @@ jobs:
           conda info
           conda list
           dir env: | %{"{0}={1}" -f $_.Name,$_.Value}
+          Write-Host "==========================="
+          Get-Location
+          
