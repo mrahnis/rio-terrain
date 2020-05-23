@@ -42,7 +42,7 @@ jobs:
           conda install rio-terrain --use-local
           pytest
       - name: Upload artifact
-      - uses: actions/upload-artifact@v2
-        with:
-          name: conda-bld-artifacts
-          path: conda-bld\noarch\*.tar.bz2
+        - uses: actions/upload-artifact@v2
+          with:
+            name: conda-bld-artifacts
+            path: conda-bld\noarch\*.tar.bz2
