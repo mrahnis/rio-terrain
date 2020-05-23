@@ -25,7 +25,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip setuptools wheel
+        python -m pip install --upgrade pip 
+        pip install setuptools wheel
         pip install numpy
         pip install cython
         pip install -r requirements.txt
@@ -48,5 +49,5 @@ jobs:
         python setup.py sdist bdist_wheel
     - uses: actions/upload-artifact@v2
       with:
-        name: wheel-artifact
-        path: dist/*.whl
+        name: dist-artifacts
+        path: dist/*

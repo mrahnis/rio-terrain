@@ -10,6 +10,9 @@ Rio-terrain provides a set of rasterio CLI plugins to perform common raster oper
 .. image:: https://ci.appveyor.com/api/projects/status/90fk8n3stif0yp5f?svg=true
 	:target: https://ci.appveyor.com/project/mrahnis/rio-terrain
 
+.. image:: https://github.com/mrahnis/rio-terrain/workflows/Python%20package/badge.svg
+	:alt: Python Package
+
 .. image:: https://readthedocs.org/projects/rio-terrain/badge/?version=latest
 	:target: http://rio-terrain.readthedocs.io/en/latest/?badge=latest
 	:alt: Documentation Status
