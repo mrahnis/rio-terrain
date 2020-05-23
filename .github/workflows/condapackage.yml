@@ -16,13 +16,12 @@ jobs:
       - uses: goanpeca/setup-miniconda@v1
         with:
           miniconda-version: 'latest'
-          activate-environment: rio
           auto-update-conda: true
           channels: conda-forge
           allow-softlinks: true
           channel-priority: flexible
           show-channel-urls: true
-          use-only-tar-bz2: true
+          use-only-tar-bz2: false
       - name: Conda build setup
         shell: pwsh
         run: |
