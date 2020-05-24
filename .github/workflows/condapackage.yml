@@ -13,6 +13,7 @@ jobs:
     name: Ex1 Windows
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v2
       - uses: goanpeca/setup-miniconda@v1
         with:
           miniconda-version: 'latest'
@@ -33,6 +34,6 @@ jobs:
           conda list
           dir env: | %{"{0}={1}" -f $_.Name,$_.Value}
           Write-Host "==========================="
-          Get-Location
+          Get-ChildItem -Path .
           Write-Host "==========================="
           conda build .
