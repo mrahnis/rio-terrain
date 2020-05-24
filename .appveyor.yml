@@ -2,7 +2,7 @@ platform: x64
 
 environment:
   ANACONDA_TOKEN:
-    secure: iTF8kOBGKYYFOx5c0inHuvqyiTzjxM68i4bfZjgEpdmYCIhTwwtGj8NWWFf9AbFV
+    secure: mr-f57d5547-1738-4591-b5a0-6fc44a924fba
   PROJECT_NAME: rio-terrain
   GITHUB_REPO_NAME: mrahnis/rio-terrain
 
