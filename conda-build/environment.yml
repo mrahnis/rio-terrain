@@ -1,6 +1,11 @@
 name: rio
 dependencies:
+    - anaconda-client
+    - conda-build
+    - conda-verify
+    - pytest
     - python
+    - cython
     - numpy
     - scipy
     - matplotlib
