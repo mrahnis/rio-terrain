@@ -16,14 +16,13 @@ jobs:
       - uses: actions/checkout@v2
       - uses: goanpeca/setup-miniconda@v1
         with:
-          miniconda-version: 'latest'
           activate-environment: rio
-          auto-update-conda: true
+          python-version: 3.8
           channels: conda-forge
-          allow-softlinks: true
           channel-priority: flexible
-          show-channel-urls: true
+          environment-file: conda-build/environment.yml
           use-only-tar-bz2: true
+          auto-activate-base: false
       - name: Conda build setup
         shell: pwsh
         run: |

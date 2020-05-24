@@ -1,0 +1,9 @@
+name: rio
+dependencies:
+    - python
+    - numpy
+    - scipy
+    - matplotlib
+    - rasterio
+    - click
+    - crick 
