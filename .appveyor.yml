@@ -2,14 +2,14 @@ platform: x64
 
 environment:
   ANACONDA_TOKEN:
-    secure: iTF8kOBGKYYFOx5c0inHuvqyiTzjxM68i4bfZjgEpdmYCIhTwwtGj8NWWFf9AbFV
+    secure: k/tCXr3H9Q9yaqUAwww2l45dctzEivV87lfr5hD3oYkg+6pyRflfSrzG7hyw0E8c
   PROJECT_NAME: rio-terrain
   GITHUB_REPO_NAME: mrahnis/rio-terrain
 
   matrix:
-    - PYTHON_VERSION: 3.6
+    - PYTHON_VERSION: 3.7
       PYTHON_ARCH: 64
-      MINICONDA: C:\Miniconda36-x64
+      MINICONDA: C:\Miniconda37-x64
 
 init:
   - ps: Write-Host $Env:PYTHON_VERSION
