@@ -47,6 +47,12 @@ def test_extract():
     assert result.exit_code == 0
 
 
+def test_label():
+    runner = CliRunner()
+    result = runner.invoke(main_group, ['label', '--help'])
+    assert result.exit_code == 0
+
+
 def test_mad():
     runner = CliRunner()
     result = runner.invoke(main_group, ['mad', '--help'])
