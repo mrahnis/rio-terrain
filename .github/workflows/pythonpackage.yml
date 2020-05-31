@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-
+    name: Python package
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -46,7 +46,11 @@ jobs:
     - name: Package and upload build artifact
       run: |
         python setup.py sdist bdist_wheel
+        WHEEL_PATH=$(find dist/*.whl)
+        WHEEL_NAME=$(basename $WHEEL_PATH)
+        echo ::set-env name=WHEEL_PATH::$WHEEL_PATH
+        echo ::set-env name=WHEEL_NAME::$WHEEL_NAME
     - uses: actions/upload-artifact@v2
       with:
-        name: dist-artifacts
-        path: dist/*
+        name: ${{ env.WHEEL_NAME }}
+        path: ${{ env.WHEEL_PATH }}
