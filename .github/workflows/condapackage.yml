@@ -26,6 +26,7 @@ jobs:
       - name: Conda build setup
         shell: pwsh
         run: |
+          conda install conda-build
           conda config --set always_yes yes --set changeps1 no
           conda create -n rio -c conda-forge dask click rasterio fiona shapely rasterstats scikit-fmm scikit-image scikit-learn astropy
           conda activate rio
