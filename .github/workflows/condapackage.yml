@@ -24,7 +24,7 @@ jobs:
           show-channel-urls: true
           channel-priority: flexible
           environment-file: conda-build/environment.yml
-          auto-activate-base: false
+          auto-activate-base: true
       - name: Conda build setup
         shell: pwsh
         run: |
