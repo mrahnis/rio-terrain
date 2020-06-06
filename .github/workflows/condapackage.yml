@@ -26,10 +26,13 @@ jobs:
           environment-file: conda-build/environment.yml
           auto-activate-base: false
       - name: Conda build
-        shell: bash
+        shell: pwsh
         run: |
           conda config --set always_yes yes --set changeps1 no
           conda build .
+          Copy-Item $env:MINICONDA\conda-bld -Destination . -Recurse
+      - name: Locate file
+        run: |
           ARTIFACT_PATH=$(find conda-bld/noarch/*.tar.bz2)
           ARTIFACT_NAME=$(basename $ARTIFACT_PATH)
           echo ::set-env name=ARTIFACT_PATH::$ARTIFACT_PATH
