@@ -11,7 +11,7 @@ on:
 jobs:
   example-1:
     name: Ex1 Windows
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: goanpeca/setup-miniconda@v1
@@ -31,7 +31,5 @@ jobs:
           conda config --set always_yes yes --set changeps1 no
           conda info
           conda list
-          dir env: | %{"{0}={1}" -f $_.Name,$_.Value}
-          Get-ChildItem -Path .
           conda env list
-          conda build . --help
+          conda build .
