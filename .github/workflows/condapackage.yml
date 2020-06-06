@@ -29,7 +29,5 @@ jobs:
         shell: pwsh
         run: |
           conda config --set always_yes yes --set changeps1 no
-          conda info
-          conda list
-          conda env list
           conda build .
+

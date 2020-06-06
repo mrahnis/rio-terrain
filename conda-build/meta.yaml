@@ -4,6 +4,7 @@ package:
 
 source:
   git_url: ../
+  git_rev: HEAD
 
 build:
   noarch: python
