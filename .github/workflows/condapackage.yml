@@ -16,23 +16,22 @@ jobs:
       - uses: actions/checkout@v2
       - uses: goanpeca/setup-miniconda@v1
         with:
+          activate-environment: rio
           python-version: 3.8
           auto-update-conda: true
           allow-softlinks: true
           channels: conda-forge
           show-channel-urls: true
           channel-priority: flexible
-          auto-activate-base: true
+          environment-file: conda-build/environment.yml
+          auto-activate-base: false
       - name: Conda build setup
         shell: pwsh
         run: |
-          conda install conda-build
           conda config --set always_yes yes --set changeps1 no
-          conda create -n rio -c conda-forge dask click rasterio fiona shapely rasterstats scikit-fmm scikit-image scikit-learn astropy
-          conda activate rio
           conda info
           conda list
           dir env: | %{"{0}={1}" -f $_.Name,$_.Value}
           Get-ChildItem -Path .
           conda env list
-          conda build .
+          conda build . --help
