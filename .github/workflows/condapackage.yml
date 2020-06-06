@@ -26,16 +26,16 @@ jobs:
           environment-file: conda-build/environment.yml
           auto-activate-base: false
       - name: Conda build
-        shell: pwsh
+        shell: bash
         run: |
           conda config --set always_yes yes --set changeps1 no
           conda build .
-          PACKAGE_PATH=$(find conda-bld/noarch/*.tar.bz2)
-          PACKAGE_NAME=$(basename $WHEEL_PATH)
-          echo ::set-env name=PACKAGE_PATH::$PACKAGE_PATH
-          echo ::set-env name=PACKAGE_NAME::$PACKAGE_NAME
+          ARTIFACT_PATH=$(find conda-bld/noarch/*.tar.bz2)
+          ARTIFACT_NAME=$(basename $ARTIFACT_PATH)
+          echo ::set-env name=ARTIFACT_PATH::$ARTIFACT_PATH
+          echo ::set-env name=ARTIFACT_NAME::$ARTIFACT_NAME
       - uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.PACKAGE_NAME }}
-          path: ${{ env.PACKAGE_PATH }}
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_PATH }}
 
