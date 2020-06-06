@@ -10,7 +10,7 @@ on:
 
 jobs:
   example-1:
-    name: Ex1 Windows
+    name: Conda package
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -25,9 +25,17 @@ jobs:
           channel-priority: flexible
           environment-file: conda-build/environment.yml
           auto-activate-base: false
-      - name: Conda build setup
+      - name: Conda build
         shell: pwsh
         run: |
           conda config --set always_yes yes --set changeps1 no
           conda build .
+          PACKAGE_PATH=$(find conda-bld/noarch/*.tar.bz2)
+          PACKAGE_NAME=$(basename $WHEEL_PATH)
+          echo ::set-env name=PACKAGE_PATH::$PACKAGE_PATH
+          echo ::set-env name=PACKAGE_NAME::$PACKAGE_NAME
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PACKAGE_NAME }}
+          path: ${{ env.PACKAGE_PATH }}
 
