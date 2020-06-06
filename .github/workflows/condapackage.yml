@@ -30,7 +30,7 @@ jobs:
         run: |
           conda config --set always_yes yes --set changeps1 no
           conda build .
-          Copy-Item $env:CONDA\conda-bld -Destination . -Recurse
+          Copy-Item $env:CONDA_PREFIX\conda-bld -Destination . -Recurse
       - name: Locate file
         run: |
           ARTIFACT_PATH=$(find conda-bld/noarch/*.tar.bz2)
