@@ -14,6 +14,10 @@ Rio-terrain provides a set of rasterio CLI plugins to perform common raster oper
 	:target: https://github.com/mrahnis/rio-terrain/actions?query=workflow%3A%22Python+package%22
 	:alt: Python Package
 
+.. image:: https://github.com/mrahnis/rio-terrain/workflows/Conda%20package/badge.svg
+	:target: https://github.com/mrahnis/rio-terrain/actions?query=workflow%3A%22Conda+package%22
+	:alt: Conda Package
+
 .. image:: https://readthedocs.org/projects/rio-terrain/badge/?version=latest
 	:target: http://rio-terrain.readthedocs.io/en/latest/?badge=latest
 	:alt: Documentation Status
