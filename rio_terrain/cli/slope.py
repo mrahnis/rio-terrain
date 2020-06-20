@@ -70,7 +70,8 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
                 overlap=0,
             )
         else:
-            warnings.warn((msg.NOTILING).format(blockshape))
+            blockshape = 128
+            warnings.warn((msg.NOTILING).format(src.shape))
 
         with rasterio.open(output, 'w', **profile) as dst:
 

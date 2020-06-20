@@ -67,7 +67,8 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
                 overlap=0,
             )
         else:
-            warnings.warn((msg.NOTILING).format(blockshape))
+            blockshape = 128
+            warnings.warn((msg.NOTILING).format(src.shape))
 
         with rasterio.open(output, 'w', **profile) as dst:
             if njobs < 1:

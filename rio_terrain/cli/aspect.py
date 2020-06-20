@@ -57,7 +57,8 @@ def aspect(ctx, input, output, neighbors, pcs, njobs, verbose):
             write_windows = rt.tile_grid(
                 src.width, src.height, blockshape[0], blockshape[1], overlap=0)
         else:
-            warnings.warn((msg.NOTILING).format(blockshape))
+            blockshape = 128
+            warnings.warn((msg.NOTILING).format(src.shape))
 
         with rasterio.open(output, 'w', **profile) as dst:
             if njobs < 1:
