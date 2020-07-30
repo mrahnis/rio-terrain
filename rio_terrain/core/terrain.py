@@ -13,18 +13,18 @@ def _ring_gradient(arr, res=(1, 1)):
         res (tuple): tuple of raster cell width and height
 
     Returns:
-        dz_dx, dz_dy (ndarrays): x and y gradient components
+        dz_dy, dz_dx (ndarrays): x and y gradient components
 
     """
     origin = (0, 0)
 
-    k_X = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
+    k_X = np.array([[1, 0, -1], [2, 0, -2], [1, 0, -1]])
     k_Y = np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]])
 
     dz_dx = ndimage.convolve(arr, k_X, origin=origin) / (8 * res[0])
     dz_dy = ndimage.convolve(arr, k_Y, origin=origin) / (8 * res[1])
 
-    return dz_dx, dz_dy
+    return dz_dy, dz_dx
 
 
 def slope(arr, res=(1, 1), units='grade', neighbors=4):
@@ -41,9 +41,9 @@ def slope(arr, res=(1, 1), units='grade', neighbors=4):
 
     """
     if neighbors == 4:
-        dz_dx, dz_dy = np.gradient(arr, res[0])
+        dz_dy, dz_dx = np.gradient(arr, res[0])
     else:
-        dz_dx, dz_dy = _ring_gradient(arr, res)
+        dz_dy, dz_dx = _ring_gradient(arr, res)
 
     m = np.sqrt(dz_dx ** 2 + dz_dy ** 2)
     if units == 'grade':
@@ -60,23 +60,23 @@ def aspect(arr, res=(1, 1), pcs='compass', neighbors=4):
     Parameters:
         arr (ndarray): 2D numpy array
         res (tuple): tuple of raster cell width and height
-        north (str, optional): choice of polar coordinate systeM
+        north (str, optional): choice of polar coordinate system
 
     Returns:
         aspect (ndarray): 2D numpy array representing slope aspect
 
     """
     if neighbors == 4:
-        dz_dx, dz_dy = np.gradient(arr, res[0])
+        dz_dy, dz_dx = np.gradient(arr, res[0])
     else:
-        dz_dx, dz_dy = _ring_gradient(arr, res)
+        dz_dy, dz_dx = _ring_gradient(arr, res)
 
     if pcs == 'compass':
-        aspect = (180 / pi) * np.arctan2(dz_dy, -dz_dx)
-        aspect += 180
+        aspect = (180 / pi) * np.arctan2(dz_dy, dz_dx)
+        aspect += 270
+        aspect[aspect > 360] -= 360
     elif pcs == 'cartesian':
-        aspect = (180 / pi) * np.arctan2(-dz_dy, dz_dx)
-        aspect = 90.0 - aspect
+        aspect = -(180 / pi) * np.arctan2(-dz_dy, -dz_dx)
         aspect[aspect < 0] += 360
     else:
         aspect = (180 / pi) * np.arctan2(dz_dy, dz_dx)
@@ -96,15 +96,15 @@ def curvature(arr, res=(1, 1), neighbors=4):
 
     """
     if neighbors == 4:
-        dz_dx, dz_dy = np.gradient(arr, res[0])
+        dz_dy, dz_dx = np.gradient(arr, res[0])
     else:
-        dz_dx, dz_dy = _ring_gradient(arr, res)
+        dz_dy, dz_dx = _ring_gradient(arr, res)
 
     m = np.sqrt(dz_dx ** 2 + dz_dy ** 2)
     dT_dx = np.divide(dz_dx, m)
     dT_dy = np.divide(dz_dy, m)
-    d2T_dxx, _ = np.gradient(dT_dx, res[0])
-    _, d2T_dyy = np.gradient(dT_dy, res[0])
+    _, d2T_dxx = np.gradient(dT_dx, res[0])
+    d2T_dyy, _ = np.gradient(dT_dy, res[0])
 
     curvature = d2T_dxx + d2T_dyy
 
