@@ -50,7 +50,7 @@ jobs:
         echo ::set-env name=WHEEL_NAME::$WHEEL_NAME
     - name: Create release
       id: create_release
-      uses: actions/create-release@v1.1.2
+      uses: actions/create-release@v1.1.3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
