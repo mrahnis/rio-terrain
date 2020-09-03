@@ -5,54 +5,69 @@ from rasterio.windows import Window
 from rasterio.transform import rowcol, xy, from_bounds
 
 
-def tile_dim(dim, tile_size, min_size=None):
-    """Chunk a range using a minimum chunk size
+def tile_dim(stop, step, min_size=1, balance=False, merge=False, as_chunks=False):
+    """Tile a range to coordinates or tile shapes
+
+    Divide a range using a specified size, and optionally remove last coordinate to meet a minimum size
+
+    Parameters:
+        dim (int) : size of the range
+        step (int) : desired tile width
+        min_size (int) : minumum allowed width
+        balance (bool) : distribute remainder to balance tile sizes
+        merge (bool) : include remainder in final tile
+        as_chunks (bool) : return tile width instead of coordinates
+
+    Returns:
+        coords (ndarray) : array of start coordinates or widths
 
     """
-    coords = np.arange(0, dim, tile_size)
-    if min_size and (dim % tile_size < min_size):
+    coords = np.arange(0, stop, step)  # initial coords
+    rem = stop % step                  # distance from the last coord to stop
+
+    # calculate and apply amount needed to balance
+    if balance is True:
+        bal = floor(rem/(len(coords) - 1))
+        coords += np.arange(len(coords)) * bal
+        rem = stop - coords[-1]        # update rem for newly balanced coords
+        # rem = stop % (step+bal)
+
+    # include the remainder in the last coord
+    if (merge is True or rem < min_size) and (rem > 0):
         coords = coords[:-1]
 
-    return coords
+    # return chunks or coords
+    if as_chunks is True:
+        # get the widths
+        if stop > coords[-1]:
+            coords = np.append(coords, stop)
+        chunks = np.diff(coords)
+        return chunks
+    else:
+        return coords
 
 
-def tile_dims(shape, tile_shape, min_size=None):
-    """Chunk a 2D array
+def tile_dims(shape, tile_shape, min_size=1, balance=False, merge=False, as_chunks=False):
+    """Tile a 2D array
+
+    Tile a 2D array with a specified size and return corner coordinate series.
+
+    Parameters:
+        shape (int, int) : shape to tile as a tuple
+        tile_shape (int, int) : desired tile shape as a tuple
+        min_size (int) : minimum allowed tile length
+        balance (bool) : distribute remainder to balance tile sizes
+        merge (bool) : include remainder in final tile
+        as_chunks (bool) : return tile shapes instead of coordinates
+
+    Returns:
+        xx, yy (ndarray, ndarray) : start corner coordinate arrays, or tile height and width arrays
 
     """
-    xx = tile_dim(shape[0], tile_shape[0], min_size=min_size)
-    yy = tile_dim(shape[1], tile_shape[1], min_size=min_size)
+    xx = tile_dim(shape[0], tile_shape[0], min_size=min_size, balance=balance, merge=merge, as_chunks=as_chunks)
+    yy = tile_dim(shape[1], tile_shape[1], min_size=min_size, balance=balance, merge=merge, as_chunks=as_chunks)
 
     return xx, yy
-
-
-def chunk_dim(dim, chunk_size, min_size=None):
-    """Chunk a 1D array
-
-    """
-    nchunks = floor(dim / chunk_size)
-    remainder = dim % chunk_size
-
-    if nchunks == 0:
-        chunks = [remainder]
-    elif min_size and (nchunks > 1) and (remainder < min_size):
-        chunks = [chunk_size] * (nchunks - 1)
-        chunks.append(chunk_size + remainder)
-    else:
-        chunks = [chunk_size] * nchunks
-        chunks.append(remainder)
-
-    return np.array(chunks)
-
-
-def chunk_dims(shape, chunk_shape, min_size=None):
-    """Chunk a 2D array
-
-    """
-    hh = chunk_dim(shape[0], chunk_shape[0], min_size=min_size)
-    ww = chunk_dim(shape[1], chunk_shape[1], min_size=min_size)
-
-    return hh, ww
 
 
 def block_count(shape, block_shapes, band=1):
