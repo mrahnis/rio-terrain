@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.3.4
-      - uses: goanpeca/setup-miniconda@v1
+      - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: rio
           python-version: 3.8
@@ -35,8 +35,8 @@ jobs:
         run: |
           ARTIFACT_PATH=$(find conda-bld/noarch/*.tar.bz2)
           ARTIFACT_NAME=$(basename $ARTIFACT_PATH)
-          echo ::set-env name=ARTIFACT_PATH::$ARTIFACT_PATH
-          echo ::set-env name=ARTIFACT_NAME::$ARTIFACT_NAME
+          echo "ARTIFACT_PATH=$ARTIFACT_PATH" >> $GITHUB_ENV
+          echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ env.ARTIFACT_NAME }}
