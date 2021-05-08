@@ -46,8 +46,8 @@ jobs:
         python setup.py sdist bdist_wheel
         WHEEL_PATH=$(find dist/*.whl)
         WHEEL_NAME=$(basename $WHEEL_PATH)
-        echo ::set-env name=WHEEL_PATH::$WHEEL_PATH
-        echo ::set-env name=WHEEL_NAME::$WHEEL_NAME
+        echo "WHEEL_PATH=$WHEEL_PATH" >> $GITHUB_ENV
+        echo "WHEEL_NAME=$WHEEL_NAME" >> $GITHUB_ENV
     - name: Create release
       id: create_release
       uses: actions/create-release@v1.1.2
