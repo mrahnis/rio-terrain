@@ -4,12 +4,6 @@ rio-terrain
 
 Rio-terrain provides a set of rasterio CLI plugins to perform common raster operations, and can write slope, aspect and curvature rasters.
 
-.. image:: https://travis-ci.org/mrahnis/rio-terrain.svg?branch=main
-    :target: https://travis-ci.org/mrahnis/rio-terrain
-
-.. image:: https://ci.appveyor.com/api/projects/status/90fk8n3stif0yp5f?svg=true
-	:target: https://ci.appveyor.com/project/mrahnis/rio-terrain
-
 .. image:: https://github.com/mrahnis/rio-terrain/workflows/Python%20package/badge.svg
 	:target: https://github.com/mrahnis/rio-terrain/actions?query=workflow%3A%22Python+package%22
 	:alt: Python Package
