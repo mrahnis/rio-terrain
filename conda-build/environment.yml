@@ -7,8 +7,3 @@ dependencies:
     - python
     - cython
     - numpy
-    - scipy
-    - matplotlib
-    - rasterio
-    - click
-    - crick 
