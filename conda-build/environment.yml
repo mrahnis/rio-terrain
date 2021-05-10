@@ -4,6 +4,6 @@ dependencies:
     - conda-build
     - conda-verify
     - pytest
-    - python
+    - python=3.8
     - cython
-    - numpy
+    - numpy=1.16

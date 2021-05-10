@@ -32,7 +32,7 @@ jobs:
           allow-softlinks: true
           channels: conda-forge
           show-channel-urls: true
-          channel-priority: flexible
+          channel-priority: strict
           environment-file: conda-build/environment.yml
           auto-activate-base: false
           use-only-tar-bz2: true

@@ -29,8 +29,8 @@ requirements:
     - python
     - setuptools
   run:
-    - python
-    - numpy
+    - python=3.8
+    - numpy=1.16
     - scipy
     - matplotlib
     - rasterio
