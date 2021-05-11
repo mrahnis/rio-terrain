@@ -9,15 +9,15 @@ on:
     branches: [ main ]
 
 jobs:
-  example-1:
+  build:
     name: Conda package (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest"]
-        python-version: ["3.7", "3.8"]
-        numpy-version: ["1.16"]
+        os: ["ubuntu-latest", "windows-latest"]
+        python-version: [3.8]
+        numpy-version: [1.19]
     steps:
       - uses: actions/checkout@v2.3.4
       - name: Cache conda 
