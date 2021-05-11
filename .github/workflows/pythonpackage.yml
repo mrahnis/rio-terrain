@@ -44,13 +44,10 @@ jobs:
       run: |
         pip install pytest
         pytest
-    - name: Package and upload build artifact
+    - name: Package source and wheels
       run: |
         python setup.py sdist bdist_wheel
-        WHEEL_PATH=$(find dist/*.whl)
-        WHEEL_NAME=$(basename $WHEEL_PATH)
-        echo "WHEEL_PATH=$WHEEL_PATH" >> $GITHUB_ENV
-        echo "WHEEL_NAME=$WHEEL_NAME" >> $GITHUB_ENV
+    - name: Upload wheel artifacts
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.os }}-${{ matrix.python-version }}-wheels

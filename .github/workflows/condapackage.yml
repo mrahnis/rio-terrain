@@ -42,20 +42,15 @@ jobs:
           environment-file: conda-build/environment.yml
           auto-activate-base: false
           use-only-tar-bz2: true
-      - name: Conda build
+      - name: Build conda package
         shell: pwsh
         run: |
           conda config --set always_yes yes --set changeps1 no
           conda build . --python ${{ matrix.python-version }} --numpy ${{ matrix.python-version }}
           Copy-Item $env:CONDA_PREFIX\conda-bld -Destination . -Recurse
-      - name: Locate file
-        run: |
-          ARTIFACT_PATH=$(find conda-bld/noarch/*.tar.bz2)
-          ARTIFACT_NAME=$(basename $ARTIFACT_PATH)
-          echo "ARTIFACT_PATH=$ARTIFACT_PATH" >> $GITHUB_ENV
-          echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> $GITHUB_ENV
+      - name: Upload package artifacts
       - uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ env.ARTIFACT_PATH }}
+          name: ${{ matrix.os }}-${{ matrix.python-version }}-packages
+          path: conda-bld/noarch/*.tar.bz2
 
