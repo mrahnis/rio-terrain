@@ -40,7 +40,7 @@ jobs:
         shell: pwsh
         run: |
           conda config --set always_yes yes --set changeps1 no
-          conda build .
+          conda build . --python ${{python-version}} --numpy 1.16
           Copy-Item $env:CONDA_PREFIX\conda-bld -Destination . -Recurse
       - name: Locate file
         run: |
