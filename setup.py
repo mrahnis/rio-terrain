@@ -1,24 +1,19 @@
 from os import path
 from setuptools import setup, find_packages
+import versioneer
 
-
-for line in open('rio_terrain/__init__.py', 'r'):
-    if line.find("__version__") >= 0:
-        version = line.split("=")[1].strip()
-        version = version.strip('"')
-        version = version.strip("'")
-        continue
-
-with open('VERSION.txt', 'w') as fp:
-    fp.write(version)
 
 current_directory = path.abspath(path.dirname(__file__))
-with open(path.join(current_directory, 'README.rst'), 'r', encoding='utf-8') as f:
+# with open(path.join(current_directory, 'README.rst'), 'r', encoding='utf-8') as f:
+with open('README.rst', 'r', encoding='utf-8') as f:
     long_description = f.read()
 
+with open("requirements.txt", "r") as fh:
+    requirements = [line.strip() for line in fh]
 
 setup(name='rio-terrain',
-      version=version,
+      version=versioneer.get_version(),
+      cmdclass=versioneer.get_cmdclass(),
       author='Michael Rahnis',
       author_email='mike@topomatrix.com',
       description='Rasterio CLI plugin to perform common operations on single-band elevation rasters',
@@ -28,14 +23,7 @@ setup(name='rio-terrain',
       license='BSD',
       packages=find_packages(exclude=['examples']),
       include_package_data=True,
-      install_requires=[
-        'numpy',
-        'scipy',
-        'matplotlib',
-        'rasterio',
-        'click',
-        'crick',
-      ],
+      install_requires=requirements,
       entry_points='''
         [rasterio.rio_commands]
         aspect=rio_terrain.cli.aspect:aspect
