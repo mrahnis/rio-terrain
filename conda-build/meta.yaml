@@ -1,6 +1,9 @@
+{% set data = load_setup_py_data() %}
+{% set version = data.get('version')  %}
+
 package:
   name: rio-terrain
-  version: 0.0.29
+  version: {{ version }}
 
 source:
   git_url: ../
