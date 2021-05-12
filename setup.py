@@ -1,15 +1,11 @@
-from os import path
 from setuptools import setup, find_packages
 import versioneer
 
 
-current_directory = path.abspath(path.dirname(__file__))
-# with open(path.join(current_directory, 'README.rst'), 'r', encoding='utf-8') as f:
 with open('README.rst', 'r', encoding='utf-8') as f:
     long_description = f.read()
-
-with open("requirements.txt", "r") as fh:
-    requirements = [line.strip() for line in fh]
+with open("requirements.txt", "r") as f:
+    requirements = [line.strip() for line in f]
 
 setup(name='rio-terrain',
       version=versioneer.get_version(),
