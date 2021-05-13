@@ -1,9 +1,9 @@
 import logging
-from ._version import get_versions
 
 from rio_terrain.core.terrain import *
 from rio_terrain.core.statistics import *
 from rio_terrain.core.windowing import *
+from ._version import get_versions
 
 
 __author__ = "Mike Rahnis"
