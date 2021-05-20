@@ -12,7 +12,7 @@ from math import ceil
 import click
 import numpy as np
 import rasterio
-from rasterio.windowing import Window
+from rasterio.windows import Window
 from crick import TDigest
 from scipy import stats
 from scipy.stats.mstats import mquantiles
