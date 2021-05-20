@@ -1,11 +1,19 @@
 from math import floor, ceil
+from typing import List, Tuple, Iterator
 
 import numpy as np
 from rasterio.windows import Window
 from rasterio.transform import rowcol, xy, from_bounds
 
 
-def tile_dim(stop, step, min_size=1, balance=False, merge=False, as_chunks=False):
+def tile_dim(
+    stop: int,
+    step: int,
+    min_size: int = 1,
+    balance: bool = False,
+    merge: bool = False,
+    as_chunks: bool = False
+) -> np.ndarray:
     """Tile a range to coordinates or tile shapes
 
     Divide a range using a specified size, and optionally remove last coordinate to meet a minimum size
@@ -26,14 +34,14 @@ def tile_dim(stop, step, min_size=1, balance=False, merge=False, as_chunks=False
     rem = stop % step                  # distance from the last coord to stop
 
     # calculate and apply amount needed to balance
-    if balance is True:
+    if (balance is True) and (len(coords) > 2):
         bal = floor(rem/(len(coords) - 1))
         coords += np.arange(len(coords)) * bal
         rem = stop - coords[-1]        # update rem for newly balanced coords
         # rem = stop % (step+bal)
 
-    # include the remainder in the last coord
-    if (merge is True or rem < min_size) and (rem > 0):
+    # drop the last coord if it marks a remainder less than the minimum size
+    if (merge is True or rem < min_size) and (rem > 0) and (len(coords) > 1):
         coords = coords[:-1]
 
     # return chunks or coords
@@ -47,7 +55,14 @@ def tile_dim(stop, step, min_size=1, balance=False, merge=False, as_chunks=False
         return coords
 
 
-def tile_dims(shape, tile_shape, min_size=1, balance=False, merge=False, as_chunks=False):
+def tile_dims(
+    shape: Tuple[int, int],
+    tile_shape: Tuple[int, int],
+    min_size: int = 1,
+    balance: bool = False,
+    merge: bool = False,
+    as_chunks: bool = False
+) -> Tuple[np.ndarray, np.ndarray]:
     """Tile a 2D array
 
     Tile a 2D array with a specified size and return corner coordinate series.
@@ -70,7 +85,11 @@ def tile_dims(shape, tile_shape, min_size=1, balance=False, merge=False, as_chun
     return xx, yy
 
 
-def block_count(shape, block_shapes, band=1):
+def block_count(
+    shape: Tuple[int, int],
+    block_shapes: List[Tuple[int, int]],
+    band: int = 1
+) -> int:
     """Determine the number of blocks in a band
 
     Parameters:
@@ -90,7 +109,10 @@ def block_count(shape, block_shapes, band=1):
     return blocks_high * blocks_wide
 
 
-def subsample(blocks, probability=1.0):
+def subsample(
+    blocks: Iterator[Window],
+    probability: float = 1.0
+) -> Iterator[Window]:
     """Subsample an iterable at a given probability
 
     Parameters:
@@ -108,7 +130,11 @@ def subsample(blocks, probability=1.0):
             yield block
 
 
-def expand_window(window, src_shape, margin=10):
+def expand_window(
+    window: Window,
+    src_shape: Tuple[int, int],
+    margin: int = 10
+) -> Window:
     """Expand a window by a margin
 
     Parameters:
@@ -207,7 +233,10 @@ def intersect_bounds(bbox0, bbox1):
     return bounds
 
 
-def margins(window0, window1):
+def margins(
+    window0: Window,
+    window1: Window
+) -> Tuple[int, int, int, int]:
     """Size of collar between a pair of windows
 
     Here, window0 is a read window and window1 is a write window
@@ -223,7 +252,10 @@ def margins(window0, window1):
     return (int(left), int(upper), int(right), int(lower))
 
 
-def trim(arr, margins):
+def trim(
+    arr: np.ndarray,
+    margins: Tuple[int, int, int, int]
+) -> np.ndarray:
     """Trim a 2D array by a set of margins
 
     """
@@ -242,9 +274,18 @@ def trim(arr, margins):
 
 
 def tile_grid(
-    ncols, nrows, blockxsize, blockysize, col_offset=0, row_offset=0, overlap=0
-):
-    """Return a generator containing read and write windows with a specified
+    ncols: int,
+    nrows: int,
+    blockxsize: int,
+    blockysize: int,
+    col_offset: int = 0,
+    row_offset: int = 0,
+    overlap: int = 0,
+    min_size: int = 1,
+    balance: bool = False,
+    merge: bool = False
+) -> Iterator[Window]:
+    """Return a generator containing read and write windows with specified
     dimensions and overlap
 
     mgrid returns not as expected so used broadcast_arrays instead
@@ -263,7 +304,7 @@ def tile_grid(
         window (Window) : tiled windows over a region
 
     """
-    rows, cols = tile_dims((ncols, nrows), (blockxsize, blockysize))
+    rows, cols = tile_dims((ncols, nrows), (blockxsize, blockysize), min_size=min_size, balance=balance, merge=balance)
     base_cols, base_rows = np.broadcast_arrays(rows, cols.reshape(cols.shape[0], -1))
 
     ul_cols = base_cols - overlap

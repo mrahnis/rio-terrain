@@ -1,9 +1,16 @@
+from typing import Iterator, Tuple, Optional
 import concurrent.futures
 
 import numpy as np
+import rasterio
+from rasterio.windows import Window
 
 
-def minmax(src, windows, njobs):
+def minmax(
+    src: rasterio.DatasetReader,
+    windows: Iterator[Window],
+    njobs: int
+) -> Tuple[Optional[float], Optional[float]]:
     """Calculates the minimum and maximum values in a rasterio source.
 
     Parameters:
@@ -19,7 +26,7 @@ def minmax(src, windows, njobs):
     ArcGIS max = 218.81454467773
     """
 
-    def _minmax(arr):
+    def _minmax(arr: np.ndarray) -> Tuple[Optional[float], Optional[float]]:
         mask = np.isfinite(arr[:])
         if np.count_nonzero(mask) > 0:
             arr_min = np.nanmin(arr[mask])
@@ -56,20 +63,23 @@ def minmax(src, windows, njobs):
                 # window = future_to_window[future]
                 window_min, window_max = future.result()
 
-                if not src_min and not src_max:
-                    if window_min and window_max:
-                        src_min = window_min
-                        src_max = window_max
-                elif window_min and window_max:
-                    if window_min < src_min:
-                        src_min = window_min
-                    if window_max > src_max:
-                        src_max = window_max
+                if window_min and not src_min:
+                    src_min = window_min
+                elif window_min and src_min and window_min < src_min:
+                    src_min = window_min
+                if window_max and not src_max:
+                    src_max = window_max
+                elif window_max and src_max and window_max > src_max:
+                    src_max = window_max
 
         return src_min, src_max
 
 
-def mean(src, windows, njobs):
+def mean(
+    src: rasterio.DatasetReader,
+    windows: Iterator[Window],
+    njobs: int
+) -> float:
     """Calculates the mean of a rasterio source
 
     Parameters:
@@ -124,7 +134,12 @@ def mean(src, windows, njobs):
     return mean
 
 
-def stddev(src, mean, windows, njobs):
+def stddev(
+    src: rasterio.DatasetReader,
+    mean: float,
+    windows: Iterator[Window],
+    njobs: int
+) -> float:
     """Calculates the standard deviation of a rasterio source
 
     Parameters:

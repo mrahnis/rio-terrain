@@ -1,7 +1,8 @@
+from typing import Tuple
 import numpy as np
 
 
-def mad(arr, size=(3, 3)):
+def mad(arr: np.ndarray, size: Tuple[int, int] = (3, 3)) -> np.ndarray:
     """Calculates the median absolute deviation (MAD) for an array
 
     """
@@ -14,7 +15,7 @@ def mad(arr, size=(3, 3)):
     return mads
 
 
-def std(arr, size=(3, 3)):
+def std(arr: np.ndarray, size: Tuple[int, int] = (3, 3)) -> np.ndarray:
     """Calculates the standard deviation for a neighborhood
 
     """
@@ -34,7 +35,7 @@ def std(arr, size=(3, 3)):
     return result.astype(np.float32)
 
 
-def std_ndimage(arr, size=(3, 3)):
+def std_ndimage(arr: np.ndarray, size: Tuple[int, int] = (3, 3)) -> np.ndarray:
     """Calculates the standard deviation for a neighborhood
 
     """

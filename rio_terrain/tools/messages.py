@@ -1,4 +1,6 @@
 import sys
+import time
+
 
 # Startup information
 STARTING = "Running {} on {}"
@@ -19,7 +21,7 @@ NONINTERSECTING = "Input rasters are non-intersecting"
 NONALIGNED = "Raster cells are not aligned between inputs"
 
 
-def printtime(t0, t1):
+def printtime(t0: float, t1: float) -> str:
     """Return the elapsed time between t0 and t1 in h:m:s formatted string
 
     """
@@ -30,7 +32,12 @@ def printtime(t0, t1):
     return fmt
 
 
-def progress(value, endvalue, bar_length=20, msg=None):
+def progress(
+    value: int,
+    endvalue: int,
+    bar_length: int = 20,
+    msg: str = None
+) -> None:
     """Display and update a progress bar
 
     """

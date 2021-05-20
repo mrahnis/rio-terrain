@@ -70,7 +70,8 @@ def uncertainty(
         if not rt.is_raster_intersecting(src0, src1):
             raise ValueError(msg.NONINTERSECTING)
         if not rt.is_raster_aligned(src0, src1):
-            raise ValueError(msg.NONALIGNED)
+            # raise ValueError(msg.NONALIGNED)
+            pass
 
         profile = src0.profile
         affine = src0.transform
