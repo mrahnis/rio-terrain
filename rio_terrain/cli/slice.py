@@ -3,6 +3,7 @@
 import time
 import warnings
 import concurrent.futures
+from typing import Union
 
 import click
 import numpy as np
@@ -13,7 +14,13 @@ import rio_terrain.tools.messages as msg
 from rio_terrain import __version__ as plugin_version
 
 
-def do_slice(img, minimum=None, maximum=None, keep_data=False, false_val=0):
+def do_slice(
+    img: np.ndarray,
+    minimum: Union[None, int, float] = None,
+    maximum: Union[None, int, float] = None,
+    keep_data: bool = False,
+    false_val: Union[int, float] = 0
+) -> np.ndarray:
     """Slice data or ones from an array given a value range.
 
     Parameters:

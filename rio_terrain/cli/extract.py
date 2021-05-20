@@ -1,9 +1,9 @@
 """Extract regions from a raster by category."""
+from __future__ import annotations
 
 import time
 import warnings
 import concurrent.futures
-from typing import List
 
 import click
 import numpy as np
@@ -14,7 +14,11 @@ import rio_terrain.tools.messages as msg
 from rio_terrain import __version__ as plugin_version
 
 
-def do_extract(img: np.ndarray, categorical: np.ndarray, category: List[int]) -> np.ndarray:
+def do_extract(
+    img: np.ndarray,
+    categorical: np.ndarray,
+    category: list[int]
+) -> np.ndarray:
     if category is None:
         _category = [1]
     else:

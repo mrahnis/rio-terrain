@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from math import floor, ceil
-from typing import List, Tuple, Iterator
+from typing import List, Iterator
 
 import numpy as np
 from rasterio.windows import Window
@@ -56,13 +58,13 @@ def tile_dim(
 
 
 def tile_dims(
-    shape: Tuple[int, int],
-    tile_shape: Tuple[int, int],
+    shape: tuple[int, int],
+    tile_shape: tuple[int, int],
     min_size: int = 1,
     balance: bool = False,
     merge: bool = False,
     as_chunks: bool = False
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """Tile a 2D array
 
     Tile a 2D array with a specified size and return corner coordinate series.
@@ -86,8 +88,8 @@ def tile_dims(
 
 
 def block_count(
-    shape: Tuple[int, int],
-    block_shapes: List[Tuple[int, int]],
+    shape: tuple[int, int],
+    block_shapes: List[tuple[int, int]],
     band: int = 1
 ) -> int:
     """Determine the number of blocks in a band
@@ -132,7 +134,7 @@ def subsample(
 
 def expand_window(
     window: Window,
-    src_shape: Tuple[int, int],
+    src_shape: tuple[int, int],
     margin: int = 10
 ) -> Window:
     """Expand a window by a margin
@@ -236,7 +238,7 @@ def intersect_bounds(bbox0, bbox1):
 def margins(
     window0: Window,
     window1: Window
-) -> Tuple[int, int, int, int]:
+) -> tuple[int, int, int, int]:
     """Size of collar between a pair of windows
 
     Here, window0 is a read window and window1 is a write window
@@ -254,7 +256,7 @@ def margins(
 
 def trim(
     arr: np.ndarray,
-    margins: Tuple[int, int, int, int]
+    margins: tuple[int, int, int, int]
 ) -> np.ndarray:
     """Trim a 2D array by a set of margins
 

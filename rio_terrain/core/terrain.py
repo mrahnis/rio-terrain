@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import warnings
 from math import pi
-from typing import Tuple
 
 import numpy as np
 from scipy import ndimage
@@ -8,8 +9,8 @@ from scipy import ndimage
 
 def _ring_gradient(
     arr: np.ndarray,
-    res: Tuple[float, float] = (1, 1)
-) -> Tuple[np.ndarray, np.ndarray]:
+    res: tuple[float, float] = (1, 1)
+) -> tuple[np.ndarray, np.ndarray]:
     """Convolve an array using a 3x3 ring-shaped kernel
 
     Parameters:
@@ -33,7 +34,7 @@ def _ring_gradient(
 
 def slope(
     arr: np.ndarray,
-    res: Tuple[float, float] = (1, 1),
+    res: tuple[float, float] = (1, 1),
     units: str = 'grade',
     neighbors: int = 4
 ) -> np.ndarray:
@@ -65,7 +66,7 @@ def slope(
 
 def aspect(
     arr: np.ndarray,
-    res: Tuple[float, float] = (1, 1),
+    res: tuple[float, float] = (1, 1),
     pcs: str = 'compass',
     neighbors: int = 4
 ) -> np.ndarray:
@@ -100,7 +101,7 @@ def aspect(
 
 def curvature(
     arr: np.ndarray,
-    res: Tuple[float, float] = (1, 1),
+    res: tuple[float, float] = (1, 1),
     neighbors: int = 4
 ) -> np.ndarray:
     """Calculates curvature.

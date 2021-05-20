@@ -3,6 +3,7 @@
 import time
 import warnings
 import concurrent.futures
+from typing import Union
 
 import click
 import numpy as np
@@ -13,7 +14,12 @@ import rio_terrain.tools.messages as msg
 from rio_terrain import __version__ as plugin_version
 
 
-def do_threshold(img0, img1, level, default=0):
+def do_threshold(
+    img0: np.ndarray,
+    img1: np.ndarray,
+    level: Union[int, float],
+    default: Union[int, float] = 0
+) -> np.ndarray:
     conditions = [img0 >= img1 * level, img0 <= -img1 * level]
     choices = [1, -1]
     result = np.select(conditions, choices, default=default)

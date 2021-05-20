@@ -1,4 +1,5 @@
 """Calculate and print quantile values from a single-band raster."""
+from __future__ import annotations
 
 import time
 import warnings
@@ -11,6 +12,7 @@ from math import ceil
 import click
 import numpy as np
 import rasterio
+from rasterio.windowing import Window
 from crick import TDigest
 from scipy import stats
 from scipy.stats.mstats import mquantiles
@@ -21,7 +23,7 @@ import rio_terrain.tools.messages as msg
 from rio_terrain import __version__ as plugin_version
 
 
-def tdigest_mean(digest):
+def tdigest_mean(digest: TDigest) -> float:
     """Estimate the mean from a tdigest
 
     """
@@ -31,7 +33,7 @@ def tdigest_mean(digest):
     return mean
 
 
-def tdigest_std(digest):
+def tdigest_std(digest: TDigest) -> float:
     """Estimate the standard deviation of the mean from a tdigest
 
     """
@@ -45,7 +47,7 @@ def tdigest_std(digest):
     return std
 
 
-def tdigest_stats(digest):
+def tdigest_stats(digest: TDigest) -> tuple[float, float, float, float]:
     """Estimate descriptive statistics from a tdigest
 
     """
@@ -57,7 +59,7 @@ def tdigest_stats(digest):
     return (minX, maxX, meanX, stdX)
 
 
-def digest_window(file, window, absolute):
+def digest_window(file: str, window: Window, absolute: bool) -> tuple[Window, TDigest, int]:
     '''Process worker that calculates a t-digest on a raster
 
     '''

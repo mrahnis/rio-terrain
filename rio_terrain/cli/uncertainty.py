@@ -3,6 +3,7 @@
 import time
 import warnings
 import concurrent.futures
+from typing import Union
 
 import click
 import numpy as np
@@ -13,7 +14,12 @@ import rio_terrain.tools.messages as msg
 from rio_terrain import __version__ as plugin_version
 
 
-def propagate(img0, img1, instrumental0, instrumental1):
+def propagate(
+    img0: np.ndarray,
+    img1: np.ndarray,
+    instrumental0: Union[int, float],
+    instrumental1: Union[int, float]
+) -> np.ndarray:
     if instrumental0:
         img0[img0 < instrumental0] = instrumental0
     if instrumental1:

@@ -1,4 +1,6 @@
-from typing import Iterator, Tuple, Optional
+from __future__ import annotations
+
+from typing import Iterator, Optional
 import concurrent.futures
 
 import numpy as np
@@ -10,7 +12,7 @@ def minmax(
     src: rasterio.DatasetReader,
     windows: Iterator[Window],
     njobs: int
-) -> Tuple[Optional[float], Optional[float]]:
+) -> tuple[Optional[float], Optional[float]]:
     """Calculates the minimum and maximum values in a rasterio source.
 
     Parameters:
@@ -26,7 +28,7 @@ def minmax(
     ArcGIS max = 218.81454467773
     """
 
-    def _minmax(arr: np.ndarray) -> Tuple[Optional[float], Optional[float]]:
+    def _minmax(arr: np.ndarray) -> tuple[Optional[float], Optional[float]]:
         mask = np.isfinite(arr[:])
         if np.count_nonzero(mask) > 0:
             arr_min = np.nanmin(arr[mask])

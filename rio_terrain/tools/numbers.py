@@ -1,4 +1,6 @@
-from typing import Tuple, Union
+from __future__ import annotations
+
+from typing import Union
 import numpy as np
 
 
@@ -18,7 +20,7 @@ def is_all_nan(arr: np.ndarray) -> bool:
         return False
 
 
-def nan_shape(shape: Tuple[int, int]) -> np.ndarray:
+def nan_shape(shape: tuple[int, ...]) -> np.ndarray:
     result = np.empty(shape)
     result[:] = np.nan
     return result
