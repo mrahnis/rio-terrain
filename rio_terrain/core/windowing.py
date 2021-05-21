@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from math import floor, ceil
-from typing import List, Iterator
+from typing import Iterator
 
 import numpy as np
 from rasterio.windows import Window
@@ -89,7 +89,7 @@ def tile_dims(
 
 def block_count(
     shape: tuple[int, int],
-    block_shapes: List[tuple[int, int]],
+    block_shapes: list[tuple[int, int]],
     band: int = 1
 ) -> int:
     """Determine the number of blocks in a band
