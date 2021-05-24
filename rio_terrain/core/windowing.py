@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from math import floor, ceil
-from typing import Iterator
+from typing import Iterator, Union
 
 import numpy as np
-from affine import Affine
+from rasterio import Affine
+from rasterio.io import DatasetReader
 from rasterio.windows import Window
 from rasterio.transform import rowcol, xy, from_bounds
 
@@ -168,8 +169,9 @@ def expand_window(
 
 def bounds_window(
     bounds: tuple[float, float, float, float],
-    affine: Affine, constrain=True
-) -> tuple(slice, slice):
+    affine: Affine,
+    constrain: bool = True
+) -> tuple[slice, slice]:
     """Create a full cover rasterio-style window
 
     Parameters:
@@ -340,25 +342,30 @@ def tile_grid(
         yield Window.from_slices(slice(ul_row, lr_row), slice(ul_col, lr_col))
 
 
-def tile_grid_intersection(src0, src1, blockxsize=None, blockysize=None):
+def tile_grid_intersection(
+    src0: DatasetReader,
+    src1: DatasetReader,
+    blockxsize: Union[None, int] = None,
+    blockysize: Union[None, int] = None
+) -> tuple[Iterator[Window], Iterator[Window], Iterator[Window], Affine, int, int]:
     """Generate tiled windows for the intersection between two grids.
 
     Given two rasters having different dimensions calculate read-window generators for each
     and a write-window generator for the intersecion.
 
     Parameters:
-        src0 : rasterio read source
-        src1 : rasterio read source
-        blockxsize (int) : write-window width
-        blockysize (int) : write-window height
+        src0: rasterio read source
+        src1: rasterio read source
+        blockxsize: write-window width
+        blockysize: write-window height
 
     Returns:
         src0_blocks : read windows for src0
         src1_blocks : read windows for src1
         write_blocks : write windows for the intersection
-        affine (Affine) : write raster Affine
-        ncols (int) : write raster width in columns
-        nrows (int) : write raster height in rows
+        affine: write raster Affine
+        ncols: write raster width in columns
+        nrows: write raster height in rows
 
     """
     bbox0 = window_bounds(((0, 0), src0.shape), src0.transform, offset='ul')
