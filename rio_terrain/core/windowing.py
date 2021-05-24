@@ -4,6 +4,7 @@ from math import floor, ceil
 from typing import Iterator
 
 import numpy as np
+from affine import Affine
 from rasterio.windows import Window
 from rasterio.transform import rowcol, xy, from_bounds
 
@@ -21,15 +22,15 @@ def tile_dim(
     Divide a range using a specified size, and optionally remove last coordinate to meet a minimum size
 
     Parameters:
-        dim (int) : size of the range
-        step (int) : desired tile width
-        min_size (int) : minumum allowed width
-        balance (bool) : distribute remainder to balance tile sizes
-        merge (bool) : include remainder in final tile
-        as_chunks (bool) : return tile width instead of coordinates
+        dim: size of the range
+        step: desired tile width
+        min_size: minumum allowed width
+        balance: distribute remainder to balance tile sizes
+        merge: include remainder in final tile
+        as_chunks: return tile width instead of coordinates
 
     Returns:
-        coords (ndarray) : array of start coordinates or widths
+        coords: array of start coordinates or widths
 
     """
     coords = np.arange(0, stop, step)  # initial coords
@@ -70,15 +71,15 @@ def tile_dims(
     Tile a 2D array with a specified size and return corner coordinate series.
 
     Parameters:
-        shape (int, int) : shape to tile as a tuple
-        tile_shape (int, int) : desired tile shape as a tuple
-        min_size (int) : minimum allowed tile length
-        balance (bool) : distribute remainder to balance tile sizes
-        merge (bool) : include remainder in final tile
-        as_chunks (bool) : return tile shapes instead of coordinates
+        shape: shape to tile as a tuple
+        tile_shape: desired tile shape as a tuple
+        min_size: minimum allowed tile length
+        balance: distribute remainder to balance tile sizes
+        merge: include remainder in final tile
+        as_chunks: return tile shapes instead of coordinates
 
     Returns:
-        xx, yy (ndarray, ndarray) : start corner coordinate arrays, or tile height and width arrays
+        xx, yy: start corner coordinate arrays, or tile height and width arrays
 
     """
     xx = tile_dim(shape[0], tile_shape[0], min_size=min_size, balance=balance, merge=merge, as_chunks=as_chunks)
@@ -95,12 +96,12 @@ def block_count(
     """Determine the number of blocks in a band
 
     Parameters:
-        shape (tuple) : tuple containing raster height and width in cells
-        block_shapes (tuple) : block shapes for a rasterio read source
-        band (int) : raster band to count on
+        shape: tuple containing raster height and width in cells
+        block_shapes: block shapes for a rasterio read source
+        band: raster band to count on
 
     Returns:
-        result (int) : number of blocks in the raster
+        result: number of blocks in the raster
 
     """
     block_shape = block_shapes[band - 1]
@@ -118,11 +119,11 @@ def subsample(
     """Subsample an iterable at a given probability
 
     Parameters:
-        blocks (iterable) : an iterable of rasterio windows
-        probability (float) : fraction of blocks to sample
+        blocks: an iterable of rasterio windows
+        probability: fraction of blocks to sample
 
     Yields:
-        block (window) : yield a rasterio window if sampled
+        block: yield a rasterio window if sampled
 
     """
     import random
@@ -140,12 +141,12 @@ def expand_window(
     """Expand a window by a margin
 
     Parameters:
-        window (Window)
-        src_shape (tuple)
-        margin (int)
+        window: Window
+        src_shape: shape
+        margin: margin width in cells
 
     Returns:
-        result (Window)
+        result: Window
 
     """
     cols, rows = window.toslices()
@@ -165,16 +166,19 @@ def expand_window(
     return result
 
 
-def bounds_window(bounds, affine, constrain=True):
+def bounds_window(
+    bounds: tuple[float, float, float, float],
+    affine: Affine, constrain=True
+) -> tuple(slice, slice):
     """Create a full cover rasterio-style window
 
     Parameters:
-        bounds (tuple)
-        affine (Affine)
+        bounds: boundary
+        affine: transformation
 
     Returns:
-        row_slice (tuple)
-        col_slice (tuple)
+        row_slice: slice coordinates
+        col_slice: slice coordinates
 
     """
     w, s, e, n = bounds
@@ -190,21 +194,25 @@ def bounds_window(bounds, affine, constrain=True):
     return (row_start, row_stop), (col_start, col_stop)
 
 
-def slices_to_window(rows, cols):
+def slices_to_window(rows: slice, cols: slice) -> Window:
 
     return Window.from_slices(rows, cols)
 
 
-def window_bounds(window, affine, offset='center'):
+def window_bounds(
+    window: Window,
+    affine: Affine,
+    offset: str = 'center'
+) -> tuple[float, float, float, float]:
     """Create bounds coordinates from a rasterio window
 
     Parameters:
-        window (Window)
-        affine (Affine)
-        offset (str)
+        window: Window
+        affine: Affine
+        offset: str
 
     Returns:
-        bounds (tuple) : coordinate bounds (w, s, e, n)
+        bounds: coordinate bounds (w, s, e, n)
 
     """
     (row_start, col_start), (row_stop, col_stop) = window
@@ -215,15 +223,18 @@ def window_bounds(window, affine, offset='center'):
     return bounds
 
 
-def intersect_bounds(bbox0, bbox1):
+def intersect_bounds(
+    bbox0: tuple[float, float, float, float],
+    bbox1: tuple[float, float, float, float]
+) -> tuple[float, float, float, float]:
     """Get the intersection in w s e n
 
     Parameters:
-        bbox0 (tuple)
-        bbox1 (tuple)
+        bbox0: bounding coordinates
+        bbox1: bounding coordinates
 
     Returns:
-        bounds (tuple) : coordinate bounds (w, s, e, n)
+        bounds: coordinate bounds (w, s, e, n)
 
     """
     w = max(bbox0[0], bbox1[0])
@@ -294,16 +305,16 @@ def tile_grid(
     base_rows, base_cols = np.mgrid[0:h:blockysize, 0:w:blockxsize]
 
     Parameters:
-        ncols (int) : raster width in columns
-        nrows (int) : raster height in rows
-        blockxsize (int) : block width in rows
-        blockysize (int) : block height in rows
-        col_offset (int) : columns to offset the grid
-        row_offset (int) : rows to offset the grid
-        overlap (int) : overlap between windows
+        ncols: raster width in columns
+        nrows: raster height in rows
+        blockxsize: block width in rows
+        blockysize: block height in rows
+        col_offset: columns to offset the grid
+        row_offset: rows to offset the grid
+        overlap: overlap between windows
 
     Yields:
-        window (Window) : tiled windows over a region
+        window: tiled windows over a region
 
     """
     rows, cols = tile_dims((ncols, nrows), (blockxsize, blockysize), min_size=min_size, balance=balance, merge=balance)
