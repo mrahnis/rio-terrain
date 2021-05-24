@@ -20,6 +20,18 @@ def do_threshold(
     level: Union[int, float],
     default: Union[int, float] = 0
 ) -> np.ndarray:
+    """Threshold an image based on another image
+
+    Parameters:
+        img0:
+        img1:
+        level:
+        default:
+
+    Returns:
+        data from img0 after thresholding
+
+    """
     conditions = [img0 >= img1 * level, img0 <= -img1 * level]
     choices = [1, -1]
     result = np.select(conditions, choices, default=default)
@@ -44,7 +56,7 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
 
     \b
     Example:
-    rio threshold diff.tif uncertainty.tif, detected.tif 1.68
+        rio threshold diff.tif uncertainty.tif, detected.tif 1.68
 
     """
     if verbose:

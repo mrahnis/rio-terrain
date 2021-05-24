@@ -32,7 +32,7 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
 
     \b
     Example:
-    rio std elevation.tif stddev.tif
+        rio std elevation.tif stddev.tif
 
     """
     if verbose:

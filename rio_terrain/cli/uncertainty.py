@@ -20,6 +20,18 @@ def propagate(
     instrumental0: Union[int, float],
     instrumental1: Union[int, float]
 ) -> np.ndarray:
+    """Propagate undertainty in addition or subtraction of two rasters.
+
+    Parameters:
+        img0: uncertainty raster
+        img1: uncertainty raster
+        instrumental0: instrumental or minumum uncertainty of img0
+        instrumental1: instrumental or minumum uncertainty of img1
+
+    Returns:
+        propagated uncertainty
+
+    """
     if instrumental0:
         img0[img0 < instrumental0] = instrumental0
     if instrumental1:
@@ -60,7 +72,7 @@ def uncertainty(
 
     \b
     Example:
-    rio uncertainty roughness_t0.tif roughness_t1.tif uncertainty.tif
+        rio uncertainty roughness_t0.tif roughness_t1.tif uncertainty.tif
 
     """
     if verbose:

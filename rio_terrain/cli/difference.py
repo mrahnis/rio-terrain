@@ -30,9 +30,8 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
     INPUT_T0 should be a single-band raster at time t0.
     INPUT_T1 should be a single-band raster at time t1.
 
-    \b
     Example:
-    rio diff elevation1.tif elevation2.tif, diff2_1.tif
+        rio diff elevation1.tif elevation2.tif, diff2_1.tif
 
     """
     if verbose:

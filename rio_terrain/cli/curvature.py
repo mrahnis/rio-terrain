@@ -30,9 +30,8 @@ def curvature(ctx, input, output, neighbors, stats, njobs, verbose):
 
     INPUT should be a single-band raster.
 
-    \b
     Example:
-    rio curvature elevation.tif curvature.tif
+        rio curvature elevation.tif curvature.tif
 
     """
     if verbose:

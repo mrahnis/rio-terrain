@@ -29,9 +29,8 @@ def aspect(ctx, input, output, neighbors, pcs, njobs, verbose):
 
     INPUT should be a single-band raster.
 
-    \b
     Example:
-    rio aspect elevation.tif aspect.tif --pcs compass
+        rio aspect elevation.tif aspect.tif --pcs compass
 
     """
     if verbose:

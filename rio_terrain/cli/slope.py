@@ -34,7 +34,7 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
 
     \b
     Example:
-    rio slope elevation.tif slope.tif
+        rio slope elevation.tif slope.tif
 
     """
     if verbose:

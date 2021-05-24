@@ -24,6 +24,12 @@ NONALIGNED = "Raster cells are not aligned between inputs"
 def printtime(t0: float, t1: float) -> str:
     """Return the elapsed time between t0 and t1 in h:m:s formatted string
 
+    Parameters:
+        t0: initial time
+        t1: final time
+
+    Returns:
+        elapsed time
     """
     m, s = divmod(t1 - t0, 60)
     h, m = divmod(m, 60)
@@ -40,6 +46,11 @@ def progress(
 ) -> None:
     """Display and update a progress bar
 
+    Parameters:
+        value: current value representing the progress
+        endvalue: expected value at completion
+        bar_length: number of characters used to render the bar
+        msg: message to display
     """
     done_char = '#'
     todo_char = ' '

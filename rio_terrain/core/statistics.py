@@ -16,16 +16,17 @@ def minmax(
     """Calculates the minimum and maximum values in a rasterio source.
 
     Parameters:
-        src : rasterio source
-        windows : iterable of read and write windows
-        njobs (integer) : number of processing jobs
+        src: rasterio source
+        windows: iterable of read and write windows
+        njobs: number of processing jobs
 
     Returns:
-        src_min (float) : minimum value
-        src_max (float) : maximum value
+        src_min: minimum value
+        src_max: maximum value
 
-    ArcGIS min = 77.278923034668
-    ArcGIS max = 218.81454467773
+    Note:
+        ArcGIS min = 77.278923034668
+        ArcGIS max = 218.81454467773
     """
 
     def _minmax(arr: np.ndarray) -> tuple[Optional[float], Optional[float]]:
@@ -85,15 +86,15 @@ def mean(
     """Calculates the mean of a rasterio source
 
     Parameters:
-        src : rasterio source
-        windows : iterable of read and write windows
-        njobs (integer) : number of processing jobs
+        src: rasterio source
+        windows: iterable of read and write windows
+        njobs: number of processing jobs
 
     Returns:
-        mean (float) : mean value
+        mean: mean value
 
-    mean =  140.043719088
-    ArcGIS = 140.04371922353
+    Note:
+        ArcGIS mean = 140.04371922353
     """
 
     def _accumulate(arr):
@@ -145,16 +146,16 @@ def stddev(
     """Calculates the standard deviation of a rasterio source
 
     Parameters:
-        src : rasterio source
-        mean : mean value
-        windows : iterable of read and write windows
-        njobs (integer) : number of processing jobs
+        src: rasterio source
+        mean: mean value
+        windows: iterable of read and write windows
+        njobs: number of processing jobs
 
     Returns:
-        stddev (float) : standard deviation
+        stddev: standard deviation
 
-    stddev =  23.5554506735
-    ArcGIS = 23.555450665488
+    Note:
+        ArcGIS stddev = 23.555450665488
     """
 
     def _accumulate(arr):

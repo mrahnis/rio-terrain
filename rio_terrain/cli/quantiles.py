@@ -26,6 +26,12 @@ from rio_terrain import __version__ as plugin_version
 def tdigest_mean(digest: TDigest) -> float:
     """Estimate the mean from a tdigest
 
+    Parameters:
+        digest: digest on which to estimate the mean
+
+    Returns:
+        estimate of the mean
+
     """
     ctr = digest.centroids()
     mean = np.sum(ctr['mean']*ctr['weight'])/np.sum(ctr['weight'])
@@ -35,6 +41,12 @@ def tdigest_mean(digest: TDigest) -> float:
 
 def tdigest_std(digest: TDigest) -> float:
     """Estimate the standard deviation of the mean from a tdigest
+
+    Parameters:
+        digest: digest on which to estimate the standard deviation
+
+    Returns:
+        estimate of the standard deviation
 
     """
     ctr = digest.centroids()
@@ -50,6 +62,12 @@ def tdigest_std(digest: TDigest) -> float:
 def tdigest_stats(digest: TDigest) -> tuple[float, float, float, float]:
     """Estimate descriptive statistics from a tdigest
 
+    Parameters:
+        digest: digest on which to estimate statistics
+
+    Returns:
+        minimum, maximum, mean, standard deviation
+
     """
     minX = digest.min()
     maxX = digest.max()
@@ -61,6 +79,14 @@ def tdigest_stats(digest: TDigest) -> tuple[float, float, float, float]:
 
 def digest_window(file: str, window: Window, absolute: bool) -> tuple[Window, TDigest, int]:
     '''Process worker that calculates a t-digest on a raster
+
+    Parameters:
+        file: raster data source
+        window: data window to digest
+        absolute: estimate on the absolute value of the data
+
+    Returns:
+        window, digest and number of samples digested
 
     '''
     with rasterio.open(file) as src:
@@ -100,7 +126,7 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
 
     \b
     Example:
-    rio quantiles elevation.tif -q 0.5 -q 0.9
+        rio quantiles elevation.tif -q 0.5 -q 0.9
 
     """
     if verbose:

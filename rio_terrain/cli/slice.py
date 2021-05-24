@@ -24,13 +24,13 @@ def do_slice(
     """Slice data or ones from an array given a value range.
 
     Parameters:
-        img (ndarray)
-        minimum (float)
-        maximum (float)
-        keep_data (bool)
+        img: image data
+        minimum: minimum threshold value
+        maximum: maximum threshold value
+        keep_data: keep the image data if True, else return the shape as ones 
 
     Returns:
-        result (ndarray)
+        result
 
     """
 
@@ -72,7 +72,7 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
 
     \b
     Example:
-    rio range diff.tif extracted.tif --minumum -2.0 --maximum 2.0
+        rio range diff.tif extracted.tif --minumum -2.0 --maximum 2.0
 
     """
     if verbose:

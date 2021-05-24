@@ -6,6 +6,13 @@ import numpy as np
 def mad(arr: np.ndarray, size: tuple[int, int] = (3, 3)) -> np.ndarray:
     """Calculates the median absolute deviation (MAD) for an array
 
+    Parameters:
+        arr: data array
+        size: kernel size
+
+    Returns:
+        array of median absolute deviation
+
     """
     from scipy.ndimage.filters import median_filter
 
@@ -18,6 +25,13 @@ def mad(arr: np.ndarray, size: tuple[int, int] = (3, 3)) -> np.ndarray:
 
 def std(arr: np.ndarray, size: tuple[int, int] = (3, 3)) -> np.ndarray:
     """Calculates the standard deviation for a neighborhood
+
+    Parameters:
+        arr: data array
+        size: kernel size
+
+    Returns:
+        array of standard deviation
 
     """
     from scipy.signal import convolve2d
@@ -39,6 +53,12 @@ def std(arr: np.ndarray, size: tuple[int, int] = (3, 3)) -> np.ndarray:
 def std_ndimage(arr: np.ndarray, size: tuple[int, int] = (3, 3)) -> np.ndarray:
     """Calculates the standard deviation for a neighborhood
 
+    Parameters:
+        arr: data array
+        size: kernel size
+
+    Returns:
+        array of standard deviation
     """
     from scipy.ndimage.filters import convolve
 

@@ -14,11 +14,11 @@ def _ring_gradient(
     """Convolve an array using a 3x3 ring-shaped kernel
 
     Parameters:
-        arr (ndarray): 2D numpy array
-        res (tuple): tuple of raster cell width and height
+        arr: 2D numpy array
+        res: tuple of raster cell width and height
 
     Returns:
-        dz_dy, dz_dx (ndarrays): x and y gradient components
+        dz_dy, dz_dx: x and y gradient components
 
     """
     origin = (0, 0)
@@ -41,13 +41,13 @@ def slope(
     """Calculates slope.
 
     Parameters:
-        arr (ndarray): 2D numpy array
-        res (tuple): tuple of raster cell width and height
-        units (str, optional): choice of grade or degrees
-        neighbors (int, optional): use four or eight neighbors in calculation
+        arr: 2D numpy array
+        res: tuple of raster cell width and height
+        units: choice of grade or degrees
+        neighbors: use four or eight neighbor cells in calculation
 
     Returns:
-        slope (ndarray): 2D numpy array representing slope
+        slope: 2D numpy array representing slope
 
     """
     if neighbors == 4:
@@ -73,12 +73,13 @@ def aspect(
     """Calculates aspect.
 
     Parameters:
-        arr (ndarray): 2D numpy array
-        res (tuple): tuple of raster cell width and height
-        north (str, optional): choice of polar coordinate system
+        arr: 2D numpy array
+        res: tuple of raster cell width and height
+        pcs: choice of polar coordinate system
+        neighbors: use four or eight neighbor cells in calculation
 
     Returns:
-        aspect (ndarray): 2D numpy array representing slope aspect
+        aspect: 2D numpy array representing slope aspect
 
     """
     if neighbors == 4:
@@ -107,11 +108,12 @@ def curvature(
     """Calculates curvature.
 
     Parameters:
-        arr (ndarray): 2D numpy array
-        res (tuple): tuple of raster cell width and height
+        arr: 2D numpy array
+        res: tuple of raster cell width and height
+        neighbors: use four or eight neighbor cells in calculation
 
     Returns:
-        curvature (ndarray): 2D numpy array representing surface curvature
+        curvature: 2D numpy array representing surface curvature
 
     """
     if neighbors == 4:

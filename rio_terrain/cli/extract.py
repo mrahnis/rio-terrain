@@ -19,6 +19,17 @@ def do_extract(
     categorical: np.ndarray,
     category: list[int]
 ) -> np.ndarray:
+    """Extract data from an image given a categorical raster and list of categories
+
+    Parameters:
+        img: data array to extract from
+        categorical: integer array with categories to extract
+        category: list of integer categories to extract
+
+    Returns:
+        array with extracted data conforming to the shapes of the categories
+
+    """
     if category is None:
         _category = [1]
     else:
