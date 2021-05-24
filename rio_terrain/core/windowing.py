@@ -254,7 +254,13 @@ def margins(
 ) -> tuple[int, int, int, int]:
     """Size of collar between a pair of windows
 
-    Here, window0 is a read window and window1 is a write window
+    Parameters:
+        window0: read window
+        window1: write window
+
+    Returns:
+        result
+
     """
     cols0, rows0 = window0.toslices()
     cols1, rows1 = window1.toslices()
@@ -273,6 +279,13 @@ def trim(
 ) -> np.ndarray:
     """Trim a 2D array by a set of margins
 
+    Parameters:
+        arr: an array to trim
+        margins: number of cells to trim from each side
+
+    Returns:
+        result: the trimmed array
+        
     """
     (left, upper, right, lower) = margins
 
@@ -415,11 +428,11 @@ def is_raster_congruent(src0: DatasetReader, src1: DatasetReader, band: int = 1)
     """Tests two rasters for coincident bounds.
 
     Parameters:
-        src0 : rasterio read source
-        src1 : rasterio read source
+        src0: rasterio read source
+        src1: rasterio read source
 
     Returns:
-        result (bool) : True if the rasters are coincident
+        result: True if the rasters are coincident
 
     """
     window0 = ((0, 0), src0.shape)
@@ -434,6 +447,13 @@ def is_raster_congruent(src0: DatasetReader, src1: DatasetReader, band: int = 1)
 
 def is_raster_intersecting(src0: DatasetReader, src1: DatasetReader) -> bool:
     """Test two rasters for overlap
+
+    Parameters:
+        src0: rasterio read source
+        src1: rasterio read source
+
+    Returns:
+        result: True if the raster sources intersect
 
     """
     bbox0 = window_bounds(((0, 0), src0.shape), src0.transform, offset='ul')
@@ -452,11 +472,11 @@ def is_raster_aligned(src0: DatasetReader, src1: DatasetReader) -> bool:
     """Check two rasters for cell alignment
 
     Parameters:
-        src0 : rasterio read source
-        src1 : rasterio read source
+        src0: rasterio read source
+        src1: rasterio read source
 
     Returns:
-        result (bool) : True if the raster source cells align
+        result: True if the raster source cells align
 
     """
     affine0 = np.array(src0.transform)
