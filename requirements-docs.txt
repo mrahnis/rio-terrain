@@ -1,2 +1,2 @@
 click>=6.7
-sphinxcontrib-napoleon
+sphinx-autodoc-typehints
