@@ -23,7 +23,7 @@ def tile_dim(
     Divide a range using a specified size, and optionally remove last coordinate to meet a minimum size
 
     Parameters:
-        dim: size of the range
+        dim: size of the ranges
         step: desired tile width
         min_size: minumum allowed width
         balance: distribute remainder to balance tile sizes
@@ -285,7 +285,7 @@ def trim(
 
     Returns:
         result: the trimmed array
-        
+
     """
     (left, upper, right, lower) = margins
 
