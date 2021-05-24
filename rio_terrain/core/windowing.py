@@ -5,7 +5,7 @@ from typing import Iterator, Union
 
 import numpy as np
 from rasterio import Affine
-from rasterio.io import DatasetReader
+from rasterio import DatasetReader
 from rasterio.windows import Window
 from rasterio.transform import rowcol, xy, from_bounds
 
@@ -411,7 +411,7 @@ def tile_grid_intersection(
     return (windows0, windows1, write_windows, affine, nrows, ncols)
 
 
-def is_raster_congruent(src0, src1, band=1):
+def is_raster_congruent(src0: DatasetReader, src1: DatasetReader, band: int = 1) -> bool:
     """Tests two rasters for coincident bounds.
 
     Parameters:
@@ -432,7 +432,7 @@ def is_raster_congruent(src0, src1, band=1):
     return (window0 == window1) & (affine0 == affine1)
 
 
-def is_raster_intersecting(src0, src1):
+def is_raster_intersecting(src0: DatasetReader, src1: DatasetReader) -> bool:
     """Test two rasters for overlap
 
     """
@@ -448,7 +448,7 @@ def is_raster_intersecting(src0, src1):
     )
 
 
-def is_raster_aligned(src0, src1):
+def is_raster_aligned(src0: DatasetReader, src1: DatasetReader) -> bool:
     """Check two rasters for cell alignment
 
     Parameters:
