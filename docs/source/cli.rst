@@ -8,28 +8,10 @@ added by rio-terrain.
 
 .. code-block:: console
 
-	$ rio --help
-	Usage: rio [OPTIONS] COMMAND [ARGS]...
+	.. click:: rio
+	  :prog: rio
+	  :nested: none
 
-	  Rasterio command line interface.
-
-	Options:
-	  -v, --verbose           Increase verbosity.
-	  -q, --quiet             Decrease verbosity.
-	  --aws-profile TEXT      Select a profile from the AWS credentials file
-	  --aws-no-sign-requests  Make requests anonymously
-	  --aws-requester-pays    Requester pays data transfer costs
-	  --version               Show the version and exit.
-	  --gdal-version
-	  --help                  Show this message and exit.
-
-	Commands:
-	  aspect       Calculates aspect of a height raster.
-	  blocks       Write dataset blocks as GeoJSON features.
-	  bounds       Write bounding boxes to stdout as GeoJSON.
-	  calc         Raster data calculator.
-	  clip         Clip a raster to given bounds.
-	  ...
 
 The list below describes the purpose of the individual rio-terrain subcommands. Command usage can be had by accessing the ``--help`` of each command.
 
@@ -38,23 +20,10 @@ aspect
 
 .. code-block:: console
 
-	$ rio aspect --help
-	Usage: rio aspect [OPTIONS] INPUT OUTPUT
+.. click:: aspect:rio
+  :prog: aspect
+  :nested: none
 
-	  Calculate aspect of a raster.
-
-	  INPUT should be a single-band raster.
-
-	  Example:
-	  rio aspect elevation.tif aspect.tif --pcs compass
-
-	Options:
-	  --neighbors [4|8]          Specifies the number of neighboring cells to use.
-	  --pcs [compass|cartesian]  Specifies the polar coordinate system.
-	  -j, --njobs INTEGER        Number of concurrent jobs to run
-	  -v, --verbose              Enables verbose mode.
-	  --version                  Show the version and exit.
-	  --help                     Show this message and exit.
 
 curvature
 ---------
