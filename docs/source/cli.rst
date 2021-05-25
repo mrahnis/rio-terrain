@@ -6,11 +6,10 @@ The rasterio command line interface plugins allow you to execute commands that
 operate on a raster dataset. Online help lists the avalable subcommands, including those
 added by rio-terrain.
 
-.. code-block:: console
 
-	.. click:: rio
-	  :prog: rio
-	  :nested: none
+.. click:: rio
+  :prog: rio
+  :nested: none
 
 
 The list below describes the purpose of the individual rio-terrain subcommands. Command usage can be had by accessing the ``--help`` of each command.
@@ -18,11 +17,9 @@ The list below describes the purpose of the individual rio-terrain subcommands. 
 aspect
 ------
 
-.. code-block:: console
-
-.. click:: aspect:rio
+.. click:: rio_terrain.cli.aspect:aspect
   :prog: aspect
-  :nested: none
+  :nested: full
 
 
 curvature
