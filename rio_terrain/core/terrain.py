@@ -18,7 +18,7 @@ def _ring_gradient(
         res: tuple of raster cell width and height
 
     Returns:
-        dz_dy, dz_dx: x and y gradient components
+        dz_dy and dz_dx, the x and y gradient components
 
     """
     origin = (0, 0)
@@ -47,7 +47,7 @@ def slope(
         neighbors: use four or eight neighbor cells in calculation
 
     Returns:
-        slope: 2D numpy array representing slope
+        2D array representing slope
 
     """
     if neighbors == 4:
@@ -79,7 +79,7 @@ def aspect(
         neighbors: use four or eight neighbor cells in calculation
 
     Returns:
-        aspect: 2D numpy array representing slope aspect
+        2D array representing slope aspect
 
     """
     if neighbors == 4:
@@ -113,7 +113,7 @@ def curvature(
         neighbors: use four or eight neighbor cells in calculation
 
     Returns:
-        curvature: 2D numpy array representing surface curvature
+        2D array representing surface curvature
 
     """
     if neighbors == 4:
