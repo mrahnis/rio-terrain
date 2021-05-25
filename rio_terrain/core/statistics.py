@@ -21,8 +21,7 @@ def minmax(
         njobs: number of processing jobs
 
     Returns:
-        src_min: minimum value
-        src_max: maximum value
+        minimum value, maximum value
 
     Note:
         ArcGIS min = 77.278923034668
@@ -91,7 +90,7 @@ def mean(
         njobs: number of processing jobs
 
     Returns:
-        mean: mean value
+        mean value
 
     Note:
         ArcGIS mean = 140.04371922353
@@ -152,7 +151,7 @@ def stddev(
         njobs: number of processing jobs
 
     Returns:
-        stddev: standard deviation
+        standard deviation
 
     Note:
         ArcGIS stddev = 23.555450665488

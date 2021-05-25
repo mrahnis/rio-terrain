@@ -30,7 +30,7 @@ def do_slice(
         keep_data: keep the image data if True, else return the shape as ones 
 
     Returns:
-        result
+        sliced data or slice shape
 
     """
 

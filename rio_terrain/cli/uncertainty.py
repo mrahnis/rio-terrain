@@ -29,7 +29,7 @@ def propagate(
         instrumental1: instrumental or minumum uncertainty of img1
 
     Returns:
-        propagated uncertainty
+        propagated uncertainty raster
 
     """
     if instrumental0:

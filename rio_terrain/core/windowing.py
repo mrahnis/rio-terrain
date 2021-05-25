@@ -31,7 +31,7 @@ def tile_dim(
         as_chunks: return tile width instead of coordinates
 
     Returns:
-        coords: array of start coordinates or widths
+        array of start coordinates or chunk widths
 
     """
     coords = np.arange(0, stop, step)  # initial coords
@@ -80,7 +80,7 @@ def tile_dims(
         as_chunks: return tile shapes instead of coordinates
 
     Returns:
-        xx, yy: start corner coordinate arrays, or tile height and width arrays
+        xx and yy start corner coordinate arrays, or tile height and width arrays
 
     """
     xx = tile_dim(shape[0], tile_shape[0], min_size=min_size, balance=balance, merge=merge, as_chunks=as_chunks)
@@ -102,7 +102,7 @@ def block_count(
         band: raster band to count on
 
     Returns:
-        result: number of blocks in the raster
+        number of blocks in the raster
 
     """
     block_shape = block_shapes[band - 1]
@@ -124,7 +124,7 @@ def subsample(
         probability: fraction of blocks to sample
 
     Yields:
-        block: yield a rasterio window if sampled
+        yield a rasterio window if sampled
 
     """
     import random
@@ -147,7 +147,7 @@ def expand_window(
         margin: margin width in cells
 
     Returns:
-        result: Window
+        Window
 
     """
     cols, rows = window.toslices()
@@ -179,8 +179,7 @@ def bounds_window(
         affine: transformation
 
     Returns:
-        row_slice: slice coordinates
-        col_slice: slice coordinates
+        row slice coordinates, col slice coordinates
 
     """
     w, s, e, n = bounds
@@ -214,7 +213,7 @@ def window_bounds(
         offset: str
 
     Returns:
-        bounds: coordinate bounds (w, s, e, n)
+        coordinate bounds (w, s, e, n)
 
     """
     (row_start, col_start), (row_stop, col_stop) = window
@@ -236,7 +235,7 @@ def intersect_bounds(
         bbox1: bounding coordinates
 
     Returns:
-        bounds: coordinate bounds (w, s, e, n)
+        intersection coordinate bounds (w, s, e, n)
 
     """
     w = max(bbox0[0], bbox1[0])
@@ -259,7 +258,7 @@ def margins(
         window1: write window
 
     Returns:
-        result
+        margins in cells in order w, s, e, n
 
     """
     cols0, rows0 = window0.toslices()
@@ -284,7 +283,7 @@ def trim(
         margins: number of cells to trim from each side
 
     Returns:
-        result: the trimmed array
+        trimmed array
 
     """
     (left, upper, right, lower) = margins
@@ -329,7 +328,7 @@ def tile_grid(
         overlap: overlap between windows
 
     Yields:
-        window: tiled windows over a region
+        window within a tiling for a region
 
     """
     rows, cols = tile_dims((ncols, nrows), (blockxsize, blockysize), min_size=min_size, balance=balance, merge=balance)
@@ -373,12 +372,12 @@ def tile_grid_intersection(
         blockysize: write-window height
 
     Returns:
-        src0_blocks : read windows for src0
-        src1_blocks : read windows for src1
-        write_blocks : write windows for the intersection
-        affine: write raster Affine
-        ncols: write raster width in columns
-        nrows: write raster height in rows
+        read windows for src0,
+        read windows for src1,
+        write windows for the intersection,
+        write raster Affine,
+        write raster width in columns
+        write raster height in rows
 
     """
     bbox0 = window_bounds(((0, 0), src0.shape), src0.transform, offset='ul')
@@ -432,7 +431,7 @@ def is_raster_congruent(src0: DatasetReader, src1: DatasetReader, band: int = 1)
         src1: rasterio read source
 
     Returns:
-        result: True if the rasters are coincident
+        True if the rasters are coincident
 
     """
     window0 = ((0, 0), src0.shape)
@@ -453,7 +452,7 @@ def is_raster_intersecting(src0: DatasetReader, src1: DatasetReader) -> bool:
         src1: rasterio read source
 
     Returns:
-        result: True if the raster sources intersect
+        True if the raster sources intersect
 
     """
     bbox0 = window_bounds(((0, 0), src0.shape), src0.transform, offset='ul')
@@ -476,7 +475,7 @@ def is_raster_aligned(src0: DatasetReader, src1: DatasetReader) -> bool:
         src1: rasterio read source
 
     Returns:
-        result: True if the raster source cells align
+        True if the raster source cells align
 
     """
     affine0 = np.array(src0.transform)
