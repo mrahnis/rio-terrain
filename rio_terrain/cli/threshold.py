@@ -56,7 +56,7 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
 
     \b
     Example:
-        rio threshold diff.tif uncertainty.tif, detected.tif 1.68
+        rio threshold diff.tif uncertainty.tif detected.tif 1.68
 
     """
     if verbose:

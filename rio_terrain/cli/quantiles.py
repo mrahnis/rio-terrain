@@ -122,6 +122,11 @@ def digest_window(file: str, window: Window, absolute: bool) -> tuple[Window, TD
 def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, verbose):
     """Calculate and print quantile values.
 
+    If user supplies --njobs 0 the entire data is loaded and the statistics are calculated
+    precisely. When --njobs 1 or greater the statistics are estimated from an incrementally built
+    t-digest (https://github.com/tdunning/t-digest/) of data tiles.
+    Crick (https://github.com/jcrist/crick/) provides the t-digest implementation.
+
     INPUT should be a single-band raster.
 
     \b

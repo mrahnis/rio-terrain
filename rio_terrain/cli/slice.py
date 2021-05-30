@@ -67,12 +67,12 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
     INPUT should be a single-band raster.
 
     \b
-    Setting the --keep-data option will return the data values.
+    Setting the --keep-data option will return the data values from the INPUT raster.
     The default is to return a raster of ones and zeros.
 
     \b
     Example:
-        rio range diff.tif extracted.tif --minumum -2.0 --maximum 2.0
+        rio slice diff.tif extracted.tif --minumum -2.0 --maximum 2.0
 
     """
     if verbose:
