@@ -1,4 +1,7 @@
 click>=6.7
 sphinx>=3.5.4
-sphinx-copybutton
 furo
+myst-parser
+sphinx-copybutton
+sphinx-design
+sphinx-inline-tabs

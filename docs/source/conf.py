@@ -63,10 +63,15 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.autosummary',
-              'sphinx.ext.napoleon',
-              'sphinx_copybutton']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.napoleon',
+    'myst_parser',
+    'sphinx_copybutton',
+    'sphinx_design',
+    'sphinx_inline_tabs',
+]
 
 # fpr Napoleon to use the typehints
 napoleon_use_param = True
