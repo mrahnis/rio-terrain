@@ -30,24 +30,24 @@ Installation
 
 To install from the Python Package Index:
 
-.. code-block:: console
+.. code:: console
 
-	$pip install rio-terrain
+	pip install rio-terrain
 
 To install from Anaconda Cloud:
 
 If you are starting from scratch the first thing to do is install the Anaconda Python distribution, add the necessary channels to obtain the dependencies and install rio-terrain.
 
-.. code-block:: console
+.. code:: console
 
-	$conda config --append channels conda-forge
-	$conda install rio-terrain -c mrahnis
+	conda config --append channels conda-forge
+	conda install rio-terrain -c mrahnis
 
 To install from the source distribution execute the setup script in the rio-terrain directory:
 
-.. code-block:: console
+.. code:: console
 
-	$python setup.py install
+	python setup.py install
 
 Examples
 ========

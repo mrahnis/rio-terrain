@@ -63,7 +63,10 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.napoleon']
+extensions = ['sphinx.ext.autodoc',
+              'sphinx.ext.autosummary',
+              'sphinx.ext.napoleon',
+              'sphinx_copybutton']
 
 # fpr Napoleon to use the typehints
 napoleon_use_param = True
@@ -129,7 +132,8 @@ exclude_patterns = []
 #show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'tango'
+pygments_dark_style = 'monokai'
 
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
@@ -139,7 +143,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme = 'furo'
 # to use rtd locally
 #import sphinx_rtd_theme
 #html_theme = "sphinx_rtd_theme"
@@ -147,7 +151,9 @@ html_theme = 'default'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {
+    "prefers-color-scheme": "light"
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = []
