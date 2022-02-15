@@ -1,3 +1,3 @@
 .. click:: module:parser
-   :prog: rio
+   :prog: rasterio.rio.main:main_group
    :commands: slope, aspect, difference
