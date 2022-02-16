@@ -36,15 +36,11 @@ The list below describes the purpose of the individual rio-terrain subcommands. 
 aspect
 ------
 
-.. code-block:: console
-
 .. include:: cli/cli.aspect.txt
    :literal:
 
 curvature
 ---------
-
-.. code-block:: console
 
 .. include:: cli/cli.curvature.txt
    :literal:
@@ -52,15 +48,11 @@ curvature
 difference
 ----------
 
-.. code-block:: console
-
 .. include:: cli/cli.difference.txt
    :literal:
 
 extract
 -------
-
-.. code-block:: console
 
 .. include:: cli/cli.extract.txt
    :literal:
@@ -68,15 +60,11 @@ extract
 label
 -----
 
-.. code-block:: console
-
 .. include:: cli/cli.label.txt
    :literal:
 
 mad
 ---
-
-.. code-block:: console
 
 .. include:: cli/cli.mad.txt
    :literal:
@@ -84,15 +72,11 @@ mad
 quantiles
 ---------
 
-.. code-block:: console
-
 .. include:: cli/cli.quantiles.txt
    :literal:
 
 slice
 -----
-
-.. code-block:: console
 
 .. include:: cli/cli.slice.txt
    :literal:
@@ -100,15 +84,11 @@ slice
 slope
 -----
 
-.. code-block:: console
-
 .. include:: cli/cli.slope.txt
    :literal:
 
 std
 ---
-
-.. code-block:: console
 
 .. include:: cli/cli.std.txt
    :literal:
@@ -116,15 +96,11 @@ std
 threshold
 ---------
 
-.. code-block:: console
-
 .. include:: cli/cli.threshold.txt
    :literal:
 
 uncertainty
 -----------
-
-.. code-block:: console
 
 .. include:: cli/cli.uncertainty.txt
    :literal:
