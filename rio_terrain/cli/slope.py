@@ -49,7 +49,13 @@ def slope(ctx, input, output, neighbors, units, blocks, njobs, verbose):
         profile = src.profile
         affine = src.transform
         res = (affine[0], affine[4])
-        profile.update(dtype=rasterio.float32, count=1, compress='lzw')
+
+        profile.update(
+            dtype=rasterio.float32,
+            count=1,
+            compress='lzw',
+            bigtiff='yes'
+        )
 
         if (njobs >= 1) and src.is_tiled:
             blockshape = (list(src.block_shapes))[0]

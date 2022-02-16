@@ -27,7 +27,7 @@ def do_slice(
         img: image data
         minimum: minimum threshold value
         maximum: maximum threshold value
-        keep_data: keep the image data if True, else return the shape as ones 
+        keep_data: keep the image data if True, else return the shape as ones
 
     Returns:
         sliced data or slice shape
@@ -91,12 +91,20 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
         if keep_data:
             dtype = profile['dtype']
             nodata = profile['nodata']
-            profile.update(count=1, compress='lzw')
+            profile.update(
+                count=1,
+                compress='lzw',
+                bigtiff='yes'
+            )
         else:
             dtype = 'int32'
             nodata = np.iinfo(np.int32).min
             profile.update(
-                dtype=rasterio.int32, nodata=nodata, count=1, compress='lzw'
+                dtype=rasterio.int32,
+                nodata=nodata,
+                count=1,
+                compress='lzw',
+                bigtiff='yes'
             )
 
         if zeros:

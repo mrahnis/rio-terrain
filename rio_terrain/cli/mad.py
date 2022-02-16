@@ -45,7 +45,12 @@ def mad(ctx, input, output, neighborhood, blocks, njobs, verbose):
     with rasterio.open(input) as src:
         profile = src.profile
         affine = src.transform
-        profile.update(dtype=rasterio.float32, count=1, compress='lzw')
+        profile.update(
+            dtype=rasterio.float32,
+            count=1,
+            compress='lzw',
+            bigtiff='yes'
+        )
 
         if (njobs >= 1) and src.is_tiled:
             blockshape = (list(src.block_shapes))[0]

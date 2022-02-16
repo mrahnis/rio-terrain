@@ -54,7 +54,13 @@ def label(ctx, input, output, diagonals, zeros, njobs, verbose):
 
         dtype = 'int32'
         nodata = np.iinfo(np.int32).min
-        profile.update(dtype=rasterio.int32, nodata=nodata, count=1, compress='lzw')
+        profile.update(
+            dtype=rasterio.int32,
+            nodata=nodata,
+            count=1,
+            compress='lzw',
+            bigtiff='yes'
+        )
 
         if zeros:
             false_val = 0
