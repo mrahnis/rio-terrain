@@ -1,0 +1,16 @@
+Usage: rio std [OPTIONS] INPUT OUTPUT
+
+  Calculate a standard-deviation raster.
+
+  INPUT should be a single-band raster.
+
+  Example:
+      rio std elevation.tif stddev.tif
+
+Options:
+  -n, --neighborhood INTEGER  Neigborhood size in cells.
+  -b, --blocks INTEGER        Multiple internal blocks to chunk.
+  -j, --njobs INTEGER         Number of concurrent jobs to run.
+  -v, --verbose               Enables verbose mode.
+  --version                   Show the version and exit.
+  --help                      Show this message and exit.

@@ -1,0 +1,15 @@
+Usage: rio threshold [OPTIONS] INPUT UNCERTAINTY OUTPUT LEVEL
+
+  Threshold a raster with an uncertainty raster.
+
+  INPUT should be a single-band raster.
+  UNCERTAINTY should be a single-band raster representing uncertainty.
+
+  Example:
+      rio threshold diff.tif uncertainty.tif detected.tif 1.68
+
+Options:
+  -j, --njobs INTEGER  Number of concurrent jobs to run.
+  -v, --verbose        Enables verbose mode.
+  --version            Show the version and exit.
+  --help               Show this message and exit.

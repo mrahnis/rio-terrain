@@ -1,0 +1,18 @@
+Usage: rio extract [OPTIONS] INPUT CATEGORICAL OUTPUT
+
+  Extract regions from a raster by category.
+
+  INPUT should be a single-band raster.
+  CATEGORICAL should be a single-band raster with categories to extract.
+
+  The categorical data may be the input raster or another raster.
+
+  Example:
+  rio extract diff.tif categorical.tif extract.tif -c 1 -c 3
+
+Options:
+  -c, --category INTEGER  Category to extract.
+  -j, --njobs INTEGER     Number of concurrent jobs to run
+  -v, --verbose           Enables verbose mode.
+  --version               Show the version and exit.
+  --help                  Show this message and exit.

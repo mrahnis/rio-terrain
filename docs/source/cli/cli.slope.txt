@@ -1,0 +1,20 @@
+Usage: rio slope [OPTIONS] INPUT OUTPUT
+
+  Calculate slope of a raster.
+
+  INPUT should be a single-band raster.
+
+  Example:
+      rio slope elevation.tif slope.tif
+
+Options:
+  --neighbors [4|8]               Specifies the number of neighboring cells to
+                                  use.
+
+  -u, --units [grade|rise|sqrt|degrees|percent]
+                                  Specifies the units of slope.
+  -b, --blocks INTEGER            Multiple internal blocks to chunk.
+  -j, --njobs INTEGER             Number of concurrent jobs to run.
+  -v, --verbose                   Enables verbose mode.
+  --version                       Show the version and exit.
+  --help                          Show this message and exit.

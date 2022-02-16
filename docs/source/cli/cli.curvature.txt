@@ -1,0 +1,15 @@
+Usage: rio curvature [OPTIONS] INPUT OUTPUT
+
+  Calculate curvature of a raster.
+
+  INPUT should be a single-band raster.
+
+  Example:     rio curvature elevation.tif curvature.tif
+
+Options:
+  --neighbors [4|8]     Specifies the number of neighboring cells to use.
+  --stats / --no-stats  Print basic curvature statistics.
+  -j, --njobs INTEGER   Number of concurrent jobs to run.
+  -v, --verbose         Enables verbose mode.
+  --version             Show the version and exit.
+  --help                Show this message and exit.

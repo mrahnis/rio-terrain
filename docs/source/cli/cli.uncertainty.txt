@@ -1,0 +1,17 @@
+Usage: rio uncertainty [OPTIONS] UNCERTAINTY0 UNCERTAINTY1 OUTPUT
+
+  Calculate a level-of-detection raster.
+
+  UNCERTAINTY0 should be a single-band raster for uncertainty at time 0.
+  UNCERTAINTY1 should be a single-band raster for uncertainty at time 1.
+
+  Example:
+      rio uncertainty roughness_t0.tif roughness_t1.tif uncertainty.tif
+
+Options:
+  --instrumental0 FLOAT  Minimum uncertainty for the first raster.
+  --instrumental1 FLOAT  Minimum uncertainty for the second raster.
+  -j, --njobs INTEGER    Number of concurrent jobs to run.
+  -v, --verbose          Enables verbose mode.
+  --version              Show the version and exit.
+  --help                 Show this message and exit.

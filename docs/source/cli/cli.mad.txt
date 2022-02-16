@@ -1,0 +1,16 @@
+Usage: rio mad [OPTIONS] INPUT OUTPUT
+
+  Calculate a median absolute deviation raster.
+
+  INPUT should be a single-band raster.
+
+  Example:
+  rio mad elevation.tif mad.tif
+
+Options:
+  -n, --neighborhood INTEGER  Neighborhood size in cells.
+  -b, --blocks INTEGER        Multiple internal blocks to chunk.
+  -j, --njobs INTEGER         Number of concurrent jobs to run.
+  -v, --verbose               Enables verbose mode.
+  --version                   Show the version and exit.
+  --help                      Show this message and exit.

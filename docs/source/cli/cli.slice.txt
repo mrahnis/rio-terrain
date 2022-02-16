@@ -1,0 +1,23 @@
+Usage: rio slice [OPTIONS] INPUT OUTPUT
+
+  Extract regions from a raster by a data range.
+
+  INPUT should be a single-band raster.
+
+  Setting the --keep-data option will return the data values from the INPUT raster.
+  The default is to return a raster of ones and zeros.
+
+  Example:
+      rio slice diff.tif extracted.tif --minumum -2.0 --maximum 2.0
+
+Options:
+  --minimum FLOAT               Minimum value to extract.
+  --maximum FLOAT               Maximum value to extract.
+  --keep-data / --no-keep-data  Return the input data, or return ones.
+  --zeros / --no-zeros          Use the raster nodata value or zeros for False
+                                condition.
+
+  -j, --njobs INTEGER           Number of concurrent jobs to run.
+  -v, --verbose                 Enables verbose mode.
+  --version                     Show the version and exit.
+  --help                        Show this message and exit.

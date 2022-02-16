@@ -1,0 +1,15 @@
+Usage: rio difference [OPTIONS] INPUT_T0 INPUT_T1 OUTPUT
+
+  Subtract INPUT_T0 from INPUT_T1.
+
+  INPUT_T0 should be a single-band raster at time t0.
+  INPUT_T1 should be a single-band raster at time t1.
+
+  Example:     rio diff elevation1.tif elevation2.tif, diff2_1.tif
+
+Options:
+  -b, --blocks INTEGER  Multiple internal blocks to chunk.
+  -j, --njobs INTEGER   Number of concurrent jobs to run.
+  -v, --verbose         Enables verbose mode.
+  --version             Show the version and exit.
+  --help                Show this message and exit.

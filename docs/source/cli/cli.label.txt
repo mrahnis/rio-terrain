@@ -1,0 +1,18 @@
+Usage: rio label [OPTIONS] INPUT OUTPUT
+
+  Label regions in a raster.
+
+  INPUT should be a single-band raster.
+
+  Example:
+  rio label blobs.tif labeled_blobs.tif
+
+Options:
+  --diagonals / --no-diagonals  Connect diagonal cells (8-connected).
+  --zeros / --no-zeros          Use the raster nodata value or zeros for False
+                                condition.
+
+  -j, --njobs INTEGER           Number of concurrent jobs to run.
+  -v, --verbose                 Enables verbose mode.
+  --version                     Show the version and exit.
+  --help                        Show this message and exit.

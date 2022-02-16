@@ -11,7 +11,6 @@ Rio-terrain Documentation Contents
 
 	Project/Getting Started <project>
 	Command Line User Guide <cli>
-	Command Line User Guide Click <cli-click>
 	API Documentation <api/modules>
 
 Indices and tables

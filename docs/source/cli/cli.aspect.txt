@@ -1,0 +1,15 @@
+Usage: rio aspect [OPTIONS] INPUT OUTPUT
+
+  Calculate aspect of a raster.
+
+  INPUT should be a single-band raster.
+
+  Example:     rio aspect elevation.tif aspect.tif --pcs compass
+
+Options:
+  --neighbors [4|8]          Specifies the number of neighboring cells to use.
+  --pcs [compass|cartesian]  Specifies the polar coordinate system.
+  -j, --njobs INTEGER        Number of concurrent jobs to run.
+  -v, --verbose              Enables verbose mode.
+  --version                  Show the version and exit.
+  --help                     Show this message and exit.
