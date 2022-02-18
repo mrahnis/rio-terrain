@@ -6,30 +6,8 @@ The rasterio command line interface plugins allow you to execute commands that
 operate on a raster dataset. Online help lists the avalable subcommands, including those
 added by rio-terrain.
 
-.. code-block:: console
-
-	$ rio --help
-	Usage: rio [OPTIONS] COMMAND [ARGS]...
-
-	  Rasterio command line interface.
-
-	Options:
-	  -v, --verbose           Increase verbosity.
-	  -q, --quiet             Decrease verbosity.
-	  --aws-profile TEXT      Select a profile from the AWS credentials file
-	  --aws-no-sign-requests  Make requests anonymously
-	  --aws-requester-pays    Requester pays data transfer costs
-	  --version               Show the version and exit.
-	  --gdal-version
-	  --help                  Show this message and exit.
-
-	Commands:
-	  aspect       Calculates aspect of a height raster.
-	  blocks       Write dataset blocks as GeoJSON features.
-	  bounds       Write bounding boxes to stdout as GeoJSON.
-	  calc         Raster data calculator.
-	  clip         Clip a raster to given bounds.
-	  ...
+.. include:: cli/cli.rio.txt
+   :literal:
 
 The list below describes the purpose of the individual rio-terrain subcommands. Command usage can be had by accessing the ``--help`` of each command.
 
