@@ -331,7 +331,7 @@ def tile_grid(
         window within a tiling for a region
 
     """
-    rows, cols = tile_dims((ncols, nrows), (blockxsize, blockysize), min_size=min_size, balance=balance, merge=balance)
+    rows, cols = tile_dims((ncols, nrows), (blockxsize, blockysize), min_size=min_size, balance=balance, merge=merge)
     base_cols, base_rows = np.broadcast_arrays(rows, cols.reshape(cols.shape[0], -1))
 
     ul_cols = base_cols - overlap
@@ -350,7 +350,6 @@ def tile_grid(
         lr_rows.ravel() + row_offset,
         lr_cols.ravel() + col_offset,
     ):
-
         yield Window.from_slices(slice(ul_row, lr_row), slice(ul_col, lr_col))
 
 
