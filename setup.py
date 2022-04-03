@@ -23,15 +23,20 @@ setup(name='rio-terrain',
       entry_points='''
         [rasterio.rio_commands]
         aspect=rio_terrain.cli.aspect:aspect
+        labelbounds=rio_terrain.cli.labelbounds:labelbounds
+        compare=rio_terrain.cli.compare:compare
+        copynodata=rio_terrain.cli.copynodata:copynodata
         curvature=rio_terrain.cli.curvature:curvature
         difference=rio_terrain.cli.difference:difference
         extract=rio_terrain.cli.extract:extract
+        fillnodata=rio_terrain.cli.fillnodata:fillnodata
         label=rio_terrain.cli.label:label
         mad=rio_terrain.cli.mad:mad
         quantiles=rio_terrain.cli.quantiles:quantiles
         slice=rio_terrain.cli.slice:slice
         slope=rio_terrain.cli.slope:slope
         std=rio_terrain.cli.std:std
+        subdivide=rio_terrain.cli.subdivide:subdivide
         threshold=rio_terrain.cli.threshold:threshold
         uncertainty=rio_terrain.cli.uncertainty:uncertainty
       ''',
