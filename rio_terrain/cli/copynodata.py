@@ -116,7 +116,7 @@ def copynodata(ctx, intensity_f, mask_f, output, blocks, njobs, verbose):
                 click.echo((msg.STARTING).format(command, msg.CONCURRENT))
 
                 def jobs():
-                    for (ij, window) in src.block_windows():
+                    for (ij, window) in intensity_src.block_windows():
                         intensity = intensity_src.read(1, window=window)
                         mask = mask_src.read(1, window=window)
                         yield intensity, mask, window
