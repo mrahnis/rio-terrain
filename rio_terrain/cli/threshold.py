@@ -38,7 +38,7 @@ def do_threshold(
     return result
 
 
-@click.command('threshold', short_help="Threshold a raster with an uncertainty raster.")
+@click.command('threshold', short_help="Threshold an intensity raster with an uncertainty raster.")
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.argument('uncertainty', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
@@ -48,7 +48,7 @@ def do_threshold(
 @click.version_option(version=plugin_version, message='rio-terrain v%(version)s')
 @click.pass_context
 def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
-    """Threshold a raster with an uncertainty raster.
+    """Threshold an intensity raster with an uncertainty raster.
 
     \b
     INPUT should be a single-band raster.

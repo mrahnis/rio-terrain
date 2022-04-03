@@ -56,9 +56,13 @@ def slope(
         dz_dy, dz_dx = _ring_gradient(arr, res)
 
     m = np.sqrt(dz_dx ** 2 + dz_dy ** 2)
-    if units == 'grade':
+    if units == 'grade' or units == 'rise':
         slope = m
-    elif units == 'degrees':
+    elif units == 'percent':
+        slope = m*100
+    elif units == 'sqrt':
+        slope = np.sqrt(m)
+    else:  # units == 'degrees':
         slope = (180 / pi) * np.arctan(m)
 
     return slope

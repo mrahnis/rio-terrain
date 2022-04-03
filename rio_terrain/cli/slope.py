@@ -19,7 +19,7 @@ from rio_terrain import __version__ as plugin_version
 @click.argument('output', nargs=1, type=click.Path())
 @click.option('--neighbors', type=click.Choice(['4', '8']), default='4',
               help='Specifies the number of neighboring cells to use.')
-@click.option('-u', '--units', type=click.Choice(['grade', 'degrees']), default='grade',
+@click.option('-u', '--units', type=click.Choice(['grade', 'rise', 'sqrt', 'degrees', 'percent']), default='grade',
               help='Specifies the units of slope.')
 @click.option('-b', '--blocks', 'blocks', nargs=1, type=int, default=40,
               help='Multiple internal blocks to chunk.')
