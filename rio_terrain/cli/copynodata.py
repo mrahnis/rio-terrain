@@ -2,6 +2,7 @@
 
 import time
 import warnings
+import concurrent.futures
 import multiprocessing
 from typing import Union
 
@@ -32,7 +33,7 @@ def do_copynodata(
 @click.argument('output', nargs=1, type=click.Path())
 @click.option('-b', '--blocks', 'blocks', nargs=1, type=int, default=40,
               help='Multiply TIFF block size by an amount to make chunks')
-@click.option('-j', '--jobs', 'njobs', type=int, default=multiprocessing.cpu_count(),
+@click.option('-j', '--jobs', 'njobs', type=int, default=1,
               help='Number of concurrent jobs to run')
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-channel v%(version)s')
