@@ -16,7 +16,7 @@ from rio_terrain import __version__ as plugin_version
 @click.command('aspect', short_help="Calculate aspect.")
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
-@click.option('--neighbors', type=click.Choice(['4', '8']), default='4',
+@click.option('--neighbors', type=click.Choice(['4', '8']), default='8',
               help='Specifies the number of neighboring cells to use.')
 @click.option('--pcs', type=click.Choice(['compass', 'cartesian']), default='cartesian',
               help='Specifies the polar coordinate system.')

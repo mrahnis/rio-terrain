@@ -17,7 +17,7 @@ from rio_terrain import __version__ as plugin_version
 @click.command('slope', short_help="Calculate slope.")
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
-@click.option('--neighbors', type=click.Choice(['4', '8']), default='4',
+@click.option('--neighbors', type=click.Choice(['4', '8']), default='8',
               help='Specifies the number of neighboring cells to use.')
 @click.option('-u', '--units', type=click.Choice(['grade', 'rise', 'sqrt', 'degrees', 'percent']), default='grade',
               help='Specifies the units of slope.')
