@@ -38,11 +38,12 @@ requirements:
   run:
     - python
     - numpy
-    - cython
     - scipy
     - matplotlib
-    - rasterio
     - click
+    - rasterio
+    - fiona
+    - shapely
     - crick 
 
 test:
@@ -50,14 +51,20 @@ test:
     - rio_terrain
   commands:
     - rio aspect --help
+    - rio compare --help
+    - rio copynodata --help
     - rio curvature --help
     - rio difference --help
     - rio extract --help
+    - rio fillnodata --help
+    - rio label --help
+    - rio labelbounds --help
     - rio mad --help
     - rio quantiles --help
     - rio slice --help
     - rio slope --help
     - rio std --help
+    - rio subdivide --help
     - rio threshold --help
     - rio uncertainty --help
 

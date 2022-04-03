@@ -4,5 +4,5 @@ matplotlib>=2.2
 click>=7.0
 rasterio>=1.0
 fiona>=1.8
-shapely
+shapely>=1.7
 crick>=0.0.3
