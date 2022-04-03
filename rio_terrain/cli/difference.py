@@ -56,12 +56,11 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
             block_shape = (src0.block_shapes)[0]
             blockxsize = block_shape[1]
             blockysize = block_shape[0]
+            tiles = rt.tile_grid_intersection(
+                src0, src1, blockxsize=blockxsize * blocks, blockysize=blockysize * blocks)
         else:
-            blockxsize = None
-            blockysize = None
+            tiles = rt.tile_grid_intersection(src0, src1)
 
-        tiles = rt.tile_grid_intersection(
-            src0, src1, blockxsize=blockxsize * blocks, blockysize=blockysize * blocks)
         windows0, windows1, write_windows, affine, nrows, ncols = tiles
 
         profile.update(
