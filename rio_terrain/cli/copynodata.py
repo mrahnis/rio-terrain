@@ -137,7 +137,7 @@ def copynodata(ctx, intensity_f, mask_f, output, blocks, njobs, verbose):
                     for future in concurrent.futures.as_completed(future_to_window):
                         window = future_to_window[future]
                         result = future.result()
-                        dst.write(result.astype(dtype), 1, window=window)
+                        dst.write(result.astype(profile['dtype']), 1, window=window)
                         bar.update(result.size)
 
                 """
