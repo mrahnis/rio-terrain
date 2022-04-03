@@ -2,7 +2,6 @@ from pkg_resources import iter_entry_points
 
 from click.testing import CliRunner
 
-import rasterio
 from rasterio.rio.main import main_group
 
 import rio_terrain
@@ -29,6 +28,24 @@ def test_aspect():
     assert result.exit_code == 0
 
 
+def test_labelbounds():
+    runner = CliRunner()
+    result = runner.invoke(main_group, ['labelbounds', '--help'])
+    assert result.exit_code == 0
+
+
+def test_compare():
+    runner = CliRunner()
+    result = runner.invoke(main_group, ['compare', '--help'])
+    assert result.exit_code == 0
+
+
+def test_copynodata():
+    runner = CliRunner()
+    result = runner.invoke(main_group, ['copynodata', '--help'])
+    assert result.exit_code == 0
+
+
 def test_curvature():
     runner = CliRunner()
     result = runner.invoke(main_group, ['curvature', '--help'])
@@ -44,6 +61,12 @@ def test_difference():
 def test_extract():
     runner = CliRunner()
     result = runner.invoke(main_group, ['extract', '--help'])
+    assert result.exit_code == 0
+
+
+def test_fillnodata():
+    runner = CliRunner()
+    result = runner.invoke(main_group, ['fillnodata', '--help'])
     assert result.exit_code == 0
 
 
@@ -80,6 +103,12 @@ def test_slope():
 def test_std():
     runner = CliRunner()
     result = runner.invoke(main_group, ['std', '--help'])
+    assert result.exit_code == 0
+
+
+def test_subdivide():
+    runner = CliRunner()
+    result = runner.invoke(main_group, ['subdivide', '--help'])
     assert result.exit_code == 0
 
 

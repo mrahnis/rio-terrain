@@ -129,7 +129,7 @@ def copynodata(ctx, intensity_f, mask_f, output, blocks, njobs, verbose):
 
                     future_to_window = {
                         executor.submit(
-                            do_copynodata, intensity, mask, nodata, mask_sr.nodata
+                            do_copynodata, intensity, mask, nodata, mask_src.nodata
                         ): (window)
                         for (intensity, mask, window) in jobs()
                     }

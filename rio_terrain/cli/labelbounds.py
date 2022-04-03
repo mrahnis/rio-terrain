@@ -140,7 +140,7 @@ def do_shape_windows(bounds, shapes, read_window=None):
 @click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=plugin_version, message='rio-channel v%(version)s')
 @click.pass_context
-def boxes(ctx, skeleton_f, output, intensity_f, blocks, njobs, verbose):
+def labelbounds(ctx, skeleton_f, output, intensity_f, blocks, njobs, verbose):
     """Calculate coordinate bounding boxes from labeled SKELETON components.
 
     \b
