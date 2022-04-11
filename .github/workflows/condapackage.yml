@@ -50,7 +50,7 @@ jobs:
           conda build . --python ${{ matrix.python-version }} --numpy ${{ matrix.python-version }}
           Copy-Item $env:CONDA_PREFIX\conda-bld -Destination . -Recurse
       - name: Upload package artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}-${{ matrix.python-version }}-packages
           path: conda-bld/noarch/*.tar.bz2
