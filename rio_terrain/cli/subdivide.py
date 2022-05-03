@@ -135,7 +135,8 @@ def subdivide(ctx, input, zones_f, outdir, prefix, zone_field, buffer_distance, 
                 height=nrows,
                 width=ncols,
                 transform=affine,
-                compress='lzw',
+                compress='deflate',
+                predictor=3,
                 bigtiff='yes')
 
             # write the zone to its own file

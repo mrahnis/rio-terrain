@@ -69,7 +69,8 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
             height=nrows,
             width=ncols,
             transform=affine,
-            compress='lzw',
+            compress='deflate',
+            predictor=3,
             bigtiff='yes',
         )
 

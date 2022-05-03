@@ -88,7 +88,8 @@ def fillnodata(ctx, input, output, mask, distance, iterations, njobs, verbose):
         profile.update(
             dtype=rasterio.float32,
             count=1,
-            compress='lzw',
+            compress='deflate',
+            predictor=3,
             bigtiff='YES')
 
         if (njobs >= 1) and src.is_tiled:

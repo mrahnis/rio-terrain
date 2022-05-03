@@ -48,7 +48,8 @@ def aspect(ctx, input, output, neighbors, pcs, njobs, verbose):
         profile.update(
             dtype=rasterio.float32,
             count=1,
-            compress='lzw',
+            compress='deflate',
+            predictor=3,
             bigtiff='yes'
         )
 

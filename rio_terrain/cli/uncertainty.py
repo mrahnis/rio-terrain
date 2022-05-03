@@ -110,7 +110,8 @@ def uncertainty(
             height=nrows,
             width=ncols,
             transform=affine,
-            compress='lzw',
+            compress='deflate',
+            predictor=3,
             bigtiff='yes',
         )
 
