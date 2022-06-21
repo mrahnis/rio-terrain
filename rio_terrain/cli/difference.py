@@ -52,14 +52,14 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
         profile = src0.profile
         affine = src0.transform
 
-        if njobs >= 1:
+        if njobs == 0:
+            tiles = rt.tile_grid_intersection(src0, src1)
+        else:
             block_shape = (src0.block_shapes)[0]
             blockxsize = block_shape[1]
             blockysize = block_shape[0]
             tiles = rt.tile_grid_intersection(
                 src0, src1, blockxsize=blockxsize * blocks, blockysize=blockysize * blocks)
-        else:
-            tiles = rt.tile_grid_intersection(src0, src1)
 
         windows0, windows1, write_windows, affine, nrows, ncols = tiles
 
@@ -75,16 +75,11 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
         )
 
         with rasterio.open(output, 'w', **profile) as dst:
-            if njobs < 1:
-                click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                img0 = src0.read(1, window=next(windows0))
-                img1 = src1.read(1, window=next(windows1))
-                img0[img0 <= src0.nodata + 1] = np.nan
-                img1[img1 <= src1.nodata + 1] = np.nan
-                result = img1 - img0
-                dst.write(result.astype(profile['dtype']), 1, window=next(write_windows))
-            elif njobs == 1:
-                click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
+            if njobs == 0 or njobs == 1:
+                if njobs == 0:
+                    click.echo((msg.STARTING).format(command, msg.INMEMORY))
+                else:
+                    click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
                 with click.progressbar(length=nrows * ncols, label='Blocks done:') as bar:
                     for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
                         img0 = src0.read(1, window=window0)

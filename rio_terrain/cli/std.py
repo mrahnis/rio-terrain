@@ -54,10 +54,20 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
             bigtiff='yes'
         )
 
-        if (njobs >= 1) and src.is_tiled:
-            blockshape = (list(src.block_shapes))[0]
-            if (blockshape[0] == 1) or (blockshape[1] == 1):
-                warnings.warn((msg.STRIPED).format(blockshape))
+        if njobs == 0:
+            w, s, e, n = src.bounds
+            full_window = rasterio.windows.from_bounds(w, s, e, n, transform=src.transform)
+            read_windows = [full_window]
+            write_windows = [full_window]
+        else:
+            if src.is_tiled:
+                blockshape = (list(src.block_shapes))[0]
+                if (blockshape[0] == 1) or (blockshape[1] == 1):
+                    warnings.warn((msg.STRIPED).format(blockshape))
+            else:
+                blockshape = [128, 128]
+                warnings.warn((msg.NOTILING).format(src.shape))
+
             read_windows = rt.tile_grid(
                 src.width,
                 src.height,
@@ -72,19 +82,13 @@ def std(ctx, input, output, neighborhood, blocks, njobs, verbose):
                 blockshape[1] * blocks,
                 overlap=0,
             )
-        else:
-            blockshape = 128
-            warnings.warn((msg.NOTILING).format(src.shape))
 
         with rasterio.open(output, 'w', **profile) as dst:
-            if njobs < 1:
-                click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                img = src.read(1)
-                img[img <= src.nodata + 1] = np.nan
-                result = focalstatistics.std(img, size=(neighborhood, neighborhood))
-                dst.write(result.astype(profile['dtype']), 1)
-            elif njobs == 1:
-                click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
+            if njobs == 0 or njobs == 1:
+                if njobs == 0:
+                    click.echo((msg.STARTING).format(command, msg.INMEMORY))
+                else:
+                    click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
                 with click.progressbar(length=src.width * src.height, label='Blocks done:') as bar:
                     for (read_window, write_window) in zip(read_windows, write_windows):
                         img = src.read(1, window=read_window)

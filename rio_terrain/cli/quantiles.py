@@ -148,18 +148,16 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
         profile = src.profile
         affine = src.transform
 
-        if njobs < 1:
+        if njobs == 0:
             click.echo("Running quantiles in-memory")
             img = src.read(1)
             img[img <= src.nodata+1] = np.nan
             arr = img[np.isfinite(img)]
             if absolute:
                 arr = np.absolute(arr)
-
             count = np.count_nonzero(~np.isnan(img))
             description = (arr.min(), arr.max(), arr.mean(), arr.std())
             results = zip(quantile, mquantiles(arr, np.array(quantile)))
-
         elif njobs == 1:
             blocks = rt.subsample(src.block_windows(), probability=fraction)
             n_blocks = ceil(rt.block_count(src.shape, src.block_shapes) * fraction)
@@ -173,7 +171,6 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
                     arr = img[np.isfinite(img[:])]
                     if absolute:
                         arr = np.absolute(arr)
-
                     window_count = np.count_nonzero(~np.isnan(img))
                     if window_count > 0:
                         window_digest = TDigest()
@@ -181,12 +178,9 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
                         digest.merge(window_digest)
                         count += window_count
                     bar.update(1)
-
             description = tdigest_stats(digest)
             results = zip(quantile, digest.quantile(quantile))
-
         else:
-
             blocks = rt.subsample(src.block_windows(), probability=fraction)
             n_blocks = ceil(rt.block_count(src.shape, src.block_shapes)*fraction)
             digest = TDigest()
@@ -199,7 +193,6 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
                         digest.merge(window_digest)
                         count += window_count
                     bar.update(1)
-
             description = tdigest_stats(digest)
             results = zip(quantile, digest.quantile(quantile))
 

@@ -78,13 +78,13 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
         affine = src0.transform
         nodata = np.iinfo(np.int32).min
 
-        if njobs >= 1:
+        if njobs == 0:
+            blockxsize = None
+            blockysize = None
+        else:
             block_shape = (src0.block_shapes)[0]
             blockxsize = block_shape[1]
             blockysize = block_shape[0]
-        else:
-            blockxsize = None
-            blockysize = None
 
         tiles = rt.tile_grid_intersection(
             src0, src1, blockxsize=blockxsize, blockysize=blockysize
@@ -103,14 +103,11 @@ def threshold(ctx, input, uncertainty, output, level, njobs, verbose):
         )
 
         with rasterio.open(output, 'w', **profile) as dst:
-            if njobs < 1:
-                click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                img0 = src0.read(1, window=next(windows0))
-                img1 = src1.read(1, window=next(windows1))
-                result = do_threshold(img0, img1, level, default=nodata)
-                dst.write(result, 1)
-            elif njobs == 1:
-                click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
+            if njobs == 0 or njobs == 1:
+                if njobs == 0:
+                    click.echo((msg.STARTING).format(command, msg.INMEMORY))
+                else:
+                    click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
                 with click.progressbar(length=nrows * ncols, label='Blocks done:') as bar:
                     for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
                         img0 = src0.read(1, window=window0)

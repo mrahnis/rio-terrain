@@ -81,29 +81,32 @@ def copynodata(ctx, intensity_f, mask_f, output, blocks, njobs, verbose):
             click.echo('No change in profile')
 
         blockshape = (list(intensity_src.block_shapes))[0]
-        if (njobs >= 1) and intensity_src.is_tiled:
-            if (blockshape[0] == 1) or (blockshape[1] == 1):
-                warnings.warn((msg.STRIPED).format(blockshape))
+        if njobs == 0:
+            w, s, e, n = intensity_src.bounds
+            full_window = rasterio.windows.from_bounds(w, s, e, n, transform=src.transform)
+            read_windows = [full_window]
+            write_windows = [full_window]
+        else:
+            if intensity_src.is_tiled:
+                if (blockshape[0] == 1) or (blockshape[1] == 1):
+                    warnings.warn((msg.STRIPED).format(blockshape))
+            else:
+                blockshape = [128, 128]
+                warnings.warn((msg.NOTILING).format(src.shape))
+
             windows = rt.tile_grid(
                 intensity_src.width,
                 intensity_src.height,
                 blockshape[0]*blocks,
                 blockshape[1]*blocks,
                 overlap=0)
-        else:
-            warnings.warn((msg.NOTILING).format(blockshape))
 
         with rasterio.open(output, 'w', **profile) as dst:
-
-            if njobs < 1:
-                click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                intensity = intensity_src.read(1)
-                mask = mask_src.read(1)
-                result = do_copynodata(intensity.astype(profile['dtype']), mask, nodata, mask_src.nodata)
-                dst.write(result.astype(profile['dtype']), 1)
-            elif njobs == 1:
-                click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
-
+            if njobs == 0 or njobs == 1:
+                if njobs == 0:
+                    click.echo((msg.STARTING).format(command, msg.INMEMORY))
+                else:
+                    click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
                 with click.progressbar(
                         length=intensity_src.height*intensity_src.width,
                         label='Blocks done:') as bar:

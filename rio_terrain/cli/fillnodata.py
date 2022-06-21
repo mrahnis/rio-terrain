@@ -92,10 +92,19 @@ def fillnodata(ctx, input, output, mask, distance, iterations, njobs, verbose):
             predictor=3,
             bigtiff='YES')
 
-        if (njobs >= 1) and src.is_tiled:
-            blockshape = (list(src.block_shapes))[0]
-            if (blockshape[0] == 1) or (blockshape[1] == 1):
-                warnings.warn((msg.STRIPED).format(blockshape))
+        if njobs == 0:
+            w, s, e, n = src.bounds
+            full_window = rasterio.windows.from_bounds(w, s, e, n, transform=src.transform)
+            read_windows = [full_window]
+            write_windows = [full_window]
+        else: 
+            if src.is_tiled:
+                blockshape = (list(src.block_shapes))[0]
+                if (blockshape[0] == 1) or (blockshape[1] == 1):
+                    warnings.warn((msg.STRIPED).format(blockshape))
+            else:
+                blockshape = [128, 128]
+                warnings.warn((msg.NOTILING).format(src.shape))
             read_windows = rt.tile_grid(
                 src.width,
                 src.height,
@@ -108,18 +117,13 @@ def fillnodata(ctx, input, output, mask, distance, iterations, njobs, verbose):
                 blockshape[0],
                 blockshape[1],
                 overlap=0)
-        else:
-            blockshape = (list(src.block_shapes))[0]
-            warnings.warn((msg.NOTILING).format(blockshape))
 
         with rasterio.open(output, 'w', **profile) as dst:
-            if njobs < 1:
-                click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                intensity = src.read(1)
-                result = do_fillnodata(intensity, mask, distance, iterations, nodata)
-                dst.write(result.astype(profile['dtype']), 1)
-            elif njobs == 1:
-                click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
+            if njobs == 0 or njobs == 1:
+                if njobs == 0:
+                    click.echo((msg.STARTING).format(command, msg.INMEMORY))
+                else:
+                    click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
                 with click.progressbar(length=src.width*src.height, label="Blocks done:") as bar:
                     for read_window, write_window in zip(read_windows, write_windows):
                         intensity = src.read(1, window=read_window)

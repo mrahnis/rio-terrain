@@ -94,13 +94,13 @@ def uncertainty(
         profile = src0.profile
         affine = src0.transform
 
-        if njobs >= 1:
+        if njobs == 0:
+            tiles = rt.tile_grid_intersection(src0, src1)
+        else:            
             block_shape = (src0.block_shapes)[0]
             blockxsize = block_shape[1]
             blockysize = block_shape[0]
             tiles = rt.tile_grid_intersection(src0, src1, blockxsize=blockxsize, blockysize=blockysize)
-        else:
-            tiles = rt.tile_grid_intersection(src0, src1)
 
         windows0, windows1, write_windows, affine, nrows, ncols = tiles
 
@@ -116,20 +116,17 @@ def uncertainty(
         )
 
         with rasterio.open(output, 'w', **profile) as dst:
-            if njobs < 1:
-                click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                img0 = src0.read(1)
-                img1 = src1.read(1)
-                result = propagate(img0, img1, instrumental0, instrumental1)
-                dst.write(result.astype(np.float32), 1)
-            elif njobs == 1:
-                click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
+            if njobs ==0 or njobs == 1:
+                if njobs == 0:
+                    click.echo((msg.STARTING).format(command, msg.INMEMORY))
+                else:
+                    click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
                 with click.progressbar(length=nrows * ncols, label='Blocks done:') as bar:
                     for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
                         img0 = src0.read(1, window=window0)
                         img1 = src1.read(1, window=window1)
                         result = propagate(img0, img1, instrumental0, instrumental1)
-                        dst.write(result.astype(np.float32), 1, window=write_window)
+                        dst.write(result.astype(profile['dtype']), 1, window=write_window)
                         bar.update(result.size)
             else:
                 click.echo((msg.STARTING).format(command, msg.CONCURRENT))
@@ -153,7 +150,7 @@ def uncertainty(
                     for future in concurrent.futures.as_completed(future_to_window):
                         write_window = future_to_window[future]
                         result = future.result()
-                        dst.write(result.astype(np.float32), 1, window=write_window)
+                        dst.write(result.astype(profile['dtype']), 1, window=write_window)
                         bar.update(result.size)
 
     click.echo((msg.WRITEOUT).format(output))

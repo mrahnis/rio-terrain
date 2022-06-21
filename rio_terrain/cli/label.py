@@ -52,7 +52,6 @@ def label(ctx, input, output, diagonals, zeros, njobs, verbose):
         profile = src.profile
         affine = src.transform
 
-        dtype = 'int32'
         nodata = np.iinfo(np.int32).min
         profile.update(
             dtype=rasterio.int32,
@@ -73,13 +72,13 @@ def label(ctx, input, output, diagonals, zeros, njobs, verbose):
             structure = CROSS
 
         with rasterio.open(output, 'w', **profile) as dst:
-            if njobs < 1:
+            if njobs == 0:
                 click.echo((msg.STARTING).format(command, msg.INMEMORY))
                 img = src.read(1)
                 labels, count = scipy.ndimage.label(img, structure=structure)
                 labels[img == nodata] = false_val
                 labels[labels == 0] = false_val
-                dst.write(labels.astype(dtype), 1)
+                dst.write(labels.astype(profile['dtype']), 1)
             elif njobs == 1:
                 click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
 
@@ -115,7 +114,7 @@ def label(ctx, input, output, diagonals, zeros, njobs, verbose):
 
                     print(total)
                     # result = labels
-                    # dst.write(result.astype(dtype), 1, window=write_window)
+                    # dst.write(result.astype(profile['dtype']), 1, window=write_window)
             else:
                 click.echo((msg.STARTING).format(command, msg.CONCURRENT))
                 click.echo('NOT IMPLEMENTED')

@@ -91,46 +91,50 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
         if keep_data:
             dtype = profile['dtype']
             nodata = profile['nodata']
-            profile.update(
-                count=1,
-                compress='lzw',
-                bigtiff='yes'
-            )
+            profile.update(count=1, compress='lzw', bigtiff='yes')
         else:
-            dtype = 'int32'
+            dtype = rasterio.int32
             nodata = np.iinfo(np.int32).min
-            profile.update(
-                dtype=rasterio.int32,
-                nodata=nodata,
-                count=1,
-                compress='lzw',
-                bigtiff='yes'
-            )
+            profile.update(dtype=dtype, nodata=nodata, count=1, compress='lzw', bigtiff='yes')
 
         if zeros:
             false_val = 0
         else:
             false_val = nodata
 
+        if njobs == 0:
+            w, s, e, n = src.bounds
+            full_window = rasterio.windows.from_bounds(w, s, e, n, transform=src.transform)
+            read_windows = [full_window]
+            write_windows = [full_window]
+        else:
+            if src.is_tiled:
+                blockshape = (list(src.block_shapes))[0]
+                if (blockshape[0] == 1) or (blockshape[1] == 1):
+                    warnings.warn((msg.STRIPED).format(blockshape))
+            else:
+                blockshape = [128, 128]
+                warnings.warn((msg.NOTILING).format(src.shape))
+            windows = rt.tile_grid(
+                src.width, src.height, blockshape[0], blockshape[1], overlap=0)
+
         with rasterio.open(output, 'w', **profile) as dst:
-            if njobs < 1:
-                click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                img = src.read(1)
-                result = do_slice(img, minimum, maximum, keep_data, false_val)
-                dst.write(result.astype(dtype), 1)
-            elif njobs == 1:
-                click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
+            if njobs == 0 or njobs == 1:
+                if njobs == 0:
+                    click.echo((msg.STARTING).format(command, msg.INMEMORY))
+                else:
+                    click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
                 with click.progressbar(length=src.width * src.height, label='Blocks done:') as bar:
-                    for (ij, window) in src.block_windows():
+                    for window in windows:
                         img = src.read(1, window=window)
                         result = do_slice(img, minimum, maximum, keep_data, false_val)
-                        dst.write(result.astype(dtype), 1, window=window)
+                        dst.write(result.astype(profile['dtype']), 1, window=window)
                         bar.update(result.size)
             else:
                 click.echo((msg.STARTING).format(command, msg.CONCURRENT))
 
                 def jobs():
-                    for (ij, window) in src.block_windows():
+                    for window in windows:
                         img = src.read(1, window=window)
                         yield img, window
 
@@ -147,7 +151,7 @@ def slice(ctx, input, output, minimum, maximum, keep_data, zeros, njobs, verbose
                     for future in concurrent.futures.as_completed(future_to_window):
                         window = future_to_window[future]
                         result = future.result()
-                        dst.write(result.astype(dtype), 1, window=window)
+                        dst.write(result.astype(profile['dtype']), 1, window=window)
                         bar.update(result.size)
 
     click.echo((msg.WRITEOUT).format(output))

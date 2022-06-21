@@ -80,13 +80,13 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
         profile = src.profile
         affine = src.transform
 
-        if njobs >= 1:
+        if njobs == 0:
+            tiles = rt.tile_grid_intersection(src, cat)
+        else:            
             block_shape = (src.block_shapes)[0]
             blockxsize = block_shape[1]
             blockysize = block_shape[0]
             tiles = rt.tile_grid_intersection(src, cat, blockxsize=blockxsize, blockysize=blockysize)
-        else:
-            tiles = rt.tile_grid_intersection(src, cat)
 
         windows0, windows1, write_windows, affine, nrows, ncols = tiles
 
@@ -100,14 +100,11 @@ def extract(ctx, input, categorical, output, category, njobs, verbose):
         )
 
         with rasterio.open(output, 'w', **profile) as dst:
-            if njobs < 1:
-                click.echo((msg.STARTING).format(command, msg.INMEMORY))
-                img = src.read(1, window=next(windows0))
-                mask = cat.read(1, window=next(windows1))
-                result = do_extract(img, mask, category)
-                dst.write(result.astype(profile['dtype']), 1, window=next(write_windows))
-            elif njobs == 1:
-                click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
+            if njobs == 0 or njobs == 1:
+                if njobs == 0:
+                    click.echo((msg.STARTING).format(command, msg.INMEMORY))
+                else:
+                    click.echo((msg.STARTING).format(command, msg.SEQUENTIAL))
                 with click.progressbar(length=nrows * ncols, label='Blocks done:') as bar:
                     for (window0, window1, write_window) in zip(windows0, windows1, write_windows):
                         img = src.read(1, window=window0)
