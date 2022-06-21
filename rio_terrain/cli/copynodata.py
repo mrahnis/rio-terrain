@@ -83,7 +83,7 @@ def copynodata(ctx, intensity_f, mask_f, output, blocks, njobs, verbose):
         blockshape = (list(intensity_src.block_shapes))[0]
         if njobs == 0:
             w, s, e, n = intensity_src.bounds
-            full_window = rasterio.windows.from_bounds(w, s, e, n, transform=src.transform)
+            full_window = rasterio.windows.from_bounds(w, s, e, n, transform=intensity_src.transform)
             read_windows = [full_window]
             write_windows = [full_window]
         else:
