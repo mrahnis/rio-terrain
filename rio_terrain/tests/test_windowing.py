@@ -48,7 +48,7 @@ def test_expand_window():
 
 def test_margins():
     # check margins within bounds
-    assert (rt.margins(Window(col_off=0, row_off=0, width=158, height=158), ul_in_window) == (5, 5, 5, 5))
+    assert (rt.margins(Window(col_off=5, row_off=5, width=138, height=138), ul_in_window) == (5, 5, 5, 5))
 
     # check margins at upper-left bounds
     assert (rt.margins(Window(col_off=0, row_off=0, width=158, height=158), ul_in_window) == (10, 10, 20, 20))
