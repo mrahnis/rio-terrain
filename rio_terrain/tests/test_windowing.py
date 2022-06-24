@@ -25,11 +25,25 @@ def test_tile_dim():
     assert np.array_equal(list(rt.tile_dim(200, 60, balance=True, merge=True)), [0, 66, 132])
     assert np.array_equal(list(rt.tile_dim(200, 60, balance=True, merge=True, as_chunks=True)), [66, 66, 68])
 
-"""
+
 def test_expand_window():
-    # todo: expand a window by set of margins
+    in_window = Window(col_off=10, row_off=10, width=128, height=128)
 
+    out_window = rt.expand_window(in_window, src_shape=(200, 200), margin=5)
+    assert (out_window == Window(col_off=5, row_off=5, width=138, height=138))
 
+    out_window = rt.expand_window(in_window, src_shape=(200, 200), margin=20)
+    assert (out_window == Window(col_off=0, row_off=0, width=158, height=158))
+
+    in_window = Window(col_off=62, row_off=62, width=128, height=128)
+
+    out_window = rt.expand_window(in_window, src_shape=(200, 200), margin=5)
+    assert (out_window == Window(col_off=57, row_off=57, width=138, height=138))
+
+    out_window = rt.expand_window(in_window, src_shape=(200, 200), margin=20)
+    assert (out_window == Window(col_off=42, row_off=42, width=158, height=158))
+
+"""
 def test_window_bounds():
     # todo: bounds coordinates from a window
 
