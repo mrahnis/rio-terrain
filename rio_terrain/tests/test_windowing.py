@@ -42,7 +42,7 @@ def test_expand_window():
     assert (ul_out_window == Window(col_off=0, row_off=0, width=158, height=158))
 
     # expand window by margin at lower-right bound
-    lr_out_window = rt.expand_window(in_window, src_shape=(200, 200), margin=20)
+    lr_out_window = rt.expand_window(lr_in_window, src_shape=(200, 200), margin=20)
     assert (lr_out_window == Window(col_off=42, row_off=42, width=158, height=158))
 
 
