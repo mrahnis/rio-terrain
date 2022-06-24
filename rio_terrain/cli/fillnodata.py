@@ -78,7 +78,7 @@ def fillnodata(ctx, input, output, mask_f, distance, iterations, njobs, verbose)
     t0 = time.time()
     command = click.get_current_context().info_name
 
-    with rasterio.open(input) as src
+    with rasterio.open(input) as src:
         if mask_f:
             mask_src = rasterio.open(mask_f)
 
