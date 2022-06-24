@@ -10,20 +10,20 @@ import rio_terrain as rt
 
 def test_tile_dim():
     # balance=False, merge=False, as_chunks=False/True
-    assert np.allclose(list(rt.tile_dim(20, 3)), [0, 3, 6, 9, 12, 15, 18])
-    assert np.allclose(list(rt.tile_dim(20, 3, as_chunks=True)), [3, 3, 3, 3, 3, 3, 2])
+    assert np.array_equal(list(rt.tile_dim(20, 3)), [0, 3, 6, 9, 12, 15, 18])
+    assert np.array_equal(list(rt.tile_dim(20, 3, as_chunks=True)), [3, 3, 3, 3, 3, 3, 2])
 
     # balance=False, merge=True, as_chunks=False/True
-    assert np.allclose(list(rt.tile_dim(20, 3, merge=True)), [0, 3, 6, 9, 12, 15])
-    assert np.allclose(list(rt.tile_dim(20, 3, merge=True, as_chunks=True)), [3, 3, 3, 3, 3, 5])
+    assert np.array_equal(list(rt.tile_dim(20, 3, merge=True)), [0, 3, 6, 9, 12, 15])
+    assert np.array_equal(list(rt.tile_dim(20, 3, merge=True, as_chunks=True)), [3, 3, 3, 3, 3, 5])
 
     # balance=True, merge=False, as_chunks=False/True
-    assert np.allclose(list(rt.tile_dim(200, 60, balance=True)), [0, 66, 132, 198])
-    assert np.allclose(list(rt.tile_dim(200, 60, balance=True, as_chunks=True)), [0, 66, 132, 198, 2])
+    assert np.array_equal(list(rt.tile_dim(200, 60, balance=True)), [0, 66, 132, 198])
+    assert np.array_equal(list(rt.tile_dim(200, 60, balance=True, as_chunks=True)), [0, 66, 132, 198, 2])
 
     # balance=True, merge=True, as_chunks=False/True
-    assert np.allclose(list(rt.tile_dim(200, 60, balance=True, merge=True)), [0, 66, 132])
-    assert np.allclose(list(rt.tile_dim(200, 60, balance=True, merge=True, as_chunks=True)), [66, 66, 68])
+    assert np.array_equal(list(rt.tile_dim(200, 60, balance=True, merge=True)), [0, 66, 132])
+    assert np.array_equal(list(rt.tile_dim(200, 60, balance=True, merge=True, as_chunks=True)), [66, 66, 68])
 
 """
 def test_expand_window():
