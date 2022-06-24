@@ -19,7 +19,7 @@ def test_tile_dim():
 
     # balance=True, merge=False, as_chunks=False/True
     assert np.array_equal(list(rt.tile_dim(200, 60, balance=True)), [0, 66, 132, 198])
-    assert np.array_equal(list(rt.tile_dim(200, 60, balance=True, as_chunks=True)), [0, 66, 132, 198, 2])
+    assert np.array_equal(list(rt.tile_dim(200, 60, balance=True, as_chunks=True)), [66, 66, 66, 2])
 
     # balance=True, merge=True, as_chunks=False/True
     assert np.array_equal(list(rt.tile_dim(200, 60, balance=True, merge=True)), [0, 66, 132])
