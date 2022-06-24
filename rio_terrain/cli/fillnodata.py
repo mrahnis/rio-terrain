@@ -52,7 +52,7 @@ def do_fillnodata(
 @click.command('fillnodata', short_help="Fill nodate cells by interpolation.")
 @click.argument('input', nargs=1, type=click.Path(exists=True))
 @click.argument('output', nargs=1, type=click.Path())
-@click.option('--mask', nargs=1, type=click.Path(), help="Mask containing cells to fill")
+@click.option('--mask', 'mask_f', nargs=1, type=click.Path(), help="Mask containing cells to fill")
 @click.option('-d', '--distance', nargs=1, type=float, default=100.0, help="Maximum search distance")
 @click.option('-n', '--iterations', nargs=1, type=int, default=0, help="Number of smoothing iterations")
 @click.option('-j', '--njobs', type=int, default=1,
@@ -60,7 +60,7 @@ def do_fillnodata(
 @click.option('-v', '--verbose', is_flag=True, help="Enables verbose mode.")
 @click.version_option(version=plugin_version, message="rio-terrain v%(version)s")
 @click.pass_context
-def fillnodata(ctx, input, output, mask, distance, iterations, njobs, verbose):
+def fillnodata(ctx, input, output, mask_f, distance, iterations, njobs, verbose):
     """Fill nodata cells by interpolation.
 
     INPUT should be a single-band continuous raster.
@@ -78,7 +78,9 @@ def fillnodata(ctx, input, output, mask, distance, iterations, njobs, verbose):
     t0 = time.time()
     command = click.get_current_context().info_name
 
-    with rasterio.open(input) as src:
+    with rasterio.open(input) as src
+        if mask_f:
+            mask_src = rasterio.open(mask_f)
 
         profile = src.profile
         affine = src.transform
@@ -127,6 +129,7 @@ def fillnodata(ctx, input, output, mask, distance, iterations, njobs, verbose):
                 with click.progressbar(length=src.width*src.height, label="Blocks done:") as bar:
                     for read_window, write_window in zip(read_windows, write_windows):
                         intensity = src.read(1, window=read_window)
+                        mask = mask_src.read(1, window=read_window)
                         full_result = do_fillnodata(intensity, mask, distance, iterations, nodata)
                         result = rt.trim(full_result, rt.margins(read_window, write_window))
                         dst.write(result.astype(profile['dtype']), 1, window=write_window)
@@ -137,7 +140,8 @@ def fillnodata(ctx, input, output, mask, distance, iterations, njobs, verbose):
                 def jobs():
                     for (read_window, write_window) in zip(read_windows, write_windows):
                         intensity = src.read(1, window=read_window)
-                        yield intensity, read_window, write_window
+                        mask = mask_src.read(1, window=read_window)
+                        yield intensity, mask, read_window, write_window
 
                 with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor, \
                         click.progressbar(length=src.width*src.height, label="Blocks done:") as bar:
@@ -146,7 +150,7 @@ def fillnodata(ctx, input, output, mask, distance, iterations, njobs, verbose):
                         executor.submit(
                             do_fillnodata, intensity, mask, distance, iterations, nodata
                         ): (read_window, write_window)
-                        for (intensity, read_window, write_window) in jobs()
+                        for (intensity, mask, read_window, write_window) in jobs()
                     }
 
                     for future in concurrent.futures.as_completed(future_to_window):
@@ -155,6 +159,6 @@ def fillnodata(ctx, input, output, mask, distance, iterations, njobs, verbose):
                         result = rt.trim(full_result, rt.margins(read_window, write_window))
                         dst.write(result.astype(profile['dtype']), 1, window=write_window)
                         bar.update(result.size)
-
+        mask_src.close()
     click.echo((msg.WRITEOUT).format(output))
     click.echo((msg.COMPLETION).format(msg.printtime(t0, time.time())))

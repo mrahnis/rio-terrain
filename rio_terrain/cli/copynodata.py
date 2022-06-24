@@ -93,7 +93,6 @@ def copynodata(ctx, intensity_f, mask_f, output, blocks, njobs, verbose):
             else:
                 blockshape = [128, 128]
                 warnings.warn((msg.NOTILING).format(intensity_src.shape))
-
             windows = rt.tile_grid(
                 intensity_src.width,
                 intensity_src.height,
