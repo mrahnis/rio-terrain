@@ -175,7 +175,7 @@ def bounds_window(
     """Create a full cover rasterio-style window
 
     Parameters:
-        bounds: boundary
+        bounds: boundary coordinates ordered w, s, e, n
         affine: transformation
 
     Returns:

@@ -26,22 +26,36 @@ def test_tile_dim():
     assert np.array_equal(list(rt.tile_dim(200, 60, balance=True, merge=True, as_chunks=True)), [66, 66, 68])
 
 
+# input windows
+ul_in_window = Window(col_off=10, row_off=10, width=128, height=128)
+lr_in_window = Window(col_off=62, row_off=62, width=128, height=128)
+
+
 def test_expand_window():
-    in_window = Window(col_off=10, row_off=10, width=128, height=128)
+    ## test with upper-left window
+    # expand window by margin within bounds
+    ul_out_window = rt.expand_window(ul_in_window, src_shape=(200, 200), margin=5)
+    assert (ul_out_window == Window(col_off=5, row_off=5, width=138, height=138))
 
-    out_window = rt.expand_window(in_window, src_shape=(200, 200), margin=5)
-    assert (out_window == Window(col_off=5, row_off=5, width=138, height=138))
+    # expand window by margin at upper-left bound
+    ul_out_window = rt.expand_window(ul_in_window, src_shape=(200, 200), margin=20)
+    assert (ul_out_window == Window(col_off=0, row_off=0, width=158, height=158))
 
-    out_window = rt.expand_window(in_window, src_shape=(200, 200), margin=20)
-    assert (out_window == Window(col_off=0, row_off=0, width=158, height=158))
+    # expand window by margin at lower-right bound
+    lr_out_window = rt.expand_window(in_window, src_shape=(200, 200), margin=20)
+    assert (lr_out_window == Window(col_off=42, row_off=42, width=158, height=158))
 
-    in_window = Window(col_off=62, row_off=62, width=128, height=128)
 
-    out_window = rt.expand_window(in_window, src_shape=(200, 200), margin=5)
-    assert (out_window == Window(col_off=57, row_off=57, width=138, height=138))
+def test_margins():
+    # check margins within bounds
+    assert (rt.margins(Window(col_off=0, row_off=0, width=158, height=158), ul_in_window) == (5, 5, 5, 5))
 
-    out_window = rt.expand_window(in_window, src_shape=(200, 200), margin=20)
-    assert (out_window == Window(col_off=42, row_off=42, width=158, height=158))
+    # check margins at upper-left bounds
+    assert (rt.margins(Window(col_off=0, row_off=0, width=158, height=158), ul_in_window) == (10, 10, 20, 20))
+
+    # check margins at lower-right bounds
+    assert (rt.margins(Window(col_off=42, row_off=42, width=158, height=158), lr_in_window) == (20, 20, 10, 10))
+
 
 """
 def test_window_bounds():
@@ -50,10 +64,6 @@ def test_window_bounds():
 
 def test_intersect_bounds():
     # todo: find intersection of two sets of bounds
-
-
-def test_margins():
-    # todo: compare two windows and return margins
 
 
 def test_trim():
