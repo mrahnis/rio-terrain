@@ -51,10 +51,10 @@ def test_margins():
     assert (rt.margins(Window(col_off=5, row_off=5, width=138, height=138), ul_in_window) == (5, 5, 5, 5))
 
     # check margins at upper-left bounds
-    assert (rt.margins(Window(col_off=0, row_off=0, width=158, height=158), ul_in_window) == (10, 10, 20, 20))
+    assert (rt.margins(Window(col_off=0, row_off=0, width=158, height=158), ul_in_window) == (10, 20, 20, 10))
 
     # check margins at lower-right bounds
-    assert (rt.margins(Window(col_off=42, row_off=42, width=158, height=158), lr_in_window) == (20, 20, 10, 10))
+    assert (rt.margins(Window(col_off=42, row_off=42, width=158, height=158), lr_in_window) == (20, 10, 10, 20))
 
 
 """
