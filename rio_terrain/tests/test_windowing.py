@@ -65,11 +65,34 @@ def test_window_bounds():
 def test_intersect_bounds():
     # todo: find intersection of two sets of bounds
 
+"""
 
 def test_trim():
-    # todo: trim the margins from a window
+    # trim a 2D array by a set of margins
+    arr =  np.zeros((11, 11), dtype='int32')
+    arr[5,5] = 1
 
+    # test all margins
+    collar = rt.trim(arr, margins=(1, 1, 1, 1))
+    assert (collar[4, 4] == 1 and collar.shape == (9, 9))
 
+    # test left margin
+    left = rt.trim(arr, margins=(2, 0, 0, 0))
+    assert (left[5, 3] == 1 and left.shape == (11, 9))
+
+    # test bottom margin
+    bottom = rt.trim(arr, margins=(0, 2, 0, 0))
+    assert (bottom[5, 5] == 1 and bottom.shape == (9, 11))
+
+    # test right margin
+    right = rt.trim(arr, margins=(0, 0, 2, 0))
+    assert (right[5, 5] == 1 and right.shape == (11, 9))
+
+    # test top margin
+    top = rt.trim(arr, margins=(0, 0, 0, 2))
+    assert (top[3, 5] == 1 and top.shape == (9, 11))
+
+"""
 def test_tile_grid():
     # todo: tile a grid
 

@@ -143,14 +143,14 @@ def expand_window(
 
     Parameters:
         window: Window
-        src_shape: shape
+        src_shape: shape in 
         margin: margin width in cells
 
     Returns:
         Window
 
     """
-    cols, rows = window.toslices()
+    rows, cols = window.toslices()
 
     row_start = rows.start - margin
     row_stop = rows.stop + margin
@@ -159,10 +159,10 @@ def expand_window(
 
     row_start = 0 if (row_start < 0) else row_start
     col_start = 0 if col_start < 0 else col_start
-    row_stop = src_shape[1] if row_stop > src_shape[1] else row_stop
-    col_stop = src_shape[0] if col_stop > src_shape[0] else col_stop
+    row_stop = src_shape[0] if row_stop > src_shape[0] else row_stop
+    col_stop = src_shape[1] if col_stop > src_shape[1] else col_stop
 
-    result = Window.from_slices(slice(col_start, col_stop, 1), slice(row_start, row_stop, 1))
+    result = Window.from_slices(slice(row_start, row_stop, 1), slice(col_start, col_stop, 1))
 
     return result
 
@@ -261,15 +261,15 @@ def margins(
         margins in cells in order w, s, e, n
 
     """
-    cols0, rows0 = window0.toslices()
-    cols1, rows1 = window1.toslices()
+    rows0, cols0 = window0.toslices()
+    rows1, cols1 = window1.toslices()
 
     left = cols1.start - cols0.start
     upper = rows1.start - rows0.start
     right = cols0.stop - cols1.stop
     lower = rows0.stop - rows1.stop
 
-    return (int(left), int(upper), int(right), int(lower))
+    return (int(left), int(lower), int(right), int(upper))
 
 
 def trim(
@@ -286,16 +286,16 @@ def trim(
         trimmed array
 
     """
-    (left, upper, right, lower) = margins
+    (left, lower, right, upper) = margins
 
     if (right == 0) and (lower == 0):
-        result = arr[left:, upper:]
+        result = arr[upper:, left:]
     elif right == 0:
-        result = arr[left:, upper:-lower]
+        result = arr[upper:-lower, left:]
     elif lower == 0:
-        result = arr[left:-right, upper:]
+        result = arr[upper:, left:-right]
     else:
-        result = arr[left:-right, upper:-lower]
+        result = arr[upper:-lower, left:-right]
 
     return result
 
