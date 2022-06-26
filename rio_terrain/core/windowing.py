@@ -242,7 +242,11 @@ def intersect_bounds(
     s = max(bbox0[1], bbox1[1])
     e = min(bbox0[2], bbox1[2])
     n = min(bbox0[3], bbox1[3])
-    bounds = (w, s, e, n)
+
+    if (e >= w) or (s >= n):
+        bounds = None
+    else:
+        bounds = (w, s, e, n)
 
     return bounds
 
@@ -380,9 +384,7 @@ def tile_grid_intersection(
 
     """
     bbox0 = window_bounds(((0, 0), src0.shape), src0.transform, offset='ul')
-
     bbox1 = window_bounds(((0, 0), src1.shape), src1.transform, offset='ul')
-
     bounds = intersect_bounds(bbox0, bbox1)
 
     (row_start0, row_stop0), (col_start0, col_stop0) = bounds_window(

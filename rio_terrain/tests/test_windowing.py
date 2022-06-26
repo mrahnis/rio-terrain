@@ -57,13 +57,18 @@ def test_margins():
     assert (rt.margins(Window(col_off=42, row_off=42, width=158, height=158), lr_in_window) == (20, 10, 10, 20))
 
 
+def test_intersect_bounds():
+
+    # test with intersecting bounds
+    assert (rt.intersect_bounds((0, 0, 100, 100), (80, 50, 180, 150)) == (80, 50, 100, 100))
+    assert (rt.intersect_bounds((80, 50, 180, 150), (0, 0, 100, 100)) == (80, 50, 100, 100))
+
+    # test with non-intersecting bounds
+    assert (rt.intersect_bounds((120, 120, 150, 150), (0, 0, 100, 100)) is None)
+
 """
 def test_window_bounds():
     # todo: bounds coordinates from a window
-
-
-def test_intersect_bounds():
-    # todo: find intersection of two sets of bounds
 
 """
 
