@@ -243,7 +243,9 @@ def intersect_bounds(
     e = min(bbox0[2], bbox1[2])
     n = min(bbox0[3], bbox1[3])
 
-    if (e >= w) or (s >= n):
+    # if each dimension of bounds enclosing both bbox is >= sum of individual bbox dimension
+    if (max(bbox0[2], bbox1[2]) - min(bbox0[0], bbox1[0]) >= (bbox0[2]-bbox0[0] + bbox1[2]-bbox1[0])) \
+            or (max(bbox0[3], bbox1[3]) - min(bbox0[1], bbox1[1]) >= (bbox0[3]-bbox0[1] + bbox1[3]-bbox1[1])):
         bounds = None
     else:
         bounds = (w, s, e, n)

@@ -65,6 +65,8 @@ def test_intersect_bounds():
 
     # test with non-intersecting bounds
     assert (rt.intersect_bounds((120, 120, 150, 150), (0, 0, 100, 100)) is None)
+    assert (rt.intersect_bounds((80, 120, 150, 150), (0, 0, 100, 100)) is None)
+    assert (rt.intersect_bounds((120, 120, 150, 150), (0, 150, 100, 100)) is None)
 
 """
 def test_window_bounds():
