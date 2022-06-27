@@ -16,8 +16,9 @@ Rio-terrain provides a set of rasterio CLI plugins to perform common raster oper
 	:target: http://rio-terrain.readthedocs.io/en/latest/?badge=latest
 	:alt: Documentation Status
 
-.. image:: https://coveralls.io/repos/github/mrahnis/rio-terrain/badge.svg?branch=main
-	:target: https://coveralls.io/github/mrahnis/rio-terrain?branch=main
+.. image:: https://codecov.io/gh/mrahnis/rio-terrain/branch/main/graph/badge.svg?token=OTZ3QXALUF 
+ 	:target: https://codecov.io/gh/mrahnis/rio-terrain
+	:alt: Coverage
 
 Installation
 ============
