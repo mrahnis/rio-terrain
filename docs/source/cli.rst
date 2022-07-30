@@ -6,6 +6,7 @@ The rasterio command line interface plugins allow you to execute commands that
 operate on a raster dataset. Online help lists the avalable subcommands, including those
 added by rio-terrain.
 
+.. highlight:: none
 .. include:: cli/cli.rio.txt
    :literal:
 
@@ -13,7 +14,6 @@ The list below describes the purpose of the individual rio-terrain subcommands. 
 
 aspect
 ------
-
 .. include:: cli/cli.aspect.txt
    :literal:
 
