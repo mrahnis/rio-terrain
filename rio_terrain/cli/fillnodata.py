@@ -33,7 +33,6 @@ def do_fillnodata(
 
     """
     if mask is None:
-        # mask = np.where((np.isnan(intensity)), 0, 1)
         mask = np.where((intensity == nodata), 0, 1)
 
     if 0 < np.count_nonzero(mask) < intensity.size:
@@ -81,6 +80,8 @@ def fillnodata(ctx, input, output, mask_f, distance, iterations, njobs, verbose)
     with rasterio.open(input) as src:
         if mask_f:
             mask_src = rasterio.open(mask_f)
+        else:
+            mask_src = None
 
         profile = src.profile
         affine = src.transform
@@ -129,7 +130,10 @@ def fillnodata(ctx, input, output, mask_f, distance, iterations, njobs, verbose)
                 with click.progressbar(length=src.width*src.height, label="Blocks done:") as bar:
                     for read_window, write_window in zip(read_windows, write_windows):
                         intensity = src.read(1, window=read_window)
-                        mask = mask_src.read(1, window=read_window)
+                        if mask_src:
+                            mask = mask_src.read(1, window=read_window)
+                        else:
+                            mask = None
                         full_result = do_fillnodata(intensity, mask, distance, iterations, nodata)
                         result = rt.trim(full_result, rt.margins(read_window, write_window))
                         dst.write(result.astype(profile['dtype']), 1, window=write_window)
@@ -140,7 +144,10 @@ def fillnodata(ctx, input, output, mask_f, distance, iterations, njobs, verbose)
                 def jobs():
                     for (read_window, write_window) in zip(read_windows, write_windows):
                         intensity = src.read(1, window=read_window)
-                        mask = mask_src.read(1, window=read_window)
+                        if mask_src:
+                            mask = mask_src.read(1, window=read_window)
+                        else:
+                            mask = None
                         yield intensity, mask, read_window, write_window
 
                 with concurrent.futures.ThreadPoolExecutor(max_workers=njobs) as executor, \
@@ -159,6 +166,7 @@ def fillnodata(ctx, input, output, mask_f, distance, iterations, njobs, verbose)
                         result = rt.trim(full_result, rt.margins(read_window, write_window))
                         dst.write(result.astype(profile['dtype']), 1, window=write_window)
                         bar.update(result.size)
-        mask_src.close()
+        if mask_src:
+            mask_src.close()
     click.echo((msg.WRITEOUT).format(output))
     click.echo((msg.COMPLETION).format(msg.printtime(t0, time.time())))
