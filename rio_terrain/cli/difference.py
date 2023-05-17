@@ -35,9 +35,9 @@ def difference(ctx, input_t0, input_t1, output, blocks, njobs, verbose):
 
     """
     if verbose:
-        np.warnings.filterwarnings('default')
+        warnings.filterwarnings('default')
     else:
-        np.warnings.filterwarnings('ignore')
+        warnings.filterwarnings('ignore')
 
     t0 = time.time()
     command = click.get_current_context().info_name

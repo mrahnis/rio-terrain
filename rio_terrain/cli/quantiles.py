@@ -135,9 +135,9 @@ def quantiles(ctx, input, quantile, fraction, absolute, describe, plot, njobs, v
 
     """
     if verbose:
-        np.warnings.filterwarnings('default')
+        warnings.filterwarnings('default')
     else:
-        np.warnings.filterwarnings('ignore')
+        warnings.filterwarnings('ignore')
 
     t0 = time.time()
     command = click.get_current_context().info_name

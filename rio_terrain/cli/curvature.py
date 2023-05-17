@@ -35,9 +35,9 @@ def curvature(ctx, input, output, neighbors, stats, njobs, verbose):
 
     """
     if verbose:
-        np.warnings.filterwarnings('default')
+        warnings.filterwarnings('default')
     else:
-        np.warnings.filterwarnings('ignore')
+        warnings.filterwarnings('ignore')
         # np.seterr(divide='ignore', invalid='ignore')
 
     t0 = time.time()
