@@ -5,4 +5,4 @@ click>=7.0
 rasterio>=1.0
 fiona>=1.8
 shapely>=1.7
-crick>=0.0.3
+crick @ pip install git+https://github.com/dask/crick@main
