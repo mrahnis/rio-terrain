@@ -31,7 +31,7 @@ jobs:
             ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
             hashFiles('conda-recipe/environment.yml') }}    
       - name: Setup miniconda ${{ matrix.python-version }}
-        uses: conda-incubator/setup-miniconda@v2.2.0
+        uses: conda-incubator/setup-miniconda@v3.0.0
         with:
           activate-environment: rio
           python-version: ${{ matrix.python-version }}
