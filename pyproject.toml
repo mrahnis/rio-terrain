@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rio-terrain"
+authors = [
+  {name = "Michael Rahnis", email = "mike@topomatrix.com"},
+]
+description = "Rasterio CLI plugin to perform common operations on single-band elevation rasters"
+dynamic = ["version"]
+readme = "README.rst"
+license = {file = "LICENSE.txt"}
+keywords = ["LiDAR, surveying, elevation, raster, DEM"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: BSD License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3"
+]
+
+requires-python = ">=3.8"
+
+dependencies = [
+	"numpy>=1.10",
+	"scipy>=1.0",
+	"matplotlib>=2.2",
+	"click>=7.0",
+	"rasterio>=1.0",
+	"fiona>=1.8",
+	"shapely>=1.7",
+	"crick @ git+https://github.com/dask/crick@main",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "mypy",
+    "ruff",
+]
+dev = [
+    "numpydoc",
+    "twine",
+]
+
+[project.urls]
+Homepage = "https://topomatrix.com"
+Documentation = "https://readthedocs.org"
+Repository = "https://github.com/mrahnis/rio-terrain/rio-terrain.git"
+Changelog = "https://github.com/mrahnis/rio-terrain/blob/main/CHANGELOG.md"
+
+[project.entry-points."rasterio.rio_commands"]
+aspect = "rio_terrain.cli.aspect:aspect"
+labelbounds = "rio_terrain.cli.labelbounds:labelbounds"
+compare = "rio_terrain.cli.compare:compare"
+copynodata = "rio_terrain.cli.copynodata:copynodata"
+curvature = "rio_terrain.cli.curvature:curvature"
+difference = "rio_terrain.cli.difference:difference"
+extract = "rio_terrain.cli.extract:extract"
+fillnodata = "rio_terrain.cli.fillnodata:fillnodata"
+label = "rio_terrain.cli.label:label"
+mad = "rio_terrain.cli.mad:mad"
+quantiles = "rio_terrain.cli.quantiles:quantiles"
+slice = "rio_terrain.cli.slice:slice"
+slope = "rio_terrain.cli.slope:slope"
+std = "rio_terrain.cli.std:std"
+subdivide = "rio_terrain.cli.subdivide:subdivide"
+threshold = "rio_terrain.cli.threshold:threshold"
+uncertainty = "rio_terrain.cli.uncertainty:uncertainty"
+
+[tool.setuptools.dynamic]
+version = {attr = "rio_terrain._version.__version__"}
+
+[tool.mypy]
+python_version = "3.8"
+files = ["rio_terrain"]
+show_error_codes = true
+pretty = true
+strict = true
+local_partial_types = true
+warn_unreachable = true
+

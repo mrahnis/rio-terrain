@@ -1,5 +1,5 @@
-{% set data = load_setup_py_data() %}
-{% set version = data.get('version')  %}
+{% set pyproject = load_file_data('pyproject.toml') %}
+{% set version = pyproject.get('project').get('version') %}
 
 package:
   name: rio-terrain
@@ -12,7 +12,7 @@ source:
 build:
   noarch: python
   number: 0
-  script: python setup.py install --single-version-externally-managed --record=record.txt
+  script: {{ PYTHON }} -m pip install . -vv
   entry_points:
     - aspect = rio_terrain.cli.aspect:aspect
     - labelbounds = rio_terrain.cli.labelbounds:labelbounds
@@ -73,3 +73,6 @@ about:
   description: Rasterio CLI plugin to perform common operations on single-band elevation rasters
   license: BSD
   license_file: LICENSE.txt
+
+# https://github.com/conda/conda-build/issues/4807
+# whatever_you_do_don't_load_setup_py_dataxxx!!!
