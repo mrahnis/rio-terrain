@@ -51,7 +51,7 @@ jobs:
       run: |
         python -m build
     - name: Upload wheel artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }}-${{ matrix.python-version }}-wheels
         path: dist/*.whl
