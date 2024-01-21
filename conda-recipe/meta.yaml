@@ -36,15 +36,9 @@ requirements:
     - python
     - setuptools
   run:
-    - python
-    - numpy
-    - scipy
-    - matplotlib
-    - click
-    - rasterio
-    - fiona
-    - shapely
-    - crick 
+    {% for dependency in pyproject['project']['dependencies'] %}
+    - {{ dependency.lower() }}
+    {% endfor %}
 
 test:
   imports:
