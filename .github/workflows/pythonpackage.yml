@@ -46,7 +46,7 @@ jobs:
         pip install pytest pytest-cov
         pytest --cov .
     - name: Upload coverage reports
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
     - name: Package source and wheels
       run: |
         python -m build
