@@ -67,6 +67,7 @@ target/
 examples/
 
 VERSION.txt
+
 # pixi environments
 .pixi
 
